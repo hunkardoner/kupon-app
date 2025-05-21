@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\Request;
+use App\Http\Resources\BlogResource;
 
 class BlogController extends Controller
 {
@@ -13,7 +14,7 @@ class BlogController extends Controller
      */
     public function index()
     {
-        //
+        return BlogResource::collection(Blog::where('is_published', true)->latest()->get());
     }
 
     /**
@@ -29,7 +30,7 @@ class BlogController extends Controller
      */
     public function show(Blog $blog)
     {
-        //
+        return new BlogResource($blog);
     }
 
     /**

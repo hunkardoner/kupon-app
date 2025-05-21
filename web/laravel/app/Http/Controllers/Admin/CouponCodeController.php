@@ -50,7 +50,11 @@ class CouponCodeController extends Controller
             'category_ids.*' => 'exists:categories,id',
         ]);
 
-        $couponCode = CouponCode::create($validatedData);
+        $couponCodeData = $validatedData;
+        $couponCodeData['is_active'] = $request->has('is_active');
+
+
+        $couponCode = CouponCode::create($couponCodeData);
 
         if ($request->has('category_ids')) {
             $couponCode->categories()->sync($request->category_ids);
@@ -100,10 +104,11 @@ class CouponCodeController extends Controller
             'category_ids.*' => 'exists:categories,id',
         ]);
         
+        $updateData = $validatedData;
         // 'is_active' checkbox değeri gelmezse false olarak ayarla
-        $validatedData['is_active'] = $request->has('is_active');
+        $updateData['is_active'] = $request->has('is_active');
 
-        $couponCode->update($validatedData);
+        $couponCode->update($updateData);
 
         if ($request->has('category_ids')) {
             $couponCode->categories()->sync($request->category_ids);

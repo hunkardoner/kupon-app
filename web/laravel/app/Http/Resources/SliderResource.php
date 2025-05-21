@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class SliderResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,13 +16,11 @@ class CategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'description' => $this->description,
+            'title' => $this->title,
             'image' => $this->image ? asset('storage/' . $this->image) : null,
-            'parent_id' => $this->parent_id,
-            'parent' => new CategoryResource($this->whenLoaded('parent')),
-            'children' => CategoryResource::collection($this->whenLoaded('children')),
+            'link' => $this->link,
+            'is_active' => (bool) $this->is_active,
+            'order' => $this->order,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

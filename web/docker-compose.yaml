@@ -49,6 +49,20 @@ services:
     networks:
       - kupon_network
 
+  adminer:
+    image: phpmyadmin
+    container_name: kupon-adminer
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: ${DB_USERNAME:-user}
+      PMA_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "8080:80"
+    networks:
+      - kupon_network
+
 networks:
   kupon_network:
     driver: bridge

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\BrandController; // BrandController import edildi
 use App\Http\Controllers\Admin\CouponCodeController; // CouponCodeController import edildi
 use App\Http\Controllers\Admin\BlogController; // BlogController import edildi
 use App\Http\Controllers\Admin\PageController; // PageController import edildi
+use App\Http\Controllers\Frontend\HomeController; // HomeController import edildi
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +22,7 @@ use App\Http\Controllers\Admin\PageController; // PageController import edildi
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
 
 // Breeze's default dashboard route, this can be removed or modified.
 // For now, I'm leaving it as is.

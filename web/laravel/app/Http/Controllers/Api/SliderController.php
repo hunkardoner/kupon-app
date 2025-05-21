@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Slider;
 use Illuminate\Http\Request;
+use App\Http\Resources\SliderResource;
 
 class SliderController extends Controller
 {
@@ -13,7 +14,7 @@ class SliderController extends Controller
      */
     public function index()
     {
-        //
+        return SliderResource::collection(Slider::where('is_active', true)->orderBy('order')->get());
     }
 
     /**
@@ -29,7 +30,7 @@ class SliderController extends Controller
      */
     public function show(Slider $slider)
     {
-        //
+        return new SliderResource($slider);
     }
 
     /**

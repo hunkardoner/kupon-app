@@ -71,16 +71,16 @@
 
             <div class="row">
                 <div class="col-md-6 mb-3">
-                    <label for="valid_from" class="form-label">Valid From</label>
-                    <input type="date" class="form-control @error('valid_from') is-invalid @enderror" id="valid_from" name="valid_from" value="{{ old('valid_from', $couponCode->valid_from ? $couponCode->valid_from->format('Y-m-d') : '') }}">
-                    @error('valid_from')
+                    <label for="start_date" class="form-label">Valid From</label>
+                    <input type="date" class="form-control @error('start_date') is-invalid @enderror" id="start_date" name="start_date" value="{{ old('start_date', $couponCode->start_date ? $couponCode->start_date->format('Y-m-d') : '') }}">
+                    @error('start_date')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="col-md-6 mb-3">
-                    <label for="valid_to" class="form-label">Valid To</label>
-                    <input type="date" class="form-control @error('valid_to') is-invalid @enderror" id="valid_to" name="valid_to" value="{{ old('valid_to', $couponCode->valid_to ? $couponCode->valid_to->format('Y-m-d') : '') }}">
-                    @error('valid_to')
+                    <label for="end_date" class="form-label">Valid To</label>
+                    <input type="date" class="form-control @error('end_date') is-invalid @enderror" id="end_date" name="end_date" value="{{ old('end_date', $couponCode->end_date ? $couponCode->end_date->format('Y-m-d') : '') }}">
+                    @error('end_date')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>

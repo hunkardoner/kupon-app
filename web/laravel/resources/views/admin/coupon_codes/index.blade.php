@@ -39,8 +39,8 @@
                                 {{ $couponCode->discount_value }}
                             @endif
                         </td>
-                        <td>{{ $couponCode->valid_from ? $couponCode->valid_from->format('Y-m-d') : 'N/A' }}</td>
-                        <td>{{ $couponCode->valid_to ? $couponCode->valid_to->format('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ $couponCode->start_date ? $couponCode->start_date->format('Y-m-d') : 'N/A' }}</td>
+                        <td>{{ $couponCode->end_date ? $couponCode->end_date->format('Y-m-d') : 'N/A' }}</td>
                         <td>{{ $couponCode->is_active ? 'Yes' : 'No' }}</td>
                         <td>
                             <a href="{{ route('admin.coupon-codes.show', $couponCode) }}" class="btn btn-info btn-sm">View</a>

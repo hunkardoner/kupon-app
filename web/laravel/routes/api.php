@@ -3,6 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\CouponCodeController;
+use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\PageController;
+use App\Http\Controllers\Api\SliderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +25,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource('categories', CategoryController::class);
+Route::apiResource('brands', BrandController::class);
+Route::apiResource('coupon-codes', CouponCodeController::class);
+Route::apiResource('blogs', BlogController::class);
+Route::apiResource('pages', PageController::class);
+Route::apiResource('sliders', SliderController::class);

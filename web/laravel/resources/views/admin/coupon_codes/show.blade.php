@@ -50,11 +50,11 @@
                 </tr>
                 <tr>
                     <th>Valid From</th>
-                    <td>{{ $couponCode->valid_from ? $couponCode->valid_from->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                    <td>{{ $couponCode->start_date ? $couponCode->start_date->format('Y-m-d H:i:s') : 'N/A' }}</td>
                 </tr>
                 <tr>
                     <th>Valid To</th>
-                    <td>{{ $couponCode->valid_to ? $couponCode->valid_to->format('Y-m-d H:i:s') : 'N/A' }}</td>
+                    <td>{{ $couponCode->end_date ? $couponCode->end_date->format('Y-m-d H:i:s') : 'N/A' }}</td>
                 </tr>
                 <tr>
                     <th>Max Uses (Overall)</th>

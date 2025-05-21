@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\CouponCode;
 use Illuminate\Http\Request;
+use App\Http\Resources\CouponCodeResource;
 
 class CouponCodeController extends Controller
 {
@@ -13,7 +14,7 @@ class CouponCodeController extends Controller
      */
     public function index()
     {
-        //
+        return CouponCodeResource::collection(CouponCode::with(['brand', 'categories'])->where('is_active', true)->get());
     }
 
     /**
@@ -29,7 +30,7 @@ class CouponCodeController extends Controller
      */
     public function show(CouponCode $couponCode)
     {
-        //
+        return new CouponCodeResource($couponCode->load(['brand', 'categories']));
     }
 
     /**

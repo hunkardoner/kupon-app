@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class BrandResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,11 +18,9 @@ class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
+            'logo' => $this->logo ? asset('storage/' . $this->logo) : null,
             'description' => $this->description,
-            'image' => $this->image ? asset('storage/' . $this->image) : null,
-            'parent_id' => $this->parent_id,
-            'parent' => new CategoryResource($this->whenLoaded('parent')),
-            'children' => CategoryResource::collection($this->whenLoaded('children')),
+            'is_active' => (bool) $this->is_active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

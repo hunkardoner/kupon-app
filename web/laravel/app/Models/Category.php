@@ -14,6 +14,7 @@ class Category extends Model
         'slug',
         'parent_id',
         'description',
+        'image', // Added image to fillable
     ];
 
     /**

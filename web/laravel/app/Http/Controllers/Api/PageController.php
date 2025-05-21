@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Page;
 use Illuminate\Http\Request;
+use App\Http\Resources\PageResource;
 
 class PageController extends Controller
 {
@@ -13,7 +14,7 @@ class PageController extends Controller
      */
     public function index()
     {
-        //
+        return PageResource::collection(Page::where('is_published', true)->get());
     }
 
     /**
@@ -29,7 +30,7 @@ class PageController extends Controller
      */
     public function show(Page $page)
     {
-        //
+        return new PageResource($page);
     }
 
     /**

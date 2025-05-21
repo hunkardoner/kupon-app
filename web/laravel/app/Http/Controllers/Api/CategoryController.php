@@ -14,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return CategoryResource::collection(Category::with('parent', 'children')->where('is_active', true)->get());
+        return CategoryResource::collection(Category::with('parent', 'children')->get());
     }
 
     /**
