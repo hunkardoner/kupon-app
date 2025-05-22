@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -9,7 +9,7 @@ import { Category, Slider, Coupon, Brand } from '../types';
 import SectionHeaderComponent from '../components/common/SectionHeaderComponent';
 import CardComponent from '../components/common/CardComponent';
 import SliderComponent from '../components/common/SliderComponent';
-import styles from './HomeScreen.styles';
+import createStyles from './HomeScreen.styles'; // Import createStyles
 import COLORS from '../constants/colors';
 
 // HomeScreen için birleşik navigasyon tipi
@@ -26,6 +26,8 @@ const HomeScreen: React.FC = () => {
   const [popularBrands, setPopularBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { width } = useWindowDimensions(); // Get window dimensions
+  const styles = createStyles(width); // Create styles dynamically
 
   useEffect(() => {
     const loadData = async () => {
