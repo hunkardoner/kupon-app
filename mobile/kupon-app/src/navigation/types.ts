@@ -1,22 +1,27 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
+
 export type HomeStackParamList = {
-  HomeMain: undefined; // HomeScreen için
-  // Home stack'ine özel diğer ekranlar buraya eklenebilir
+  Home: undefined;
+  CouponDetail: { couponId: number };
+  BrandDetail: { brandId: number };
+  // Gerekirse Kategori Detay ekranı için parametreler eklenebilir
+  // CategoryDetail: { categoryId: number }; 
 };
 
 export type CouponStackParamList = {
   CouponList: undefined; // Kupon listeleme ekranı için (CouponListScreen)
-  CouponDetail: { couponId: string }; // Kupon detay ekranı için (CouponScreen)
+  CouponDetail: { couponId: number }; // Kupon detay ekranı için (CouponScreen) - string to number
 };
 
 export type BrandStackParamList = {
   BrandList: undefined; // Marka listeleme ekranı için (BrandListScreen)
-  BrandDetail: { brandId: string }; // Marka detay ekranı için (BrandScreen)
+  BrandDetail: { brandId: number }; // Marka detay ekranı için (BrandScreen) - string to number
 };
 
 export type MainTabParamList = {
-  HomeTab: undefined; // Parametreleri HomeStackParamList\'ten alacak
-  CouponsTab: undefined; // Parametreleri CouponStackParamList\'ten alacak
-  BrandsTab: undefined; // Parametreleri BrandStackParamList\'ten alacak
+  HomeTab: NavigatorScreenParams<HomeStackParamList>;
+  CouponsTab: NavigatorScreenParams<CouponStackParamList>;
+  BrandsTab: NavigatorScreenParams<BrandStackParamList>;
   // Diğer sekmeler buraya eklenebilir
 };
 

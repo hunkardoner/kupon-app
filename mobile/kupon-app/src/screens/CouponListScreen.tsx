@@ -31,8 +31,8 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
       try {
         setIsLoading(true);
         setError(null);
-        const response = await fetchCouponCodes();
-        setCoupons(response.data.data || response.data); 
+        const fetchedCoupons = await fetchCouponCodes(); // fetchCouponCodes doğrudan Coupon[] döndürüyor
+        setCoupons(fetchedCoupons); 
       } catch (err) {
         setError('Kuponlar yüklenirken bir hata oluştu.');
         console.error('Fetch Coupon Codes Error:', err);
@@ -44,14 +44,13 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
     loadCoupons();
   }, []);
 
-  const handleCouponPress = (couponId: string | number) => {
-    navigation.navigate('CouponDetail', { couponId: couponId.toString() });
+  const handleCouponPress = (couponId: number) => { // couponId number olmalı
+    navigation.navigate('CouponDetail', { couponId: couponId }); // toString() kaldırıldı
   };
 
   const renderCouponItem = ({ item }: { item: Coupon }) => (
     <CardComponent
-      title={item.code}
-      subtitle={item.description}
+      item={{ ...item, type: 'coupon' }} // CardComponent'e type ile birlikte item gönder
       onPress={() => handleCouponPress(item.id)}
     />
   );

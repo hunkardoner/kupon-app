@@ -10,7 +10,7 @@ interface SectionHeaderProps {
 
 function SectionHeaderComponent({
   title,
-  onSeeAllPress,
+  onSeeAllPress, // onViewMore -> onSeeAllPress olarak düzeltildi
   seeAllText = 'Tümünü Gör',
 }: SectionHeaderProps): React.JSX.Element {
   return (

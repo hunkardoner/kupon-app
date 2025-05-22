@@ -19,8 +19,8 @@ const HomeStack = createStackNavigator<HomeStackParamList>();
 function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
-      <HomeStack.Screen name="HomeMain" component={HomeScreen} options={{ title: 'Anasayfa' }} />
-      {/* HomeScreen içinden navigasyonla açılacak diğer ekranlar buraya eklenebilir */}
+      <HomeStack.Screen name="Home" component={HomeScreen} options={{ title: 'Anasayfa' }} />
+      {/* CouponDetail and BrandDetail are removed from here as they will be accessed via their respective tabs */}
     </HomeStack.Navigator>
   );
 }

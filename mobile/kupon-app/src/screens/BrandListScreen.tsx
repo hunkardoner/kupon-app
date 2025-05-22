@@ -31,9 +31,8 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
       try {
         setIsLoading(true);
         setError(null);
-        const response = await fetchBrands();
-        // API'den gelen veri formatına göre ayarlama yapın (response.data.data vb.)
-        setBrands(response.data.data || response.data);
+        const fetchedBrands = await fetchBrands(); // fetchBrands artık doğrudan Brand[] döndürüyor
+        setBrands(fetchedBrands);
       } catch (err) {
         setError('Markalar yüklenirken bir hata oluştu.');
         console.error('Fetch Brands Error:', err);
@@ -45,15 +44,13 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
     loadBrands();
   }, []);
 
-  const handleBrandPress = (brandId: string | number) => {
-    navigation.navigate('BrandDetail', { brandId: brandId.toString() });
+  const handleBrandPress = (brandId: number) => { // brandId artık number
+    navigation.navigate('BrandDetail', { brandId: brandId }); // toString() kaldırıldı
   };
 
   const renderBrandItem = ({ item }: { item: Brand }) => (
     <CardComponent
-      title={item.name}
-      // subtitle={item.description} // Marka için alt başlık gerekirse
-      imageUrl={item.logo} // Marka logosu için
+      item={{ ...item, type: 'brand' }} // CardComponent'e type ile birlikte item gönder
       onPress={() => handleBrandPress(item.id)}
     />
   );
