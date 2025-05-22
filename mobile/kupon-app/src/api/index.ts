@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Category, Brand, Coupon, Slider } from '../types'; // Tipleri import et
 
-export const API_BASE_URL = 'http://127.0.0.1:8000/api'; // Laravel API adresiniz // Exported constant
+export const API_BASE_URL = 'http://localhost:8000/api'; // Laravel API adresiniz // Exported constant
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -88,19 +88,31 @@ export const fetchCouponCodeById = async (id: number): Promise<Coupon> => {
 export const fetchSliders = async (): Promise<Slider[]> => {
   try {
     const response = await apiClient.get('/sliders');
-    const sliderData = response.data.data; // This is what other fetches use, e.g. { data: [item1, item2] } or { data: item1 }
-
-    if (sliderData && !Array.isArray(sliderData)) {
-      // If sliderData is a single object, wrap it in an array
-      return [sliderData as Slider];
-    } else if (Array.isArray(sliderData)) {
-      // If it's already an array
-      return sliderData as Slider[];
+    
+    // Case 1: Standard Laravel wrapped collection: { data: [...] }
+    if (response.data && Array.isArray(response.data.data)) {
+      return response.data.data as Slider[];
+    } 
+    // Case 2: Potentially unwrapped collection: [...]
+    // This handles cases where JsonResource::withoutWrapping() might be used globally
+    // or if the /sliders endpoint specifically returns an array directly.
+    else if (response.data && Array.isArray(response.data)) {
+      return response.data as Slider[];
     }
-    return []; // Default to empty array if data is not in expected format or null
+    // Case 3: Original logic for response.data.data being a single object 
+    // (less common for a collection endpoint but kept for safety from original logic)
+    else if (response.data && response.data.data && typeof response.data.data === 'object' && !Array.isArray(response.data.data)) {
+      return [response.data.data as Slider];
+    }
+    
+    // If data is not in any expected array format, log a warning and return an empty array.
+    // This prevents the app from crashing and results in no sliders being shown,
+    // which can then be investigated further (e.g., checking API response or DB).
+    console.warn('Unexpected structure for sliders data or no sliders found:', response.data);
+    return [];
   } catch (error) {
     console.error('Error fetching sliders:', error);
-    throw error;
+    throw error; // Rethrow to be handled by the calling component (HomeScreen)
   }
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, Dimensions, TouchableOpacity, Platform } from 'react-native'; // Import Platform
 import styles from './SliderComponent.styles';
 import { Slider } from '../../types';
 import { API_BASE_URL } from '../../api/index'; // Import API_BASE_URL from api/index.ts
@@ -17,13 +17,20 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
   }
 
   const renderItem = ({ item }: { item: Slider }) => {
-    let imageUrl = item.image;
+    let imageUrl = item.image; // This is 'http://localhost:8000/storage/...'
 
-    // Resim URL'sini işle - remove '/api' from API_BASE_URL for storage paths
-    const imageBaseUrl = API_BASE_URL.replace('/api', '');
-    if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-      imageUrl = `${imageBaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+    // If on Android and the URL is pointing to host's localhost (localhost),
+    // replace localhost with 10.0.2.2 for the Android emulator to reach the host.
+    if (Platform.OS === 'android' && imageUrl && imageUrl.includes('localhost')) {
+      imageUrl = imageUrl.replace('localhost', '10.0.2.2');
     }
+
+    // The existing logic for relative paths (from your original code) will be skipped
+    // if 'imageUrl' is already an absolute URL (which it is after the potential Android IP fix).
+    // const imageBaseUrl = API_BASE_URL.replace('/api', '');
+    // if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+    //   imageUrl = `${imageBaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+    // }
 
     return (
       <TouchableOpacity
@@ -35,7 +42,8 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
         )}
         <View style={styles.textContainer}>
           {item.title && <Text style={styles.title}>{item.title}</Text>}
-          {item.description && <Text style={styles.description}>{item.description}</Text>}
+          {/* item.description is not in SliderResource.php, so commenting out */}
+          {/* {item.description && <Text style={styles.description}>{item.description}</Text>} */}
         </View>
       </TouchableOpacity>
     );
