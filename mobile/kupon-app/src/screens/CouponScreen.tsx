@@ -96,12 +96,6 @@ function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Eleme
             {new Date(coupon.start_date).toLocaleDateString()} - {new Date(coupon.end_date).toLocaleDateString()}
           </Text>
         </View>
-        {coupon.category && (
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Kategori:</Text>
-            <Text style={styles.detailValue}>{coupon.category.name}</Text>
-          </View>
-        )}
         {coupon.categories && coupon.categories.length > 0 && (
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Kategoriler:</Text>

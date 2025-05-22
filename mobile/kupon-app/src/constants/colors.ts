@@ -17,25 +17,28 @@ export interface AppColors {
   secondaryText?: string;
   tertiaryText?: string;
   accent?: string;
+  warning?: string;
+  textPrimary?: string;
+  textTertiary?: string;
 }
 
 const COLORS: AppColors = {
-  primary: '#6366F1', // Laravel projesindeki ana renkle uyumlu
-  secondary: '#8B5CF6', // Laravel projesindeki ikincil renkle uyumlu
-  background: '#F3F4F6', // Açık gri bir arkaplan
-  card: '#FFFFFF',       // Kartların arkaplanı
-  text: '#1F2937',        // Ana metin rengi (Koyu Gri)
-  textSecondary: '#6B7280', // İkincil metin rengi (Orta Gri)
-  border: '#E5E7EB',      // Kenarlıklar için açık gri
-  error: '#EF4444',       // Hata mesajları için kırmızı
-  success: '#10B981',     // Başarı mesajları için yeşil
+  primary: '#6F3FF5',
+  secondary: '#845EF7',
+  accent: '#FF6B00',
+  success: '#22C55E',
+  error: '#EF4444',
+  warning: '#FACC15',
+  background: '#F7F8FC',
+  card: '#FFFFFF',
+  border: '#E2E8F0',
+  text: '#1E293B',
+  textSecondary: '#64748B',
+  textPrimary: '#1E293B',
+  textTertiary: '#94A3B8',
   white: '#FFFFFF',
   black: '#000000',
   gray: '#808080',
-  primaryText: '#1F2937', // Ana metin rengi (Koyu Gri)
-  secondaryText: '#6B7280', // İkincil metin rengi (Orta Gri)
-  tertiaryText: '#9CA3AF', // Üçüncül metin rengi (Açık Gri)
-  accent: '#FBBF24',      // Vurgu rengi (Sarı)
 };
 
 export default COLORS;
