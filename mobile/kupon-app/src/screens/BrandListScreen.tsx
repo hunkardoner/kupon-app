@@ -4,15 +4,16 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import styles from './BrandListScreen.styles';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BrandStackParamList } from '../navigation/types';
-import { Brand } from '../types'; // Brand tipini import et
-import { fetchBrands } from '../api'; // API fonksiyonunu import et
+import { Brand } from '../types';
+import { fetchBrands } from '../api';
 import COLORS from '../constants/colors';
-import CardComponent from '../components/common/CardComponent'; // CardComponent'i import et
+import CardComponent from '../components/common/CardComponent';
 
 // Tip tanımlamaları
 type BrandListScreenNavigationProp = StackNavigationProp<BrandStackParamList, 'BrandList'>;
@@ -31,7 +32,7 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
       try {
         setIsLoading(true);
         setError(null);
-        const fetchedBrands = await fetchBrands(); // fetchBrands artık doğrudan Brand[] döndürüyor
+        const fetchedBrands = await fetchBrands();
         setBrands(fetchedBrands);
       } catch (err) {
         setError('Markalar yüklenirken bir hata oluştu.');
@@ -44,15 +45,17 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
     loadBrands();
   }, []);
 
-  const handleBrandPress = (brandId: number) => { // brandId artık number
-    navigation.navigate('BrandDetail', { brandId: brandId }); // toString() kaldırıldı
+  const handleBrandPress = (brandId: number) => {
+    navigation.navigate('BrandDetail', { brandId: brandId });
   };
 
   const renderBrandItem = ({ item }: { item: Brand }) => (
-    <CardComponent
-      item={{ ...item, type: 'brand' }} // CardComponent'e type ile birlikte item gönder
-      onPress={() => handleBrandPress(item.id)}
-    />
+    <View style={styles.cardContainer}>
+      <CardComponent
+        item={{ ...item, type: 'brand' }}
+        onPress={() => handleBrandPress(item.id)}
+      />
+    </View>
   );
 
   if (isLoading) {
@@ -68,22 +71,20 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
     return (
       <SafeAreaView style={[styles.container, styles.centeredContainer]}>
         <Text style={styles.errorText}>{error}</Text>
-        {/* Yeniden deneme butonu eklenebilir */}
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Text style={styles.title}>Markalar</Text> */}
-      {/* Başlık AppNavigator'da tanımlandığı için burada tekrar göstermeyebiliriz */}
       {brands.length > 0 ? (
         <FlatList
           data={brands}
           renderItem={renderBrandItem}
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.listContentContainer} // Liste için genel padding
-          numColumns={2} // Markaları 2 sütunlu göstermek için (isteğe bağlı)
+          contentContainerStyle={styles.listContentContainer}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
         />
       ) : (
         <View style={styles.centeredContainer}>

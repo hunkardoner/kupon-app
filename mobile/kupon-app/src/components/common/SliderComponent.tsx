@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, Image, FlatList, Dimensions, TouchableOpacity } from 'react-native';
-import styles from './SliderComponent.styles'; // Assuming .styles.ts is in the same directory
-import { Slider } from '../../types'; // Slider tipini import et
-
-// API için temel URL - güncellenebilir
-const API_BASE_URL = 'http://localhost:8000';
+import styles from './SliderComponent.styles';
+import { Slider } from '../../types';
+import { API_BASE_URL } from '../../api/index'; // Import API_BASE_URL from api/index.ts
 
 interface SliderComponentProps {
   sliders: Slider[];
@@ -19,11 +17,12 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
   }
 
   const renderItem = ({ item }: { item: Slider }) => {
-    let imageUrl = item.image; // Changed from item.image_url to item.image
+    let imageUrl = item.image;
 
-    // Resim URL'sini işle
+    // Resim URL'sini işle - remove '/api' from API_BASE_URL for storage paths
+    const imageBaseUrl = API_BASE_URL.replace('/api', '');
     if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-      imageUrl = `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+      imageUrl = `${imageBaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
     }
 
     return (

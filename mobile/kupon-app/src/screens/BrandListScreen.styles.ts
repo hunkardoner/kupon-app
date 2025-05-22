@@ -39,6 +39,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8, // Liste içeriği için dikey boşluk
     paddingHorizontal: 8, // Kartlar arasında ve kenarlarda boşluk için
   },
+  // New styles for grid layout
+  columnWrapper: {
+    justifyContent: 'space-between',
+    padding: 8,
+  },
+  cardContainer: {
+    // Individual card wrapper if needed for additional styling
+  },
 });
 
 export default styles;
