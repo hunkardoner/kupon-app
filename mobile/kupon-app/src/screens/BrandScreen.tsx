@@ -102,20 +102,25 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
     <SafeAreaView style={styles.container}>
       <FlatList
         ListHeaderComponent={
-          <View style={styles.headerContainer}>
-            {brandLogoUrl && (
-              <Image source={{ uri: brandLogoUrl }} style={styles.brandLogo} resizeMode="contain" />
+          <>
+            <View style={styles.headerContainer}>
+              {brandLogoUrl && (
+                <Image source={{ uri: brandLogoUrl }} style={styles.brandLogo} resizeMode="contain" />
+              )}
+              <Text style={styles.brandName}>{brand.name}</Text>
+              {brand.description && <Text style={styles.brandDescription}>{brand.description}</Text>}
+              {brand.website_url && (
+                <TouchableOpacity onPress={() => handleWebsitePress(brand.website_url!)}>
+                  <Text style={styles.websiteLink}>Website Git</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+            {coupons.length > 0 && (
+              <Text style={styles.couponsHeader}>Bu Markaya Ait Kuponlar</Text>
             )}
-            <Text style={styles.brandName}>{brand.name}</Text>
-            {brand.description && <Text style={styles.brandDescription}>{brand.description}</Text>}
-            {brand.website_url && (
-              <TouchableOpacity onPress={() => handleWebsitePress(brand.website_url!)}>
-                <Text style={styles.websiteLink}>Website Git</Text>
-              </TouchableOpacity>
-            )}
-            {coupons.length > 0 && <Text style={styles.couponsHeader}>Bu Markaya Ait Kuponlar</Text>}
-          </View>
+          </>
         }
+        ListHeaderComponentStyle={styles.listHeaderStyle}
         data={coupons}
         renderItem={({ item }) => (
           <View style={styles.cardWrapper}>
@@ -126,7 +131,8 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
           </View>
         )}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={1}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.listContentContainer}
         ListEmptyComponent={
           !loading && coupons.length === 0 ? (
@@ -154,11 +160,14 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: 'center',
     paddingVertical: 20,
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     backgroundColor: colors.card, // White background for the header section
-    marginBottom: 8, // Space before the list of coupons
+  },
+  listHeaderStyle: {
+    marginBottom: 0, // Remove margin to avoid extra space
+    zIndex: 1,
   },
   brandLogo: {
     width: 120,
@@ -183,29 +192,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.secondary, 
     fontWeight: '600',
-    marginBottom: 20, // Increased space after the link
+    marginBottom: 10, // Slightly reduced space after the link
     textDecorationLine: 'underline',
   },
   couponsHeader: {
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.text,
-    alignSelf: 'stretch', // Make header take full width
-    textAlign: 'left',
-    paddingHorizontal: 15, // Consistent padding
-    marginTop: 10, // Space before the header text
-    marginBottom: 10, // Space after the header text
+    paddingHorizontal: 16, // Consistent padding with other screens
+    paddingVertical: 12, // Vertical padding for better touch area
+    backgroundColor: colors.background, // Background color
+    marginBottom: 8, // Add space before the grid
   },
   listContentContainer: {
     paddingBottom: 10, // Padding at the bottom of the list
+    paddingHorizontal: 16, // Consistent with other screens
   },
   cardWrapper: {
-    paddingHorizontal: 15, // Add horizontal padding to each card wrapper
     marginBottom: 10, // Add some space between cards
+  },
+  columnWrapper: {
+    justifyContent: 'space-between', // Space cards evenly in the row
+    marginHorizontal: 0, // Reset any horizontal margins
   },
   emptyCouponsContainer: {
     padding: 20,
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   noCouponsText: {
     textAlign: 'center',
