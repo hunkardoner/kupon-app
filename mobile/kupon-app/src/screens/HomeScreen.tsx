@@ -97,12 +97,14 @@ const HomeScreen: React.FC = () => {
               <CardComponent
                 item={{ ...item, type: 'category' }}
                 onPress={() => handleCategoryPress(item)}
+                horizontal={true}
               />
             )}
             keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
+            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
           />
         </View>
       )}
@@ -119,12 +121,14 @@ const HomeScreen: React.FC = () => {
               <CardComponent
                 item={{ ...item, type: 'coupon' }}
                 onPress={() => handleCouponPress(item)}
+                horizontal={true}
               />
             )}
             keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
+            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
           />
         </View>
       )}
@@ -141,12 +145,14 @@ const HomeScreen: React.FC = () => {
               <CardComponent
                 item={{ ...item, type: 'brand' }}
                 onPress={() => handleBrandPress(item)}
+                horizontal={true}
               />
             )}
             keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
+            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
           />
         </View>
       )}

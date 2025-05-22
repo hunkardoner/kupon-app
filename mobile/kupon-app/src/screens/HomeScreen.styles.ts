@@ -9,10 +9,12 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginBottom: 20, // Alt boşluk artırıldı
     paddingHorizontal: 16, // Increased and equalized horizontal padding
+    paddingTop: 8, // Add top padding for better spacing between sections
   },
   horizontalList: {
-    paddingLeft: 8, // İlk eleman için sol padding
-    paddingRight: 8, // Son eleman için sağ padding
+    paddingLeft: 16, // Start with full padding
+    paddingRight: 16, // End with full padding
+    gap: 16, // Add spacing between items
   },
   centered: {
     flex: 1,

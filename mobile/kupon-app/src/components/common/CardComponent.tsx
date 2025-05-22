@@ -16,13 +16,15 @@ export type CardItem =
 interface CardComponentProps {
   item: CardItem; 
   onPress?: (item: CardItem) => void;
-  style?: object; 
+  style?: object;
+  horizontal?: boolean; // Add prop to indicate if card is in a horizontal list
 }
 
 const CardComponent: React.FC<CardComponentProps> = ({
   item,
   onPress,
   style,
+  horizontal = false, // Default to false for grid layout
 }) => {
   let title = '';
   let subtitle: string | undefined | null = undefined;
@@ -55,8 +57,19 @@ const CardComponent: React.FC<CardComponentProps> = ({
   }
 
   return (
-    <TouchableOpacity onPress={() => onPress && onPress(item)} style={[styles.touchable, style]} disabled={!onPress}>
-      <View style={styles.container}>
+    <TouchableOpacity 
+      onPress={() => onPress && onPress(item)} 
+      style={[
+        styles.touchable, 
+        horizontal ? styles.horizontalTouchable : null,
+        style
+      ]} 
+      disabled={!onPress}
+    >
+      <View style={[
+        styles.container, 
+        horizontal ? styles.horizontalContainer : null
+      ]}>
         {imageSource ? (
           <Image source={imageSource} style={styles.image} resizeMode="contain" />
         ) : (

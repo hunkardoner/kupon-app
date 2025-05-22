@@ -6,6 +6,9 @@ const screenWidth = Dimensions.get('window').width;
 // Adjusted calculation: Screen width - (outside padding left + outside padding right + space between cards)
 const cardWidth = (screenWidth - (16 + 16 + 16)) / 2; // 16 padding on left/right edges + 16 between cards
 
+// For horizontal lists we use a fixed width that's slightly narrower to give visual separation
+const horizontalCardWidth = screenWidth * 0.38; // Approximately 38% of screen width
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.card,
@@ -18,12 +21,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    width: cardWidth,
+    width: cardWidth, // Default width for grid view
     height: 200, // Fixed height for consistency
+  },
+  horizontalContainer: {
+    width: horizontalCardWidth, // Use the narrower width for horizontal lists
+    marginHorizontal: 0, // Remove any horizontal margin
+    height: 190, // Slightly smaller height for horizontal lists
   },
   touchable: {
     borderRadius: 8,
     width: cardWidth, // Ensure touchable has same width as container
+  },
+  horizontalTouchable: {
+    width: horizontalCardWidth,
   },
   image: {
     width: '100%',
