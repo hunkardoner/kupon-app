@@ -37,7 +37,14 @@ const styles = StyleSheet.create({
   },
   listContentContainer: {
     paddingVertical: 8, // Liste içeriği için dikey boşluk
-    paddingHorizontal: 8, // Kartlar arasında ve kenarlarda boşluk için
+    paddingHorizontal: 16, // Increased horizontal padding for equal margins
+  },
+  // New styles for grid layout
+  columnWrapper: {
+    justifyContent: 'space-between', // Even spacing between items
+  },
+  cardContainer: {
+    // Individual card wrapper if needed for additional styling
   },
 });
 

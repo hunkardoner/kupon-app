@@ -49,10 +49,12 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
   };
 
   const renderCouponItem = ({ item }: { item: Coupon }) => (
-    <CardComponent
-      item={{ ...item, type: 'coupon' }} // CardComponent'e type ile birlikte item gönder
-      onPress={() => handleCouponPress(item.id)}
-    />
+    <View style={styles.cardContainer}>
+      <CardComponent
+        item={{ ...item, type: 'coupon' }} // CardComponent'e type ile birlikte item gönder
+        onPress={() => handleCouponPress(item.id)}
+      />
+    </View>
   );
 
   if (isLoading) {
@@ -80,6 +82,8 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
           renderItem={renderCouponItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}
+          numColumns={2} // Changed to display 2 columns
+          columnWrapperStyle={styles.columnWrapper} // Added column wrapper style
         />
       ) : (
         <View style={styles.centeredContainer}>

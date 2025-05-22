@@ -3,7 +3,8 @@ import COLORS from '../../constants/colors';
 
 // Calculate card width based on screen width (2 cards per row with margin)
 const screenWidth = Dimensions.get('window').width;
-const cardWidth = (screenWidth - 48) / 2; // 48 = 16*3 (left margin + middle margin + right margin)
+// Adjusted calculation: Screen width - (outside padding left + outside padding right + space between cards)
+const cardWidth = (screenWidth - (16 + 16 + 16)) / 2; // 16 padding on left/right edges + 16 between cards
 
 const styles = StyleSheet.create({
   container: {
@@ -11,7 +12,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginVertical: 8,
-    marginHorizontal: 8, // Reduced horizontal margin for grid layout
+    marginHorizontal: 0, // Remove horizontal margin from card itself as container handles this
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -22,6 +23,7 @@ const styles = StyleSheet.create({
   },
   touchable: {
     borderRadius: 8,
+    width: cardWidth, // Ensure touchable has same width as container
   },
   image: {
     width: '100%',

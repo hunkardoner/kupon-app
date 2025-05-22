@@ -7,18 +7,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   title: {
-    fontSize: 22, // AppNavigator ile tutarlı olması için isteğe bağlı
+    fontSize: 22,
     fontWeight: 'bold',
     color: COLORS.text,
     paddingHorizontal: 16,
-    paddingTop: 10, // Eğer header yoksa veya ek başlık isteniyorsa
+    paddingTop: 10,
     paddingBottom: 10,
   },
   centeredContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20, // İçerik için padding
+    padding: 20,
   },
   loadingText: {
     marginTop: 10,
@@ -36,13 +36,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   listContentContainer: {
-    paddingVertical: 8, // Liste içeriği için dikey boşluk
-    paddingHorizontal: 8, // Kartlar arasında ve kenarlarda boşluk için
+    paddingVertical: 8,
+    paddingHorizontal: 16, // Increased horizontal padding for equal margins
   },
   // New styles for grid layout
   columnWrapper: {
     justifyContent: 'space-between',
-    padding: 8,
+    marginHorizontal: 0, // Reset any horizontal margins
   },
   cardContainer: {
     // Individual card wrapper if needed for additional styling

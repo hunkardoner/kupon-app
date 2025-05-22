@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginBottom: 20, // Alt boşluk artırıldı
-    paddingHorizontal: 8, // Bölüm için yatay padding
+    paddingHorizontal: 16, // Increased and equalized horizontal padding
   },
   horizontalList: {
     paddingLeft: 8, // İlk eleman için sol padding
