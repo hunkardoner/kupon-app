@@ -92,10 +92,10 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
     );
   }
 
-  const brandLogoUrl = brand.logo_url
-    ? brand.logo_url.startsWith('http') || brand.logo_url.startsWith('https')
-      ? brand.logo_url
-      : `${API_BASE_URL.replace('/api', '')}${brand.logo_url}`
+  const brandLogoUrl = brand.logo // Changed from brand.image to brand.logo
+    ? brand.logo.startsWith('http') || brand.logo.startsWith('https')
+      ? brand.logo
+      : `${API_BASE_URL.replace('/api', '')}${brand.logo}`
     : null;
 
   return (

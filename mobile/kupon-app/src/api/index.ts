@@ -88,7 +88,16 @@ export const fetchCouponCodeById = async (id: number): Promise<Coupon> => {
 export const fetchSliders = async (): Promise<Slider[]> => {
   try {
     const response = await apiClient.get('/sliders');
-    return response.data.data; // Veriyi .data.data'dan al
+    const sliderData = response.data.data; // This is what other fetches use, e.g. { data: [item1, item2] } or { data: item1 }
+
+    if (sliderData && !Array.isArray(sliderData)) {
+      // If sliderData is a single object, wrap it in an array
+      return [sliderData as Slider];
+    } else if (Array.isArray(sliderData)) {
+      // If it's already an array
+      return sliderData as Slider[];
+    }
+    return []; // Default to empty array if data is not in expected format or null
   } catch (error) {
     console.error('Error fetching sliders:', error);
     throw error;

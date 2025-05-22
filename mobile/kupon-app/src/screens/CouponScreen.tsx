@@ -66,10 +66,10 @@ function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Eleme
     );
   }
 
-  const brandLogoUrl = coupon.brand?.logo_url
-    ? coupon.brand.logo_url.startsWith('http')
-      ? coupon.brand.logo_url
-      : `${API_BASE_URL.replace('/api', '')}${coupon.brand.logo_url}` // Now correctly uses the string constant
+  const brandLogoUrl = coupon.brand?.logo // Changed from coupon.brand?.image to coupon.brand?.logo
+    ? coupon.brand.logo.startsWith('http')
+      ? coupon.brand.logo
+      : `${API_BASE_URL.replace('/api', '')}${coupon.brand.logo}`
     : null;
 
   return (

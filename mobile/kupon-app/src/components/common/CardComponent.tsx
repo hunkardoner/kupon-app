@@ -31,23 +31,25 @@ const CardComponent: React.FC<CardComponentProps> = ({
   if (item.type === 'category') {
     title = item.name;
     subtitle = item.description;
-    imageUrl = item.image_url;
+    imageUrl = item.image; // Changed from item.image_url to item.image
   } else if (item.type === 'brand') {
     title = item.name;
     subtitle = item.description;
-    imageUrl = item.logo_url;
+    imageUrl = item.logo; // Changed from item.image to item.logo
   } else if (item.type === 'coupon') {
     title = item.code;
     subtitle = item.description;
-    imageUrl = item.brand?.logo_url; // Kuponun markasının logosu
+    imageUrl = item.brand?.logo; // Changed from item.brand?.image to item.brand?.logo
   }
 
   // Resim URL'sini işle - null olmadığını ve tam URL olduğunu kontrol et
   let imageSource;
   if (imageUrl) {
     // Eğer URL http:// veya https:// ile başlamıyorsa, API_BASE_URL ile birleştir
+    // Also remove /api from API_BASE_URL for image paths if they are served from /storage directly
+    const imageApiBaseUrl = API_BASE_URL.replace('/api', '');
     if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-      imageUrl = `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+      imageUrl = `${imageApiBaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
     }
     imageSource = { uri: imageUrl };
   }

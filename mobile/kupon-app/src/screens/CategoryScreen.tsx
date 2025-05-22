@@ -55,9 +55,9 @@ const CategoryScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
-        {category.image_url && (
+        {category.image && (
           <Image 
-            source={{ uri: category.image_url }} 
+            source={{ uri: category.image }} 
             style={styles.categoryImage}
             resizeMode="cover"
           />

@@ -19,7 +19,7 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
   }
 
   const renderItem = ({ item }: { item: Slider }) => {
-    let imageUrl = item.image_url;
+    let imageUrl = item.image; // Changed from item.image_url to item.image
 
     // Resim URL'sini işle
     if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {

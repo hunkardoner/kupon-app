@@ -5,7 +5,7 @@ export interface Category {
   name: string;
   slug: string;
   description?: string | null; 
-  image_url?: string | null;
+  image?: string | null; // Changed from image_url to image
   is_active: boolean;
   parent_id?: number | null;
   created_at: string;
@@ -17,7 +17,7 @@ export interface Brand {
   name: string;
   slug: string;
   description?: string | null;
-  logo_url?: string | null;
+  logo?: string | null; // Changed from image to logo
   website_url?: string | null;
   is_active: boolean;
   created_at: string;
@@ -48,7 +48,7 @@ export interface Slider {
   id: number;
   title: string;
   description?: string | null;
-  image_url: string;
+  image: string; // Changed from image_url to image
   link_url?: string | null;
   related_coupon_id?: number | null; // Eklendi
   related_brand_id?: number | null;  // Eklendi
