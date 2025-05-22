@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { Brand } from '../types';
 import { fetchBrands } from '../api';
 import COLORS from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
+import { useQuery } from '@tanstack/react-query'; // Import useQuery
 
 // Tip tanımlamaları
 type BrandListScreenNavigationProp = StackNavigationProp<BrandStackParamList, 'BrandList'>;
@@ -23,29 +24,13 @@ interface BrandListScreenProps {
 }
 
 function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Element {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const { width } = useWindowDimensions(); // Get window dimensions
   const { styles, numColumns } = createStyles(width); // Get styles and numColumns
 
-  useEffect(() => {
-    async function loadBrands() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const fetchedBrands = await fetchBrands();
-        setBrands(fetchedBrands);
-      } catch (err) {
-        setError('Markalar yüklenirken bir hata oluştu.');
-        console.error('Fetch Brands Error:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadBrands();
-  }, []);
+  const { data: brands, isLoading, error } = useQuery<Brand[], Error>({
+    queryKey: ['brands'],
+    queryFn: () => fetchBrands(), // Call fetchBrands without arguments
+  });
 
   const handleBrandPress = (brandId: number) => {
     navigation.navigate('BrandDetail', { brandId: brandId });
@@ -72,16 +57,16 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
   if (error) {
     return (
       <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>Markalar yüklenirken bir hata oluştu: {error.message}</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      {brands.length > 0 ? (
+      {brands && brands.length > 0 ? (
         <FlatList
-          data={brands}
+          data={brands} // This should now be correctly typed as Brand[]
           renderItem={renderBrandItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}

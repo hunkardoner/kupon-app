@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, FlatList, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
 import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -11,6 +11,7 @@ import CardComponent from '../components/common/CardComponent';
 import SliderComponent from '../components/common/SliderComponent';
 import createStyles from './HomeScreen.styles'; // Import createStyles
 import COLORS from '../constants/colors';
+import { useQuery } from '@tanstack/react-query';
 
 // HomeScreen için birleşik navigasyon tipi
 type HomeScreenNavigationProp = CompositeNavigationProp<
@@ -20,45 +21,38 @@ type HomeScreenNavigationProp = CompositeNavigationProp<
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [sliders, setSliders] = useState<Slider[]>([]);
-  const [popularCoupons, setPopularCoupons] = useState<Coupon[]>([]);
-  const [popularBrands, setPopularBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { width } = useWindowDimensions(); // Get window dimensions
   const styles = createStyles(width); // Create styles dynamically
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const categoriesData = await fetchCategories();
-        const slidersData = await fetchSliders();
-        const couponsData = await fetchCouponCodes({ limit: 5, popular: true });
-        const brandsData = await fetchBrands({ limit: 5, popular: true });
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useQuery<Category[], Error>({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
 
-        setCategories(categoriesData);
-        setSliders(slidersData);
-        setPopularCoupons(couponsData);
-        setPopularBrands(brandsData);
-        setError(null);
-      } catch (err) {
-        setError('Veri yüklenirken bir hata oluştu.');
-        console.error('Error loading home screen data:', err);
-      }
-      setLoading(false);
-    };
+  const { data: sliders, isLoading: slidersLoading, error: slidersError } = useQuery<Slider[], Error>({
+    queryKey: ['sliders'],
+    queryFn: fetchSliders,
+  });
 
-    loadData();
-  }, []);
+  const { data: popularCoupons, isLoading: couponsLoading, error: couponsError } = useQuery<Coupon[], Error>({
+    queryKey: ['popularCoupons'],
+    queryFn: () => fetchCouponCodes({ limit: 5, popular: true }),
+  });
 
-  if (loading) {
+  const { data: popularBrands, isLoading: brandsLoading, error: brandsError } = useQuery<Brand[], Error>({
+    queryKey: ['popularBrands'],
+    queryFn: () => fetchBrands({ limit: 5, popular: true }),
+  });
+
+  const isLoading = categoriesLoading || slidersLoading || couponsLoading || brandsLoading;
+  const error = categoriesError || slidersError || couponsError || brandsError;
+
+  if (isLoading) {
     return <ActivityIndicator size="large" color={COLORS.primary} style={styles.centered} />;
   }
 
   if (error) {
-    return <View style={styles.centered}><Text style={styles.errorText}>{error}</Text></View>;
+    return <View style={styles.centered}><Text style={styles.errorText}>Veri yüklenirken bir hata oluştu: {error.message}</Text></View>;
   }
 
   const handleCategoryPress = (item: Category) => {
@@ -86,11 +80,11 @@ const HomeScreen: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {sliders.length > 0 && (
+      {sliders && sliders.length > 0 && (
         <SliderComponent sliders={sliders} onPressSlider={handleSliderPress} />
       )}
 
-      {categories.length > 0 && (
+      {categories && categories.length > 0 && (
         <View style={styles.sectionContainer}>
           <SectionHeaderComponent title="Kategoriler" />
           <FlatList
@@ -111,7 +105,7 @@ const HomeScreen: React.FC = () => {
         </View>
       )}
 
-      {popularCoupons.length > 0 && (
+      {popularCoupons && popularCoupons.length > 0 && (
         <View style={styles.sectionContainer}>
           <SectionHeaderComponent 
             title="Popüler Kuponlar" 
@@ -135,7 +129,7 @@ const HomeScreen: React.FC = () => {
         </View>
       )}
 
-      {popularBrands.length > 0 && (
+      {popularBrands && popularBrands.length > 0 && (
         <View style={styles.sectionContainer}>
           <SectionHeaderComponent 
             title="Popüler Markalar" 

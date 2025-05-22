@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Image, FlatList, TouchableOpacity, Linking } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, ActivityIndicator, Image, FlatList, TouchableOpacity, Linking, useWindowDimensions, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -11,6 +11,7 @@ import colors from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
 import { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useQuery } from '@tanstack/react-query';
 
 type BrandScreenRouteProp = RouteProp<BrandStackParamList, 'BrandDetail'>;
 
@@ -25,37 +26,124 @@ interface BrandScreenProps {
   navigation: BrandScreenNavigationProp;
 }
 
+// Define createStyles function
+const createStyles = (width: number) => {
+  const numColumns = width < 600 ? 2 : 3; // Example: 2 columns for smaller screens, 3 for wider
+  const logoSize = width * 0.3; // Example: logo width as 30% of screen width
+  const logoHeight = logoSize * 0.5; // Example: maintain a 2:1 aspect ratio for the logo
+
+  const styles = {
+    centered: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background,
+    } as ViewStyle,
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    } as ViewStyle,
+    headerContainer: {
+      alignItems: 'center',
+      paddingVertical: 20,
+      paddingHorizontal: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      backgroundColor: colors.card,
+    } as ViewStyle,
+    listHeaderStyle: {
+      marginBottom: 0,
+      zIndex: 1,
+    } as ViewStyle,
+    brandLogo: {
+      width: logoSize, // Dynamic width
+      height: logoHeight, // Dynamic height
+      marginBottom: 15,
+    } as ImageStyle,
+    brandName: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: colors.primary,
+      marginBottom: 8,
+      textAlign: 'center',
+    } as TextStyle,
+    brandDescription: {
+      fontSize: 15,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 12,
+      paddingHorizontal: 10,
+    } as TextStyle,
+    websiteLink: {
+      fontSize: 16,
+      color: colors.secondary,
+      fontWeight: '600',
+      marginBottom: 10,
+      textDecorationLine: 'underline',
+    } as TextStyle,
+    couponsHeader: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: colors.text,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      backgroundColor: colors.background,
+      marginBottom: 8,
+    } as TextStyle,
+    listContentContainer: {
+      paddingBottom: 10,
+      paddingHorizontal: 16,
+    } as ViewStyle,
+    cardWrapper: {
+      marginBottom: 10,
+    } as ViewStyle,
+    columnWrapper: {
+      justifyContent: 'space-between',
+      marginHorizontal: 0,
+    } as ViewStyle,
+    emptyCouponsContainer: {
+      padding: 20,
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+    } as ViewStyle,
+    noCouponsText: {
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 16,
+      color: colors.textSecondary,
+    } as TextStyle,
+    errorText: {
+      fontSize: 16,
+      color: colors.error,
+      textAlign: 'center',
+      padding: 20,
+    } as TextStyle,
+  };
+  return { styles, numColumns };
+};
+
 function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element {
   const { brandId } = route.params;
-  const [brand, setBrand] = useState<Brand | null>(null);
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { width: windowWidth } = useWindowDimensions(); // Get window width
+  const { styles, numColumns } = createStyles(windowWidth); // Get styles and numColumns
+
+  const { data: brand, isLoading: brandLoading, error: brandError } = useQuery<Brand, Error>({
+    queryKey: ['brand', brandId],
+    queryFn: () => fetchBrandById(brandId),
+  });
+
+  const { data: coupons, isLoading: couponsLoading, error: couponsError } = useQuery<Coupon[], Error>({
+    queryKey: ['coupons', 'brand', brandId],
+    queryFn: () => fetchCouponCodes({ brand_id: brandId }), // Pass brandId directly
+    enabled: !!brand, // Only run this query if brand data is available
+  });
 
   useEffect(() => {
-    const loadBrandDetails = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const fetchedBrand = await fetchBrandById(brandId);
-        setBrand(fetchedBrand);
-        navigation.setOptions({ title: fetchedBrand.name || 'Marka Detayı' });
-
-        if (fetchedBrand) {
-          // Assuming API supports filtering coupons by brand_id in query params
-          const fetchedCoupons = await fetchCouponCodes({ brand_id: fetchedBrand.id } as any);
-          setCoupons(fetchedCoupons);
-        }
-      } catch (e) {
-        console.error('Failed to fetch brand details', e);
-        setError('Marka detayları yüklenirken bir hata oluştu.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadBrandDetails();
-  }, [brandId, navigation]);
+    if (brand) {
+      navigation.setOptions({ title: brand.name || 'Marka Detayı' });
+    }
+  }, [brand, navigation]);
 
   const handleCouponPress = (couponId: number) => {
     navigation.navigate('CouponsTab', {
@@ -68,7 +156,10 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
   };
 
-  if (loading) {
+  const isLoading = brandLoading || couponsLoading;
+  const error = brandError || couponsError;
+
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -79,7 +170,7 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
   if (error) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>{error.message || 'Veri yüklenirken bir hata oluştu.'}</Text>
       </SafeAreaView>
     );
   }
@@ -115,13 +206,13 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
                 </TouchableOpacity>
               )}
             </View>
-            {coupons.length > 0 && (
+            {coupons && coupons.length > 0 && (
               <Text style={styles.couponsHeader}>Bu Markaya Ait Kuponlar</Text>
             )}
           </>
         }
         ListHeaderComponentStyle={styles.listHeaderStyle}
-        data={coupons}
+        data={coupons || []} // Use coupons from useQuery, default to empty array
         renderItem={({ item }) => (
           <View style={styles.cardWrapper}>
             <CardComponent
@@ -131,11 +222,11 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
           </View>
         )}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
+        numColumns={numColumns} // Use dynamic numColumns
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.listContentContainer}
         ListEmptyComponent={
-          !loading && coupons.length === 0 ? (
+          !isLoading && (!coupons || coupons.length === 0) ? (
             <View style={styles.emptyCouponsContainer}>
               <Text style={styles.noCouponsText}>Bu markaya ait aktif kupon bulunmamaktadır.</Text>
             </View>
@@ -145,94 +236,5 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  headerContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: colors.card, // White background for the header section
-  },
-  listHeaderStyle: {
-    marginBottom: 0, // Remove margin to avoid extra space
-    zIndex: 1,
-  },
-  brandLogo: {
-    width: 120,
-    height: 60,
-    marginBottom: 15,
-  },
-  brandName: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: colors.primary,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  brandDescription: {
-    fontSize: 15,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 10,
-  },
-  websiteLink: {
-    fontSize: 16,
-    color: colors.secondary, 
-    fontWeight: '600',
-    marginBottom: 10, // Slightly reduced space after the link
-    textDecorationLine: 'underline',
-  },
-  couponsHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    paddingHorizontal: 16, // Consistent padding with other screens
-    paddingVertical: 12, // Vertical padding for better touch area
-    backgroundColor: colors.background, // Background color
-    marginBottom: 8, // Add space before the grid
-  },
-  listContentContainer: {
-    paddingBottom: 10, // Padding at the bottom of the list
-    paddingHorizontal: 16, // Consistent with other screens
-  },
-  cardWrapper: {
-    marginBottom: 10, // Add some space between cards
-  },
-  columnWrapper: {
-    justifyContent: 'space-between', // Space cards evenly in the row
-    marginHorizontal: 0, // Reset any horizontal margins
-  },
-  emptyCouponsContainer: {
-    padding: 20,
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  noCouponsText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.error, // Use error color from theme
-    textAlign: 'center',
-    padding: 20,
-  },
-});
 
 export default BrandScreen;

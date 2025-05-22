@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Text, FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,33 +7,18 @@ import { fetchCategories } from '../api';
 import { Category } from '../types';
 import CardComponent from '../components/common/CardComponent';
 import COLORS from '../constants/colors';
-import styles from './CategoryListScreen.styles'
+import styles from './CategoryListScreen.styles';
+import { useQuery } from '@tanstack/react-query';
 
 type CategoryListScreenNavigationProp = StackNavigationProp<CategoryStackParamList, 'CategoryList'>;
 
 const CategoryListScreen: React.FC = () => {
   const navigation = useNavigation<CategoryListScreenNavigationProp>();
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchCategories();
-        setCategories(data);
-        setError(null);
-      } catch (err) {
-        setError('Kategoriler yüklenirken bir hata oluştu.');
-        console.error('Error loading categories:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCategories();
-  }, []);
+  const { data: categories, isLoading: loading, error } = useQuery<Category[], Error>({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+  });
 
   const handleCategoryPress = (category: Category) => {
     navigation.navigate('CategoryDetail', { categoryId: category.id });
@@ -44,7 +29,7 @@ const CategoryListScreen: React.FC = () => {
   }
 
   if (error) {
-    return <View style={styles.centered}><Text style={styles.errorText}>{error}</Text></View>;
+    return <View style={styles.centered}><Text style={styles.errorText}>Kategoriler yüklenirken bir hata oluştu: {error.message}</Text></View>;
   }
 
   return (

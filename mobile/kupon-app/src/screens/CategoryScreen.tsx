@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native'; // Import useWindowDimensions
+import React from 'react'; // Removed useEffect and useState
+import { View, Text, ActivityIndicator, ScrollView, Image, useWindowDimensions } from 'react-native'; // Import useWindowDimensions
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { CategoryStackParamList } from '../navigation/types';
 import { fetchCategoryById } from '../api';
@@ -13,6 +13,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList, MainTabParamList } from '../navigation/types';
 import { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { useQuery } from '@tanstack/react-query'; // Import useQuery
 
 type CategoryScreenRouteProp = RouteProp<CategoryStackParamList, 'CategoryDetail'>;
 
@@ -26,37 +27,16 @@ const CategoryScreen: React.FC = () => {
   const route = useRoute<CategoryScreenRouteProp>();
   const navigation = useNavigation<CategoryScreenNavigationProp>();
   const { categoryId } = route.params;
-  const [category, setCategory] = useState<Category | null>(null);
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { width } = useWindowDimensions(); // Get window dimensions
   const styles = createStyles(width); // Create styles dynamically
 
-  useEffect(() => {
-    const loadCategoryData = async () => {
-      try {
-        setLoading(true);
-        const categoryData = await fetchCategoryById(categoryId);
-        setCategory(categoryData);
+  const { data: category, isLoading: loading, error } = useQuery<Category, Error>({
+    queryKey: ['category', categoryId],
+    queryFn: () => fetchCategoryById(categoryId),
+  });
 
-        if (categoryData && categoryData.coupon_codes) {
-          setCoupons(categoryData.coupon_codes);
-        } else {
-          setCoupons([]); // Set to empty array if no coupons are loaded
-        }
-        
-        setError(null);
-      } catch (err) {
-        setError('Kategori bilgileri yüklenirken bir hata oluştu.');
-        console.error('Error loading category details:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCategoryData();
-  }, [categoryId]);
+  // Coupons are part of the category data
+  const coupons = category?.coupon_codes || [];
 
   const handleCouponPress = (couponId: number) => {
     navigation.navigate('CouponsTab', {
@@ -70,7 +50,7 @@ const CategoryScreen: React.FC = () => {
   }
 
   if (error || !category) {
-    return <View style={styles.centered}><Text style={styles.errorText}>{error || 'Kategori bulunamadı.'}</Text></View>;
+    return <View style={styles.centered}><Text style={styles.errorText}>{error?.message || 'Kategori bulunamadı.'}</Text></View>;
   }
 
   return (

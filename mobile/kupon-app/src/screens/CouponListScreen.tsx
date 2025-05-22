@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react'; // Removed useEffect and useState
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { Coupon } from '../types';
 import { fetchCouponCodes } from '../api'; 
 import COLORS from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
+import { useQuery } from '@tanstack/react-query'; // Import useQuery
 
 // Tip tanımlamaları
 type CouponListScreenNavigationProp = StackNavigationProp<CouponStackParamList, 'CouponList'>;
@@ -23,29 +24,13 @@ interface CouponListScreenProps {
 }
 
 function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Element {
-  const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const { width } = useWindowDimensions(); // Get window dimensions
   const { styles, numColumns } = createStyles(width); // Destructure styles and numColumns
 
-  useEffect(() => {
-    async function loadCoupons() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const fetchedCoupons = await fetchCouponCodes(); // fetchCouponCodes doğrudan Coupon[] döndürüyor
-        setCoupons(fetchedCoupons); 
-      } catch (err) {
-        setError('Kuponlar yüklenirken bir hata oluştu.');
-        console.error('Fetch Coupon Codes Error:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadCoupons();
-  }, []);
+  const { data: coupons, isLoading, error } = useQuery<Coupon[], Error>({
+    queryKey: ['coupons'],
+    queryFn: () => fetchCouponCodes(), // Adjusted to call fetchCouponCodes
+  });
 
   const handleCouponPress = (couponId: number) => { // couponId number olmalı
     navigation.navigate('CouponDetail', { couponId: couponId }); // toString() kaldırıldı
@@ -72,16 +57,16 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
   if (error) {
     return (
       <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.errorText}>Kuponlar yüklenirken bir hata oluştu: {error.message}</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      {coupons.length > 0 ? (
+      {coupons && coupons.length > 0 ? (
         <FlatList
-          data={coupons}
+          data={coupons} // Use data from useQuery
           renderItem={renderCouponItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}
