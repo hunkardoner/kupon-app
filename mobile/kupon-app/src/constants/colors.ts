@@ -12,8 +12,11 @@ export interface AppColors {
   success: string;
   white: string;
   black: string;
-  gray: string; // Gri renk eklendi
-  // İhtiyaç duydukça daha fazla renk ekleyebilirsiniz
+  gray: string;
+  primaryText?: string;
+  secondaryText?: string;
+  tertiaryText?: string;
+  accent?: string;
 }
 
 const COLORS: AppColors = {
@@ -28,7 +31,11 @@ const COLORS: AppColors = {
   success: '#10B981',     // Başarı mesajları için yeşil
   white: '#FFFFFF',
   black: '#000000',
-  gray: '#808080', // Gri renk tanımı
+  gray: '#808080',
+  primaryText: '#1F2937', // Ana metin rengi (Koyu Gri)
+  secondaryText: '#6B7280', // İkincil metin rengi (Orta Gri)
+  tertiaryText: '#9CA3AF', // Üçüncül metin rengi (Açık Gri)
+  accent: '#FBBF24',      // Vurgu rengi (Sarı)
 };
 
 export default COLORS;

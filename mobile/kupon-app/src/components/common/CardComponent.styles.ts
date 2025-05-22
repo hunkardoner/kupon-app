@@ -24,6 +24,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     resizeMode: 'cover',
   },
+  placeholderImage: {
+    backgroundColor: COLORS.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    color: COLORS.white,
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
   title: {
     fontSize: 18,
     fontWeight: 'bold',

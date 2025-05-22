@@ -1,7 +1,11 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, ImageSourcePropType } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from './CardComponent.styles';
 import { Category, Brand, Coupon } from '../../types';
+import COLORS from '../../constants/colors';
+
+// API için temel URL - güncellenebilir
+const API_BASE_URL = 'http://localhost:8000';
 
 // CardComponent'in alabileceği item tiplerini birleştir
 export type CardItem = 
@@ -10,7 +14,6 @@ export type CardItem =
   | (Coupon & { type: 'coupon' });
 
 interface CardComponentProps {
-  // title, subtitle, imageUrl doğrudan item içerisinden alınacak şekilde değiştirildi.
   item: CardItem; 
   onPress?: (item: CardItem) => void;
   style?: object; 
@@ -39,13 +42,25 @@ const CardComponent: React.FC<CardComponentProps> = ({
     imageUrl = item.brand?.logo_url; // Kuponun markasının logosu
   }
 
-  const imageSource = imageUrl ? { uri: imageUrl } : undefined;
+  // Resim URL'sini işle - null olmadığını ve tam URL olduğunu kontrol et
+  let imageSource;
+  if (imageUrl) {
+    // Eğer URL http:// veya https:// ile başlamıyorsa, API_BASE_URL ile birleştir
+    if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      imageUrl = `${API_BASE_URL}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+    }
+    imageSource = { uri: imageUrl };
+  }
 
   return (
     <TouchableOpacity onPress={() => onPress && onPress(item)} style={[styles.touchable, style]} disabled={!onPress}>
       <View style={styles.container}>
-        {imageSource && (
-          <Image source={imageSource} style={styles.image} resizeMode="contain" /> // resizeMode eklendi
+        {imageSource ? (
+          <Image source={imageSource} style={styles.image} resizeMode="contain" />
+        ) : (
+          <View style={[styles.image, styles.placeholderImage]}>
+            <Text style={styles.placeholderText}>{title.substring(0, 1).toUpperCase()}</Text>
+          </View>
         )}
         <View style={styles.contentContainer}>
           <Text style={styles.title} numberOfLines={1}>{title}</Text>

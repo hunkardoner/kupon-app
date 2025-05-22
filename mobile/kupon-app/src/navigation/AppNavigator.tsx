@@ -3,13 +3,15 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // İkon kütüphanesi
-import { RootStackParamList, MainTabParamList, HomeStackParamList, CouponStackParamList, BrandStackParamList } from './types';
+import { RootStackParamList, MainTabParamList, HomeStackParamList, CouponStackParamList, BrandStackParamList, CategoryStackParamList } from './types';
 
 import HomeScreen from '../screens/HomeScreen';
-import CouponListScreen from '../screens/CouponListScreen'; // Yeni liste ekranı
-import BrandListScreen from '../screens/BrandListScreen';   // Yeni liste ekranı
+import CouponListScreen from '../screens/CouponListScreen'; // Kupon liste ekranı
+import BrandListScreen from '../screens/BrandListScreen';   // Marka liste ekranı
 import CouponScreen from '../screens/CouponScreen'; // Kupon detay ekranı
 import BrandScreen from '../screens/BrandScreen';   // Marka detay ekranı
+import CategoryListScreen from '../screens/CategoryListScreen'; // Kategori liste ekranı
+import CategoryScreen from '../screens/CategoryScreen';   // Kategori detay ekranı
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import COLORS from '../constants/colors'; // Renk sabitleri
@@ -20,7 +22,11 @@ function HomeStackNavigator() {
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen name="Home" component={HomeScreen} options={{ title: 'Anasayfa' }} />
-      {/* CouponDetail and BrandDetail are removed from here as they will be accessed via their respective tabs */}
+      {/* Detail screens are typically part of their respective stacks or a common modal stack */}
+      {/* For navigating from Home to details in other tabs, the navigation action will target the tab first */}
+      <HomeStack.Screen name="CouponDetail" component={CouponScreen} options={{ title: 'Kupon Detayı' }} />
+      <HomeStack.Screen name="BrandDetail" component={BrandScreen} options={{ title: 'Marka Detayı' }} />
+      <HomeStack.Screen name="CategoryDetail" component={CategoryScreen} options={{ title: 'Kategori Detayı' }} />
     </HomeStack.Navigator>
   );
 }
@@ -45,6 +51,17 @@ function BrandStackNavigator() {
   );
 }
 
+// Yeni eklenen Kategoriler stack'i
+const CategoryStack = createStackNavigator<CategoryStackParamList>();
+function CategoryStackNavigator() {
+  return (
+    <CategoryStack.Navigator>
+      <CategoryStack.Screen name="CategoryList" component={CategoryListScreen} options={{ title: 'Kategoriler' }} />
+      <CategoryStack.Screen name="CategoryDetail" component={CategoryScreen} options={{ title: 'Kategori Detayı' }} />
+    </CategoryStack.Navigator>
+  );
+}
+
 // Bottom Tab Navigator
 const Tab = createBottomTabNavigator<MainTabParamList>();
 function MainTabNavigator() {
@@ -60,6 +77,8 @@ function MainTabNavigator() {
             iconName = focused ? 'pricetag' : 'pricetag-outline';
           } else if (route.name === 'BrandsTab') {
             iconName = focused ? 'business' : 'business-outline';
+          } else if (route.name === 'CategoriesTab') {
+            iconName = focused ? 'grid' : 'grid-outline';
           }
           // @ts-ignore // Ionicons type issue with string name
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -72,6 +91,7 @@ function MainTabNavigator() {
       <Tab.Screen name="HomeTab" component={HomeStackNavigator} options={{ title: 'Anasayfa' }} />
       <Tab.Screen name="CouponsTab" component={CouponStackNavigator} options={{ title: 'Kuponlar' }} />
       <Tab.Screen name="BrandsTab" component={BrandStackNavigator} options={{ title: 'Markalar' }} />
+      <Tab.Screen name="CategoriesTab" component={CategoryStackNavigator} options={{ title: 'Kategoriler' }} />
     </Tab.Navigator>
   );
 }
@@ -85,11 +105,6 @@ function AppNavigator(): React.JSX.Element {
       <NavigationContainer>
         <RootStack.Navigator screenOptions={{ headerShown: false }}>
           <RootStack.Screen name="MainTabs" component={MainTabNavigator} />
-          {/* Global modal ekranlar veya tab dışı stack ekranları buraya eklenebilir */}
-          {/* Artık Coupon ve Brand global stack'te değil, kendi tab stack'lerinde yönetiliyor.
-          <RootStack.Screen name="Coupon" component={CouponScreen} /> 
-          <RootStack.Screen name="Brand" component={BrandScreen} /> 
-          */}
         </RootStack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

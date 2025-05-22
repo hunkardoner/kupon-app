@@ -61,8 +61,7 @@ const HomeScreen: React.FC = () => {
 
   const handleCategoryPress = (item: Category) => {
     console.log('Category pressed:', item.name);
-    // Example: navigation.navigate('CategoriesTab', { screen: 'CategoryDetail', params: { categoryId: item.id } });
-    // This would require a new CategoriesTab and CategoryDetail screen.
+    navigation.navigate('CategoriesTab', { screen: 'CategoryDetail', params: { categoryId: item.id } });
   };
 
   const handleCouponPress = (item: Coupon) => {
