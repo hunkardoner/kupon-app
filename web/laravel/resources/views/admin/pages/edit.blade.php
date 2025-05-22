@@ -58,3 +58,26 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    tinymce.init({
+        selector: 'textarea#content',
+        plugins: 'code table lists image media link',
+        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | code | table | image media link',
+        setup: function (editor) {
+            editor.on('init', function() {
+                var form = editor.getElement().form;
+                if (form) {
+                    form.addEventListener('submit', function() {
+                        tinymce.triggerSave();
+                    });
+                }
+            });
+            editor.on('blur', function () {
+                tinymce.triggerSave();
+            });
+        }
+    });
+</script>
+@endpush

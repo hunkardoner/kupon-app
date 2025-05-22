@@ -66,7 +66,7 @@
 
             <div class="mb-3">
                 <label for="published_at" class="form-label">Publish At</label>
-                <input type="datetime-local" class="form-control @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at', $blog->published_at ? $blog->published_at->format('Y-m-d\\TH:i') : '') }}">
+                <input type="datetime-local" class="form-control @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at', $blog->published_at ? Carbon\Carbon::parse($blog->published_at)->format('Y-m-d\TH:i') : '') }}">
                 @error('published_at')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -77,3 +77,30 @@
         </form>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    tinymce.init({
+        selector: 'textarea#content',
+        plugins: 'code table lists image media link',
+        toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | indent outdent | bullist numlist | code | table | image media link',
+        // Consider adding image upload capabilities if your backend supports it
+        // images_upload_credentials: true, // If CSRF or other auth is needed
+        // file_picker_types: 'image media',
+        // file_picker_callback: function(cb, value, meta) { /* ... */ }
+        setup: function (editor) {
+            editor.on('init', function() {
+                var form = editor.getElement().form;
+                if (form) {
+                    form.addEventListener('submit', function() {
+                        tinymce.triggerSave();
+                    });
+                }
+            });
+            editor.on('blur', function () {
+                tinymce.triggerSave();
+            });
+        }
+    });
+</script>
+@endpush
