@@ -10,12 +10,19 @@ import COLORS from '../constants/colors';
 import styles from './CategoryListScreen.styles';
 import { useQuery } from '@tanstack/react-query';
 
-type CategoryListScreenNavigationProp = StackNavigationProp<CategoryStackParamList, 'CategoryList'>;
+type CategoryListScreenNavigationProp = StackNavigationProp<
+  CategoryStackParamList,
+  'CategoryList'
+>;
 
 const CategoryListScreen: React.FC = () => {
   const navigation = useNavigation<CategoryListScreenNavigationProp>();
 
-  const { data: categories, isLoading: loading, error } = useQuery<Category[], Error>({
+  const {
+    data: categories,
+    isLoading: loading,
+    error,
+  } = useQuery<Category[], Error>({
     queryKey: ['categories'],
     queryFn: fetchCategories,
   });
@@ -25,11 +32,23 @@ const CategoryListScreen: React.FC = () => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color={COLORS.primary} style={styles.centered} />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color={COLORS.primary}
+        style={styles.centered}
+      />
+    );
   }
 
   if (error) {
-    return <View style={styles.centered}><Text style={styles.errorText}>Kategoriler yüklenirken bir hata oluştu: {error.message}</Text></View>;
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Kategoriler yüklenirken bir hata oluştu: {error.message}
+        </Text>
+      </View>
+    );
   }
 
   return (
@@ -43,7 +62,7 @@ const CategoryListScreen: React.FC = () => {
             style={styles.card}
           />
         )}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         numColumns={2}
         contentContainerStyle={styles.listContent}
         columnWrapperStyle={styles.columnWrapper}

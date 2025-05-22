@@ -17,17 +17,26 @@ import CardComponent from '../components/common/CardComponent';
 import { useQuery } from '@tanstack/react-query'; // Import useQuery
 
 // Tip tanımlamaları
-type BrandListScreenNavigationProp = StackNavigationProp<BrandStackParamList, 'BrandList'>;
+type BrandListScreenNavigationProp = StackNavigationProp<
+  BrandStackParamList,
+  'BrandList'
+>;
 
 interface BrandListScreenProps {
   navigation: BrandListScreenNavigationProp;
 }
 
-function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Element {
+function BrandListScreen({
+  navigation,
+}: BrandListScreenProps): React.JSX.Element {
   const { width } = useWindowDimensions(); // Get window dimensions
   const { styles, numColumns } = createStyles(width); // Get styles and numColumns
 
-  const { data: brands, isLoading, error } = useQuery<Brand[], Error>({
+  const {
+    data: brands,
+    isLoading,
+    error,
+  } = useQuery<Brand[], Error>({
     queryKey: ['brands'],
     queryFn: () => fetchBrands(), // Call fetchBrands without arguments
   });
@@ -57,7 +66,9 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
   if (error) {
     return (
       <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <Text style={styles.errorText}>Markalar yüklenirken bir hata oluştu: {error.message}</Text>
+        <Text style={styles.errorText}>
+          Markalar yüklenirken bir hata oluştu: {error.message}
+        </Text>
       </SafeAreaView>
     );
   }
@@ -68,7 +79,7 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
         <FlatList
           data={brands} // This should now be correctly typed as Brand[]
           renderItem={renderBrandItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}
           numColumns={numColumns} // Use dynamic numColumns
           columnWrapperStyle={styles.columnWrapper}

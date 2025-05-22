@@ -1,10 +1,25 @@
 import React from 'react';
-import { View, Text, FlatList, ActivityIndicator, ScrollView, useWindowDimensions } from 'react-native';
-import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
+import {
+  useNavigation,
+  CompositeNavigationProp,
+} from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { HomeStackParamList, MainTabParamList } from '../navigation/types';
-import { fetchCategories, fetchSliders, fetchCouponCodes, fetchBrands } from '../api';
+import {
+  fetchCategories,
+  fetchSliders,
+  fetchCouponCodes,
+  fetchBrands,
+} from '../api';
 import { Category, Slider, Coupon, Brand } from '../types';
 import SectionHeaderComponent from '../components/common/SectionHeaderComponent';
 import CardComponent from '../components/common/CardComponent';
@@ -24,56 +39,100 @@ const HomeScreen: React.FC = () => {
   const { width } = useWindowDimensions(); // Get window dimensions
   const styles = createStyles(width); // Create styles dynamically
 
-  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useQuery<Category[], Error>({
+  const {
+    data: categories,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useQuery<Category[], Error>({
     queryKey: ['categories'],
     queryFn: fetchCategories,
   });
 
-  const { data: sliders, isLoading: slidersLoading, error: slidersError } = useQuery<Slider[], Error>({
+  const {
+    data: sliders,
+    isLoading: slidersLoading,
+    error: slidersError,
+  } = useQuery<Slider[], Error>({
     queryKey: ['sliders'],
     queryFn: fetchSliders,
   });
 
-  const { data: popularCoupons, isLoading: couponsLoading, error: couponsError } = useQuery<Coupon[], Error>({
+  const {
+    data: popularCoupons,
+    isLoading: couponsLoading,
+    error: couponsError,
+  } = useQuery<Coupon[], Error>({
     queryKey: ['popularCoupons'],
     queryFn: () => fetchCouponCodes({ limit: 5, popular: true }),
   });
 
-  const { data: popularBrands, isLoading: brandsLoading, error: brandsError } = useQuery<Brand[], Error>({
+  const {
+    data: popularBrands,
+    isLoading: brandsLoading,
+    error: brandsError,
+  } = useQuery<Brand[], Error>({
     queryKey: ['popularBrands'],
     queryFn: () => fetchBrands({ limit: 5, popular: true }),
   });
 
-  const isLoading = categoriesLoading || slidersLoading || couponsLoading || brandsLoading;
+  const isLoading =
+    categoriesLoading || slidersLoading || couponsLoading || brandsLoading;
   const error = categoriesError || slidersError || couponsError || brandsError;
 
   if (isLoading) {
-    return <ActivityIndicator size="large" color={COLORS.primary} style={styles.centered} />;
+    return (
+      <ActivityIndicator
+        size="large"
+        color={COLORS.primary}
+        style={styles.centered}
+      />
+    );
   }
 
   if (error) {
-    return <View style={styles.centered}><Text style={styles.errorText}>Veri yüklenirken bir hata oluştu: {error.message}</Text></View>;
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>
+          Veri yüklenirken bir hata oluştu: {error.message}
+        </Text>
+      </View>
+    );
   }
 
   const handleCategoryPress = (item: Category) => {
     console.log('Category pressed:', item.name);
-    navigation.navigate('CategoriesTab', { screen: 'CategoryDetail', params: { categoryId: item.id } });
+    navigation.navigate('CategoriesTab', {
+      screen: 'CategoryDetail',
+      params: { categoryId: item.id },
+    });
   };
 
   const handleCouponPress = (item: Coupon) => {
-    navigation.navigate('CouponsTab', { screen: 'CouponDetail', params: { couponId: item.id } });
+    navigation.navigate('CouponsTab', {
+      screen: 'CouponDetail',
+      params: { couponId: item.id },
+    });
   };
 
   const handleBrandPress = (item: Brand) => {
-    navigation.navigate('BrandsTab', { screen: 'BrandDetail', params: { brandId: item.id } });
+    navigation.navigate('BrandsTab', {
+      screen: 'BrandDetail',
+      params: { brandId: item.id },
+    });
   };
 
   const handleSliderPress = (slider: Slider) => {
     console.log('Slider pressed:', slider.title);
     if (slider.related_coupon_id) {
-      navigation.navigate('CouponsTab', { screen: 'CouponDetail', params: { couponId: slider.related_coupon_id } });
+      navigation.navigate('CouponsTab', {
+        screen: 'CouponDetail',
+        params: { couponId: slider.related_coupon_id },
+      });
     } else if (slider.related_brand_id) {
-      navigation.navigate('BrandsTab', { screen: 'BrandDetail', params: { brandId: slider.related_brand_id } });
+      navigation.navigate('BrandsTab', {
+        screen: 'BrandDetail',
+        params: { brandId: slider.related_brand_id },
+      });
     }
     // else if (slider.link_url) { /* Open link_url */ }
   };
@@ -96,7 +155,7 @@ const HomeScreen: React.FC = () => {
                 horizontal={true}
               />
             )}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={item => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
@@ -107,9 +166,11 @@ const HomeScreen: React.FC = () => {
 
       {popularCoupons && popularCoupons.length > 0 && (
         <View style={styles.sectionContainer}>
-          <SectionHeaderComponent 
-            title="Popüler Kuponlar" 
-            onSeeAllPress={() => navigation.navigate('CouponsTab', { screen: 'CouponList' })} 
+          <SectionHeaderComponent
+            title="Popüler Kuponlar"
+            onSeeAllPress={() =>
+              navigation.navigate('CouponsTab', { screen: 'CouponList' })
+            }
           />
           <FlatList
             data={popularCoupons}
@@ -120,7 +181,7 @@ const HomeScreen: React.FC = () => {
                 horizontal={true}
               />
             )}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={item => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}
@@ -131,9 +192,11 @@ const HomeScreen: React.FC = () => {
 
       {popularBrands && popularBrands.length > 0 && (
         <View style={styles.sectionContainer}>
-          <SectionHeaderComponent 
-            title="Popüler Markalar" 
-            onSeeAllPress={() => navigation.navigate('BrandsTab', { screen: 'BrandList' })} 
+          <SectionHeaderComponent
+            title="Popüler Markalar"
+            onSeeAllPress={() =>
+              navigation.navigate('BrandsTab', { screen: 'BrandList' })
+            }
           />
           <FlatList
             data={popularBrands}
@@ -144,7 +207,7 @@ const HomeScreen: React.FC = () => {
                 horizontal={true}
               />
             )}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={item => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalList}

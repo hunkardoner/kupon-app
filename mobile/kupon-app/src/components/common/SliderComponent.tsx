@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, Platform, useWindowDimensions } from 'react-native'; // Import useWindowDimensions
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  Platform,
+  useWindowDimensions,
+} from 'react-native'; // Import useWindowDimensions
 import createStyles from './SliderComponent.styles'; // Import createStyles
 import { Slider } from '../../types';
 import { API_BASE_URL } from '../../api/index';
@@ -9,7 +17,10 @@ interface SliderComponentProps {
   onPressSlider?: (slider: Slider) => void;
 }
 
-const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlider }) => {
+const SliderComponent: React.FC<SliderComponentProps> = ({
+  sliders,
+  onPressSlider,
+}) => {
   const { width } = useWindowDimensions(); // useWindowDimensions hook'unu kullan
   const styles = createStyles(width); // Stilleri dinamik olarak oluştur
 
@@ -20,7 +31,11 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
   const renderItem = ({ item }: { item: Slider }) => {
     let imageUrl = item.image;
 
-    if (Platform.OS === 'android' && imageUrl && imageUrl.includes('localhost')) {
+    if (
+      Platform.OS === 'android' &&
+      imageUrl &&
+      imageUrl.includes('localhost')
+    ) {
       imageUrl = imageUrl.replace('localhost', '10.0.2.2');
     }
 
@@ -30,10 +45,10 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
         style={styles.slide} // Dinamik genişlik stil dosyasından gelecek, { width } kaldırıldı
       >
         {imageUrl && (
-          <Image 
-            source={{ uri: imageUrl }} 
+          <Image
+            source={{ uri: imageUrl }}
             style={styles.image}
-            resizeMode="cover" 
+            resizeMode="cover"
           />
         )}
         {/* Text container yorumları kaldırılabilir veya isteğe bağlı olarak eklenebilir */}
@@ -46,7 +61,7 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
       <FlatList
         data={sliders}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}

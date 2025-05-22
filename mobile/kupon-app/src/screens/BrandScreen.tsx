@@ -1,15 +1,34 @@
 import React, { useEffect } from 'react';
-import { View, Text, ActivityIndicator, Image, FlatList, TouchableOpacity, Linking, useWindowDimensions, ViewStyle, TextStyle, ImageStyle } from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  Linking,
+  useWindowDimensions,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { BrandStackParamList, CouponStackParamList, MainTabParamList } from '../navigation/types';
+import {
+  BrandStackParamList,
+  CouponStackParamList,
+  MainTabParamList,
+} from '../navigation/types';
 import { fetchBrandById, fetchCouponCodes } from '../api';
 import { Brand, Coupon } from '../types';
 import { API_BASE_URL } from '../api/index';
 import colors from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
-import { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native';
+import {
+  CompositeNavigationProp,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
 
@@ -123,17 +142,28 @@ const createStyles = (width: number) => {
   return { styles, numColumns };
 };
 
-function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element {
+function BrandScreen({
+  route,
+  navigation,
+}: BrandScreenProps): React.JSX.Element {
   const { brandId } = route.params;
   const { width: windowWidth } = useWindowDimensions(); // Get window width
   const { styles, numColumns } = createStyles(windowWidth); // Get styles and numColumns
 
-  const { data: brand, isLoading: brandLoading, error: brandError } = useQuery<Brand, Error>({
+  const {
+    data: brand,
+    isLoading: brandLoading,
+    error: brandError,
+  } = useQuery<Brand, Error>({
     queryKey: ['brand', brandId],
     queryFn: () => fetchBrandById(brandId),
   });
 
-  const { data: coupons, isLoading: couponsLoading, error: couponsError } = useQuery<Coupon[], Error>({
+  const {
+    data: coupons,
+    isLoading: couponsLoading,
+    error: couponsError,
+  } = useQuery<Coupon[], Error>({
     queryKey: ['coupons', 'brand', brandId],
     queryFn: () => fetchCouponCodes({ brand_id: brandId }), // Pass brandId directly
     enabled: !!brand, // Only run this query if brand data is available
@@ -170,7 +200,9 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
   if (error) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error.message || 'Veri yüklenirken bir hata oluştu.'}</Text>
+        <Text style={styles.errorText}>
+          {error.message || 'Veri yüklenirken bir hata oluştu.'}
+        </Text>
       </SafeAreaView>
     );
   }
@@ -196,12 +228,19 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
           <>
             <View style={styles.headerContainer}>
               {brandLogoUrl && (
-                <Image source={{ uri: brandLogoUrl }} style={styles.brandLogo} resizeMode="contain" />
+                <Image
+                  source={{ uri: brandLogoUrl }}
+                  style={styles.brandLogo}
+                  resizeMode="contain"
+                />
               )}
               <Text style={styles.brandName}>{brand.name}</Text>
-              {brand.description && <Text style={styles.brandDescription}>{brand.description}</Text>}
+              {brand.description && (
+                <Text style={styles.brandDescription}>{brand.description}</Text>
+              )}
               {brand.website_url && (
-                <TouchableOpacity onPress={() => handleWebsitePress(brand.website_url!)}>
+                <TouchableOpacity
+                  onPress={() => handleWebsitePress(brand.website_url!)}>
                   <Text style={styles.websiteLink}>Website Git</Text>
                 </TouchableOpacity>
               )}
@@ -221,14 +260,16 @@ function BrandScreen({ route, navigation }: BrandScreenProps): React.JSX.Element
             />
           </View>
         )}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         numColumns={numColumns} // Use dynamic numColumns
         columnWrapperStyle={styles.columnWrapper}
         contentContainerStyle={styles.listContentContainer}
         ListEmptyComponent={
           !isLoading && (!coupons || coupons.length === 0) ? (
             <View style={styles.emptyCouponsContainer}>
-              <Text style={styles.noCouponsText}>Bu markaya ait aktif kupon bulunmamaktadır.</Text>
+              <Text style={styles.noCouponsText}>
+                Bu markaya ait aktif kupon bulunmamaktadır.
+              </Text>
             </View>
           ) : null
         }

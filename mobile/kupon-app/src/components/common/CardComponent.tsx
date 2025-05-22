@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
 import createStyles from './CardComponent.styles'; // Import the function
 import { Category, Brand, Coupon } from '../../types';
 import COLORS from '../../constants/colors';
@@ -8,13 +14,13 @@ import COLORS from '../../constants/colors';
 const API_BASE_URL = 'http://localhost:8000';
 
 // CardComponent'in alabileceği item tiplerini birleştir
-export type CardItem = 
-  | (Category & { type: 'category' }) 
-  | (Brand & { type: 'brand' }) 
+export type CardItem =
+  | (Category & { type: 'category' })
+  | (Brand & { type: 'brand' })
   | (Coupon & { type: 'coupon' });
 
 interface CardComponentProps {
-  item: CardItem; 
+  item: CardItem;
   onPress?: (item: CardItem) => void;
   style?: object;
   horizontal?: boolean; // Add prop to indicate if card is in a horizontal list
@@ -60,29 +66,41 @@ const CardComponent: React.FC<CardComponentProps> = ({
   }
 
   return (
-    <TouchableOpacity 
-      onPress={() => onPress && onPress(item)} 
+    <TouchableOpacity
+      onPress={() => onPress && onPress(item)}
       style={[
-        styles.touchable, 
+        styles.touchable,
         horizontal ? styles.horizontalTouchable : null,
-        style
-      ]} 
-      disabled={!onPress}
-    >
-      <View style={[
-        styles.container, 
-        horizontal ? styles.horizontalContainer : null
-      ]}>
+        style,
+      ]}
+      disabled={!onPress}>
+      <View
+        style={[
+          styles.container,
+          horizontal ? styles.horizontalContainer : null,
+        ]}>
         {imageSource ? (
-          <Image source={imageSource} style={styles.image} resizeMode="contain" />
+          <Image
+            source={imageSource}
+            style={styles.image}
+            resizeMode="contain"
+          />
         ) : (
           <View style={[styles.image, styles.placeholderImage]}>
-            <Text style={styles.placeholderText}>{title.substring(0, 1).toUpperCase()}</Text>
+            <Text style={styles.placeholderText}>
+              {title.substring(0, 1).toUpperCase()}
+            </Text>
           </View>
         )}
         <View style={styles.contentContainer}>
-          <Text style={styles.title} numberOfLines={1}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle} numberOfLines={2}>{subtitle}</Text>}
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
+          {subtitle && (
+            <Text style={styles.subtitle} numberOfLines={2}>
+              {subtitle}
+            </Text>
+          )}
         </View>
       </View>
     </TouchableOpacity>

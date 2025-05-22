@@ -11,28 +11,38 @@ import createStyles from './CouponListScreen.styles'; // Import the function
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
 import { Coupon } from '../types';
-import { fetchCouponCodes } from '../api'; 
+import { fetchCouponCodes } from '../api';
 import COLORS from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
 import { useQuery } from '@tanstack/react-query'; // Import useQuery
 
 // Tip tanımlamaları
-type CouponListScreenNavigationProp = StackNavigationProp<CouponStackParamList, 'CouponList'>;
+type CouponListScreenNavigationProp = StackNavigationProp<
+  CouponStackParamList,
+  'CouponList'
+>;
 
 interface CouponListScreenProps {
   navigation: CouponListScreenNavigationProp;
 }
 
-function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Element {
+function CouponListScreen({
+  navigation,
+}: CouponListScreenProps): React.JSX.Element {
   const { width } = useWindowDimensions(); // Get window dimensions
   const { styles, numColumns } = createStyles(width); // Destructure styles and numColumns
 
-  const { data: coupons, isLoading, error } = useQuery<Coupon[], Error>({
+  const {
+    data: coupons,
+    isLoading,
+    error,
+  } = useQuery<Coupon[], Error>({
     queryKey: ['coupons'],
     queryFn: () => fetchCouponCodes(), // Adjusted to call fetchCouponCodes
   });
 
-  const handleCouponPress = (couponId: number) => { // couponId number olmalı
+  const handleCouponPress = (couponId: number) => {
+    // couponId number olmalı
     navigation.navigate('CouponDetail', { couponId: couponId }); // toString() kaldırıldı
   };
 
@@ -57,7 +67,9 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
   if (error) {
     return (
       <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <Text style={styles.errorText}>Kuponlar yüklenirken bir hata oluştu: {error.message}</Text>
+        <Text style={styles.errorText}>
+          Kuponlar yüklenirken bir hata oluştu: {error.message}
+        </Text>
       </SafeAreaView>
     );
   }
@@ -68,10 +80,10 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
         <FlatList
           data={coupons} // Use data from useQuery
           renderItem={renderCouponItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}
           numColumns={numColumns} // Use dynamic numColumns from createStyles
-          columnWrapperStyle={styles.columnWrapper} 
+          columnWrapperStyle={styles.columnWrapper}
         />
       ) : (
         <View style={styles.centeredContainer}>

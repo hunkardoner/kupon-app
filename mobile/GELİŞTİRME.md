@@ -32,5 +32,5 @@ Key Conventions:
 expo-constants (ortam değişkenleri), expo-permissions (cihaz izinleri), expo-updates (OTA güncellemeleri) gibi Expo modüllerinin aktif kullanımı gözden geçirilebilir.
 TypeScript Usage:
 tsconfig.json dosyasında strict modun aktif olduğundan emin olunmalı.
-Syntax and Formatting:
-Prettier kullanımı package.json dosyasında ve proje ayarlarında kontrol edilmeli.
+<!-- Syntax and Formatting:
+Prettier kullanımı package.json dosyasında ve proje ayarlarında kontrol edilmeli. -->

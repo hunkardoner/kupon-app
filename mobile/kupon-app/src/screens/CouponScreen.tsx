@@ -10,14 +10,20 @@ import { API_BASE_URL } from '../api/index'; // Corrected: import named export
 import colors from '../constants/colors';
 
 type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
-type CouponScreenNavigationProp = StackNavigationProp<CouponStackParamList, 'CouponDetail'>;
+type CouponScreenNavigationProp = StackNavigationProp<
+  CouponStackParamList,
+  'CouponDetail'
+>;
 
 interface CouponScreenProps {
   route: CouponScreenRouteProp;
   navigation: CouponScreenNavigationProp;
 }
 
-function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Element {
+function CouponScreen({
+  route,
+  navigation,
+}: CouponScreenProps): React.JSX.Element {
   const { couponId } = route.params;
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +35,9 @@ function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Eleme
         setLoading(true);
         const fetchedCoupon = await fetchCouponCodeById(couponId);
         setCoupon(fetchedCoupon);
-        navigation.setOptions({ title: fetchedCoupon.brand?.name || 'Kupon Detayı' });
+        navigation.setOptions({
+          title: fetchedCoupon.brand?.name || 'Kupon Detayı',
+        });
         setError(null);
       } catch (e) {
         console.error('Failed to fetch coupon details', e);
@@ -76,7 +84,11 @@ function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Eleme
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
         {brandLogoUrl && (
-          <Image source={{ uri: brandLogoUrl }} style={styles.brandLogo} resizeMode="contain" />
+          <Image
+            source={{ uri: brandLogoUrl }}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
         )}
         <Text style={styles.brandName}>{coupon.brand?.name}</Text>
         <Text style={styles.couponCodeLabel}>Kupon Kodu:</Text>
@@ -93,14 +105,15 @@ function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Eleme
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Geçerlilik Tarihi:</Text>
           <Text style={styles.detailValue}>
-            {new Date(coupon.start_date).toLocaleDateString()} - {new Date(coupon.end_date).toLocaleDateString()}
+            {new Date(coupon.start_date).toLocaleDateString()} -{' '}
+            {new Date(coupon.end_date).toLocaleDateString()}
           </Text>
         </View>
         {coupon.categories && coupon.categories.length > 0 && (
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Kategoriler:</Text>
             <View style={styles.categoriesContainer}>
-              {coupon.categories.map((category) => (
+              {coupon.categories.map(category => (
                 <Text key={category.id} style={styles.categoryTag}>
                   {category.name}
                 </Text>
