@@ -102,6 +102,18 @@ function CouponScreen({ route, navigation }: CouponScreenProps): React.JSX.Eleme
             <Text style={styles.detailValue}>{coupon.category.name}</Text>
           </View>
         )}
+        {coupon.categories && coupon.categories.length > 0 && (
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Kategoriler:</Text>
+            <View style={styles.categoriesContainer}>
+              {coupon.categories.map((category) => (
+                <Text key={category.id} style={styles.categoryTag}>
+                  {category.name}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
         {/* Diğer kupon detayları eklenebilir */}
       </View>
     </SafeAreaView>
@@ -174,10 +186,28 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: 16,
     color: colors.textSecondary,
+    flexShrink: 1, // Allow text to shrink if needed
   },
   errorText: {
     fontSize: 16,
     color: 'red',
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    flex: 1, // Take remaining space
+    marginLeft: 8, // Add some space between label and tags
+  },
+  categoryTag: {
+    backgroundColor: colors.primary,
+    color: colors.white,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 4,
+    marginBottom: 4,
+    fontSize: 12,
   },
 });
 

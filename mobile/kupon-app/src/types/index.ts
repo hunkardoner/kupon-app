@@ -10,6 +10,7 @@ export interface Category {
   parent_id?: number | null;
   created_at: string;
   updated_at: string;
+  coupon_codes?: Coupon[]; // Added to include related coupons
 }
 
 export interface Brand {
@@ -38,8 +39,7 @@ export interface Coupon {
   is_active: boolean;
   brand_id: number;
   brand?: Brand; // İlişkili marka bilgisi (opsiyonel, API'ye göre)
-  category_id?: number | null; // Opsiyonel kategori
-  category?: Category; // İlişkili kategori bilgisi
+  categories?: Category[]; // Changed to an array of categories
   created_at: string;
   updated_at: string;
 }

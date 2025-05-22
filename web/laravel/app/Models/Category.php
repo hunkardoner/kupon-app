@@ -32,4 +32,12 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_id');
     }
+
+    /**
+     * The coupon codes that belong to the category.
+     */
+    public function couponCodes()
+    {
+        return $this->belongsToMany(CouponCode::class, 'category_coupon_code');
+    }
 }

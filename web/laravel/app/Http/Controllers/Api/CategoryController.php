@@ -14,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return CategoryResource::collection(Category::with('parent', 'children')->get());
+        return CategoryResource::collection(Category::with(['parent', 'children', 'couponCodes'])->get());
     }
 
     /**
@@ -30,7 +30,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return new CategoryResource($category->load('parent', 'children'));
+        return new CategoryResource($category->load(['parent', 'children', 'couponCodes']));
     }
 
     /**

@@ -23,6 +23,7 @@ class CategoryResource extends JsonResource
             'parent_id' => $this->parent_id,
             'parent' => new CategoryResource($this->whenLoaded('parent')),
             'children' => CategoryResource::collection($this->whenLoaded('children')),
+            'coupon_codes' => CouponCodeResource::collection($this->whenLoaded('couponCodes')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

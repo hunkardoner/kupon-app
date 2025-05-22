@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { CategoryStackParamList } from '../navigation/types';
-import { fetchCategoryById, fetchCouponCodes } from '../api';
+import { fetchCategoryById } from '../api';
 import { Category, Coupon } from '../types';
 import CardComponent from '../components/common/CardComponent';
 import COLORS from '../constants/colors';
@@ -26,11 +26,11 @@ const CategoryScreen: React.FC = () => {
         const categoryData = await fetchCategoryById(categoryId);
         setCategory(categoryData);
 
-        // Kategoriye ait kuponları almak için API geliştirmesi gerekebilir
-        // Bu örnekte basit bir filter kullanıyoruz
-        const couponsData = await fetchCouponCodes();
-        const filteredCoupons = couponsData.filter(coupon => coupon.category_id === categoryId);
-        setCoupons(filteredCoupons);
+        if (categoryData && categoryData.coupon_codes) {
+          setCoupons(categoryData.coupon_codes);
+        } else {
+          setCoupons([]); // Set to empty array if no coupons are loaded
+        }
         
         setError(null);
       } catch (err) {

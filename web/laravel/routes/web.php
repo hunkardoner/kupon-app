@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController; // AdminController import edildi
@@ -10,6 +11,8 @@ use App\Http\Controllers\Admin\CouponCodeController; // CouponCodeController imp
 use App\Http\Controllers\Admin\BlogController; // BlogController import edildi
 use App\Http\Controllers\Admin\PageController; // PageController import edildi
 use App\Http\Controllers\Frontend\HomeController; // HomeController import edildi
+
+Log::info('Routes web.php loaded'); // Moved this line after all use statements
 
 /*
 |--------------------------------------------------------------------------
