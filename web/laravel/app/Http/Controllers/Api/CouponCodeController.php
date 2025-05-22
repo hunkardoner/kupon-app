@@ -12,9 +12,21 @@ class CouponCodeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return CouponCodeResource::collection(CouponCode::with(['brand', 'categories'])->where('is_active', true)->get());
+        $query = CouponCode::with(['brand', 'categories'])->where('is_active', true);
+
+        if ($request->has('brand_id')) {
+            $query->where('brand_id', $request->input('brand_id'));
+        }
+
+        if ($request->has('category_id')) {
+            $query->whereHas('categories', function ($q) use ($request) {
+                $q->where('categories.id', $request->input('category_id'));
+            });
+        }
+
+        return CouponCodeResource::collection($query->latest()->paginate(10));
     }
 
     /**
@@ -72,8 +84,8 @@ class CouponCodeController extends Controller
             'min_purchase_amount' => 'nullable|numeric|min:0',
             'is_active' => 'sometimes|boolean',
             'brand_id' => 'sometimes|required|exists:brands,id',
-            'categories' => 'nullable|array', // Expect an array of category IDs
-            'categories.*' => 'exists:categories,id' // Each item in the array must be a valid category ID
+            'categories' => 'nullable|array',
+            'categories.*' => 'exists:categories,id'
         ]);
 
         $couponCode->update($validatedData);

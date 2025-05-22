@@ -8,11 +8,23 @@ import CardComponent from '../components/common/CardComponent';
 import COLORS from '../constants/colors';
 import styles from './CategoryScreen.styles';
 import { FlatList } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
+import { StackNavigationProp } from '@react-navigation/stack'; // Import StackNavigationProp
+import { CouponStackParamList, MainTabParamList } from '../navigation/types'; // Import CouponStackParamList
+import { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native'; // Import CompositeNavigationProp and NavigatorScreenParams
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'; // Import BottomTabNavigationProp
 
 type CategoryScreenRouteProp = RouteProp<CategoryStackParamList, 'CategoryDetail'>;
 
+// Define navigation prop type for CategoryScreen
+type CategoryScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<CategoryStackParamList, 'CategoryDetail'>,
+  BottomTabNavigationProp<MainTabParamList>
+>;
+
 const CategoryScreen: React.FC = () => {
   const route = useRoute<CategoryScreenRouteProp>();
+  const navigation = useNavigation<CategoryScreenNavigationProp>(); // Initialize navigation
   const { categoryId } = route.params;
   const [category, setCategory] = useState<Category | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -43,6 +55,13 @@ const CategoryScreen: React.FC = () => {
 
     loadCategoryData();
   }, [categoryId]);
+
+  const handleCouponPress = (couponId: number) => {
+    navigation.navigate('CouponsTab', {
+      screen: 'CouponDetail',
+      params: { couponId },
+    } as NavigatorScreenParams<CouponStackParamList>); // Type assertion for params
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color={COLORS.primary} style={styles.centered} />;
@@ -78,7 +97,7 @@ const CategoryScreen: React.FC = () => {
             renderItem={({ item }) => (
               <CardComponent 
                 item={{ ...item, type: 'coupon' }}
-                // onPress işleyicisi buraya eklenebilir
+                onPress={() => handleCouponPress(item.id)} // Add onPress handler
                 style={styles.couponCard}
               />
             )}
