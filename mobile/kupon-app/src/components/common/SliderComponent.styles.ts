@@ -13,15 +13,19 @@ const styles = StyleSheet.create({
   },
   slide: {
     width: width, // Her bir slide ekran genişliğinde olacak
-    height: '100%',
+    height: 250,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative', // Metinleri resmin üzerine konumlandırmak için
+    position: 'relative', // Added back: for absolute positioning of children
   },
   image: {
     width: '100%',
     height: '100%',
-    position: 'absolute', // Resmin tüm alanı kaplaması için
+    position: 'absolute', // Added: to position within the slide container
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   textContainer: {
     position: 'absolute',

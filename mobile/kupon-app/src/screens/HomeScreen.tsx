@@ -33,7 +33,6 @@ const HomeScreen: React.FC = () => {
         setLoading(true);
         const categoriesData = await fetchCategories();
         const slidersData = await fetchSliders();
-        console.log('Sliders Data from API:', slidersData); // Log sliders data
         const couponsData = await fetchCouponCodes({ limit: 5, popular: true });
         const brandsData = await fetchBrands({ limit: 5, popular: true });
 

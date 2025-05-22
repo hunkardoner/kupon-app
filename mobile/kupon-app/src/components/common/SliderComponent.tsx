@@ -38,13 +38,17 @@ const SliderComponent: React.FC<SliderComponentProps> = ({ sliders, onPressSlide
         style={[styles.slide, { width }]} // Her slide tam ekran genişliği
       >
         {imageUrl && (
-          <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+          <Image 
+            source={{ uri: imageUrl }} 
+            style={styles.image} // Use stylesheet style, remove inline
+            resizeMode="cover" 
+          />
         )}
-        <View style={styles.textContainer}>
-          {item.title && <Text style={styles.title}>{item.title}</Text>}
+        {/* <View style={styles.textContainer}> */}
+          {/* {item.title && <Text style={styles.title}>{item.title}</Text>} */}
           {/* item.description is not in SliderResource.php, so commenting out */}
           {/* {item.description && <Text style={styles.description}>{item.description}</Text>} */}
-        </View>
+        {/* </View> */}
       </TouchableOpacity>
     );
   };
