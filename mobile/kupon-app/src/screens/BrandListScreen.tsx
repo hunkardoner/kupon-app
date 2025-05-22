@@ -4,10 +4,10 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  Dimensions,
+  useWindowDimensions, // Import useWindowDimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from './BrandListScreen.styles';
+import createStyles from './BrandListScreen.styles'; // Import createStyles
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BrandStackParamList } from '../navigation/types';
 import { Brand } from '../types';
@@ -26,6 +26,8 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
   const [brands, setBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { width } = useWindowDimensions(); // Get window dimensions
+  const { styles, numColumns } = createStyles(width); // Get styles and numColumns
 
   useEffect(() => {
     async function loadBrands() {
@@ -83,7 +85,7 @@ function BrandListScreen({ navigation }: BrandListScreenProps): React.JSX.Elemen
           renderItem={renderBrandItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}
-          numColumns={2}
+          numColumns={numColumns} // Use dynamic numColumns
           columnWrapperStyle={styles.columnWrapper}
         />
       ) : (

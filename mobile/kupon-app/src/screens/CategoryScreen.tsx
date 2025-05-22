@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, Image, StyleSheet, useWindowDimensions } from 'react-native'; // Import useWindowDimensions
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { CategoryStackParamList } from '../navigation/types';
 import { fetchCategoryById } from '../api';
 import { Category, Coupon } from '../types';
 import CardComponent from '../components/common/CardComponent';
 import COLORS from '../constants/colors';
-import styles from './CategoryScreen.styles';
+import createStyles from './CategoryScreen.styles'; // Import createStyles
 import { FlatList } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation
-import { StackNavigationProp } from '@react-navigation/stack'; // Import StackNavigationProp
-import { CouponStackParamList, MainTabParamList } from '../navigation/types'; // Import CouponStackParamList
-import { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native'; // Import CompositeNavigationProp and NavigatorScreenParams
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs'; // Import BottomTabNavigationProp
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { CouponStackParamList, MainTabParamList } from '../navigation/types';
+import { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 type CategoryScreenRouteProp = RouteProp<CategoryStackParamList, 'CategoryDetail'>;
 
@@ -24,12 +24,14 @@ type CategoryScreenNavigationProp = CompositeNavigationProp<
 
 const CategoryScreen: React.FC = () => {
   const route = useRoute<CategoryScreenRouteProp>();
-  const navigation = useNavigation<CategoryScreenNavigationProp>(); // Initialize navigation
+  const navigation = useNavigation<CategoryScreenNavigationProp>();
   const { categoryId } = route.params;
   const [category, setCategory] = useState<Category | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { width } = useWindowDimensions(); // Get window dimensions
+  const styles = createStyles(width); // Create styles dynamically
 
   useEffect(() => {
     const loadCategoryData = async () => {
@@ -97,14 +99,16 @@ const CategoryScreen: React.FC = () => {
             renderItem={({ item }) => (
               <CardComponent 
                 item={{ ...item, type: 'coupon' }}
-                onPress={() => handleCouponPress(item.id)} // Add onPress handler
-                style={styles.couponCard}
+                onPress={() => handleCouponPress(item.id)}
+                style={styles.couponCard} // This style might need adjustment or removal if CardComponent handles all its layout
               />
             )}
             keyExtractor={(item) => item.id.toString()}
             horizontal={false}
             showsVerticalScrollIndicator={false}
             scrollEnabled={false} // Nested scrolling önlemek için
+            // numColumns could be added here if we want multiple columns for coupons on this screen
+            // For now, it defaults to a vertical list (1 column)
           />
         </View>
       ) : (

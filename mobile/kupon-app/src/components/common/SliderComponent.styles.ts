@@ -1,9 +1,7 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 import COLORS from '../../constants/colors';
 
-const { width } = Dimensions.get('window');
-
-const styles = StyleSheet.create({
+const createStyles = (width: number) => StyleSheet.create({
   container: {
     height: 200, // Slider yüksekliği, ihtiyaca göre ayarlayın
     marginBottom: 16,
@@ -12,7 +10,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   slide: {
-    width: width, // Her bir slide ekran genişliğinde olacak
+    width: width, // Genişliği parametreden al
     height: 250,
     justifyContent: 'center',
     alignItems: 'center',
@@ -50,4 +48,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default styles;
+export default createStyles; // createStyles fonksiyonunu dışa aktar
