@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  ScrollView, // Add ScrollView import
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -82,7 +89,7 @@ function CouponScreen({
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         {brandLogoUrl && (
           <Image
             source={{ uri: brandLogoUrl }}
@@ -122,7 +129,7 @@ function CouponScreen({
           </View>
         )}
         {/* Diğer kupon detayları eklenebilir */}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
