@@ -4,9 +4,10 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  useWindowDimensions, // Import useWindowDimensions
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from './CouponListScreen.styles';
+import createStyles from './CouponListScreen.styles'; // Import the function
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
 import { Coupon } from '../types';
@@ -25,6 +26,8 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { width } = useWindowDimensions(); // Get window dimensions
+  const { styles, numColumns } = createStyles(width); // Destructure styles and numColumns
 
   useEffect(() => {
     async function loadCoupons() {
@@ -82,8 +85,8 @@ function CouponListScreen({ navigation }: CouponListScreenProps): React.JSX.Elem
           renderItem={renderCouponItem}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={styles.listContentContainer}
-          numColumns={2} // Changed to display 2 columns
-          columnWrapperStyle={styles.columnWrapper} // Added column wrapper style
+          numColumns={numColumns} // Use dynamic numColumns from createStyles
+          columnWrapperStyle={styles.columnWrapper} 
         />
       ) : (
         <View style={styles.centeredContainer}>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import styles from './CardComponent.styles';
+import { View, Text, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
+import createStyles from './CardComponent.styles'; // Import the function
 import { Category, Brand, Coupon } from '../../types';
 import COLORS from '../../constants/colors';
 
@@ -26,6 +26,9 @@ const CardComponent: React.FC<CardComponentProps> = ({
   style,
   horizontal = false, // Default to false for grid layout
 }) => {
+  const { width } = useWindowDimensions(); // Get window dimensions
+  const styles = createStyles(width); // Create styles dynamically
+
   let title = '';
   let subtitle: string | undefined | null = undefined;
   let imageUrl: string | undefined | null = undefined;
