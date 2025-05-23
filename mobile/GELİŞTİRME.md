@@ -4,11 +4,11 @@ UI and Styling:
 Styling Kütüphanesi: RULES.md styled-components veya Tailwind CSS önerirken, projede React Native'in dahili StyleSheet.create yöntemi kullanılıyor. Bu, kurala tam uyum için bir değişiklik gerektirebilir.
 <!-- Responsive Design: useWindowDimensions gibi araçlarla ekran boyutlarına duyarlı tasarım prensipleri daha aktif kullanılabilir. -->
 Dark Mode: useColorScheme ile karanlık mod desteği eklenmemiş.
-Accessibility (a11y): ARIA rolleri ve native erişilebilirlik propları ile erişilebilirlik standartlarına uyum sağlanması belirtilmiş; bu konuda özel bir çalışma yapılmamış görünüyor.
+<!-- Accessibility (a11y): ARIA rolleri ve native erişilebilirlik propları ile erişilebilirlik standartlarına uyum sağlanması belirtilmiş; bu konuda özel bir çalışma yapılmamış görünüyor. -->
 Animasyonlar: react-native-reanimated ve react-native-gesture-handler ile performanslı animasyonlar ve jestler kuralda belirtilmiş. FlatList için react-native-gesture-handler dolaylı olarak kullanılıyor olabilir ancak özel animasyonlar için aktif bir kullanım yok.
 Safe Area Management:
 <!-- SafeAreaProvider'ın App.tsx içinde en üst seviyede kullanılıp kullanılmadığı kontrol edilmeli. -->
-Kaydırılabilir içerikler için ScrollView yerine SafeAreaScrollView kullanımı önerilmiş.
+<!-- Kaydırılabilir içerikler için ScrollView yerine SafeAreaScrollView kullanımı önerilmiş. -->
 Performance Optimization:
 Resim Optimizasyonu: expo-image ile WebP formatı, boyut verisi ve lazy loading gibi optimizasyonlar önerilmiş. Şu anki Image bileşeni kullanımı daha temel düzeyde.
 Memoization: useMemo, useCallback ve React.memo gibi tekniklerle gereksiz yeniden render'ların önlenmesi aktif olarak odaklanılmamış.

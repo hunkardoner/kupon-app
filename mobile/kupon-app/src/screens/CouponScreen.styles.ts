@@ -1,102 +1,93 @@
 import { StyleSheet } from 'react-native';
-import Colors from '../constants/colors'; // Assuming you have a colors constant
+import colors from '../constants/colors';
 
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background, // Example color
-  },
+export const couponScreenStyles = StyleSheet.create({
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    backgroundColor: colors.background,
   },
-  image: {
-    width: '100%',
-    height: 250,
-    resizeMode: 'cover',
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
   contentContainer: {
     padding: 20,
+    alignItems: 'center', // İçeriği ortala
   },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: Colors.primaryText, // Example color
-  },
-  brandName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.secondaryText, // Example color
-    marginBottom: 5,
-  },
-  categoryName: {
-    fontSize: 16,
-    fontStyle: 'italic',
-    color: Colors.tertiaryText, // Example color
+  brandLogo: {
+    width: 150,
+    height: 75,
     marginBottom: 15,
   },
-  codeContainer: {
-    backgroundColor: Colors.primary, // Example color
+  brandName: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  couponCodeLabel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    marginTop: 15,
+  },
+  couponCode: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.primary, // Changed from colors.accent
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
+    backgroundColor: colors.border, // Changed from colors.lightGray
     borderRadius: 8,
-    alignItems: 'center',
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  codeLabel: {
-    fontSize: 14,
-    color: Colors.white, // Example color
-    marginBottom: 4,
-  },
-  codeText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: Colors.white, // Example color
-    letterSpacing: 1,
-  },
-  descriptionHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 8,
-    color: Colors.primaryText,
+    textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    lineHeight: 24,
-    color: Colors.secondaryText,
-    marginBottom: 15,
-  },
-  termsHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 8,
-    color: Colors.primaryText,
-  },
-  terms: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: Colors.tertiaryText,
-    marginBottom: 15,
-  },
-  expiresText: {
-    fontSize: 14,
-    color: Colors.accent,
+    color: colors.text,
     textAlign: 'center',
-    marginTop: 10,
+    paddingHorizontal: 10,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  detailLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  detailValue: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    flexShrink: 1, // Allow text to shrink if needed
     marginBottom: 20,
   },
   errorText: {
-    color: 'red',
     fontSize: 16,
+    color: 'red',
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    flex: 1, // Take remaining space
+    marginLeft: 8, // Add some space between label and tags
+  },
+  categoryTag: {
+    backgroundColor: colors.primary,
+    color: colors.white,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 4,
+    marginBottom: 4,
+    fontSize: 12,
   },
 });

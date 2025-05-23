@@ -38,19 +38,23 @@ const CardComponent: React.FC<CardComponentProps> = ({
   let title = '';
   let subtitle: string | undefined | null = undefined;
   let imageUrl: string | undefined | null = undefined;
+  let accessibilityLabelSuffix = '';
 
   if (item.type === 'category') {
     title = item.name;
     subtitle = item.description;
     imageUrl = item.image; // Changed from item.image_url to item.image
+    accessibilityLabelSuffix = 'kategorisi';
   } else if (item.type === 'brand') {
     title = item.name;
     subtitle = item.description;
     imageUrl = item.logo; // Changed from item.image to item.logo
+    accessibilityLabelSuffix = 'markası';
   } else if (item.type === 'coupon') {
     title = item.code;
     subtitle = item.description;
     imageUrl = item.brand?.logo; // Changed from item.brand?.image to item.brand?.logo
+    accessibilityLabelSuffix = 'kuponu';
   }
 
   // Resim URL'sini işle - null olmadığını ve tam URL olduğunu kontrol et
@@ -67,6 +71,11 @@ const CardComponent: React.FC<CardComponentProps> = ({
 
   return (
     <TouchableOpacity
+      // accessible={true} // Removed: TouchableOpacity is accessible by default
+      accessibilityLabel={`${title}${subtitle ? `, ${subtitle}` : ''} ${accessibilityLabelSuffix}`}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !onPress }} // Added
+      accessibilityHint={onPress ? `Detayları görmek için dokunun: ${title}` : undefined} // Made conditional
       onPress={() => onPress && onPress(item)}
       style={[
         styles.touchable,
@@ -84,9 +93,16 @@ const CardComponent: React.FC<CardComponentProps> = ({
             source={imageSource}
             style={styles.image}
             resizeMode="contain"
+            accessible={true}
+            accessibilityLabel={`${title} ${item.type === 'brand' || (item.type === 'coupon' && item.brand) ? 'logosu' : 'resmi'}`}
+            accessibilityRole="image"
           />
         ) : (
-          <View style={[styles.image, styles.placeholderImage]}>
+          <View
+            style={[styles.image, styles.placeholderImage]}
+            accessible={true}
+            accessibilityLabel={`${title} için resim yok, baş harf: ${title.substring(0, 1).toUpperCase()}`}
+            accessibilityRole="image">
             <Text style={styles.placeholderText}>
               {title.substring(0, 1).toUpperCase()}
             </Text>
