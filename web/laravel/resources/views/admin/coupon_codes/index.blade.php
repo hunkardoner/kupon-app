@@ -44,8 +44,8 @@
                         <td>{{ $couponCode->end_date ? $couponCode->end_date->format('Y-m-d') : 'N/A' }}</td>
                         <td>
                             @if($couponCode->campaign_url)
-                                <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ $couponCode->campaign_url }}">
-                                    <i class="fas fa-external-link-alt"></i>
+                                <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-outline-success" title="{{ $couponCode->campaign_url }}">
+                                    <i class="fas fa-rocket"></i> Kampanya
                                 </a>
                             @else
                                 <span class="text-muted">-</span>

@@ -80,8 +80,8 @@
                     <th>Campaign URL</th>
                     <td>
                         @if($couponCode->campaign_url)
-                            <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-primary">
-                                <i class="fas fa-external-link-alt"></i> Visit Campaign
+                            <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-success">
+                                <i class="fas fa-rocket"></i> Kampanyaya Git
                             </a>
                             <br>
                             <small class="text-muted">{{ $couponCode->campaign_url }}</small>
