@@ -4,8 +4,10 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Share,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
@@ -132,24 +134,39 @@ const CategoryTag = styled.Text`
 
 const CouponCodeContainer = styled.View`
   flex-direction: row;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
   width: 100%;
 `;
 
 const CopyButton = styled.TouchableOpacity`
-  background-color: ${({ theme }: any) => theme.colors.secondary};
-  padding: ${({ theme }: any) => theme.spacing.sm}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
-  margin-left: ${({ theme }: any) => theme.spacing.md}px;
+  background-color: ${({ theme }: any) => theme.colors.primary};
+  padding: ${({ theme }: any) => theme.spacing.md}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  margin-left: ${({ theme }: any) => theme.spacing.sm}px;
+  justify-content: center;
+  align-items: center;
+  min-height: 56px;
+  flex: 1;
 `;
 
-const CopyButtonText = styled.Text`
-  color: ${({ theme }: any) => theme.colors.surface};
-  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
-  font-weight: ${({ theme }: any) => theme.typography.weights.medium};
+const ShareButton = styled.TouchableOpacity`
+  background-color: ${({ theme }: any) => theme.colors.secondary || theme.colors.primary};
+  padding: ${({ theme }: any) => theme.spacing.md}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  margin-left: ${({ theme }: any) => theme.spacing.sm}px;
+  justify-content: center;
+  align-items: center;
+  min-height: 56px;
+  flex: 1;
 `;
+
+// const CopyButtonText = styled.Text`
+//   color: ${({ theme }: any) => theme.colors.surface};
+//   font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
+//   font-weight: ${({ theme }: any) => theme.typography.weights.medium};
+// `;
 
 const CampaignButton = styled.TouchableOpacity`
   background-color: ${({ theme }: any) => theme.colors.primary};
@@ -196,6 +213,23 @@ function CouponScreen({
         Alert.alert('Başarılı', 'Kupon kodu kopyalandı!');
       } catch (error) {
         Alert.alert('Hata', 'Kupon kodu kopyalanırken bir hata oluştu.');
+      }
+    }
+  };
+
+  const handleShareCode = async () => {
+    if (coupon?.code) {
+      try {
+        const shareMessage = `${coupon.brand?.name || 'Kupon'} - İndirim Kodu: ${coupon.code}${
+          coupon.campaign_url ? `\n\nKampanya: ${coupon.campaign_url}` : ''
+        }`;
+        
+        await Share.share({
+          message: shareMessage,
+          title: `${coupon.brand?.name || 'Kupon'} İndirim Kodu`,
+        });
+      } catch (error) {
+        Alert.alert('Hata', 'Kupon kodu paylaşılırken bir hata oluştu.');
       }
     }
   };
@@ -298,8 +332,14 @@ function CouponScreen({
               accessible={true}
               accessibilityLabel="Kupon kodunu kopyala"
               onPress={handleCopyCode}>
-              <CopyButtonText>Kopyala</CopyButtonText>
+              <Ionicons name="copy-outline" size={20} color="white" />
             </CopyButton>
+            <ShareButton
+              accessible={true}
+              accessibilityLabel="Kupon kodunu paylaş"
+              onPress={handleShareCode}>
+              <Ionicons name="share-outline" size={20} color="white" />
+            </ShareButton>
           </CouponCodeContainer>
           
           {coupon.campaign_url && (
@@ -308,7 +348,7 @@ function CouponScreen({
               accessibilityLabel="Kampanyaya git"
               onPress={handleCampaignPress}>
               <CampaignButtonText>
-                🚀 Kampanyaya Git
+                <Ionicons name="rocket-outline" size={20} color="white" /> Kampanyaya Git
               </CampaignButtonText>
             </CampaignButton>
           )}
@@ -331,23 +371,27 @@ function CouponScreen({
                   : `${coupon.discount_value} TL`}
               </DetailValue>
             </DetailRow>
-            <DetailRow>
-              <DetailLabel
-                accessible={true}
-                accessibilityLabel="Geçerlilik tarihi etiketi">
-                Geçerlilik Tarihi:
-              </DetailLabel>
-              <DetailValue
-                accessible={true}
-                accessibilityLabel={`Geçerlilik tarihi: ${new Date(
-                  coupon.start_date,
-                ).toLocaleDateString()} tire ${new Date(
-                  coupon.end_date,
-                ).toLocaleDateString()}`}>
-                {new Date(coupon.start_date).toLocaleDateString()} -{' '}
-                {new Date(coupon.end_date).toLocaleDateString()}
-              </DetailValue>
-            </DetailRow>
+            {coupon.valid_from && coupon.valid_to && 
+             !isNaN(new Date(coupon.valid_from).getTime()) && 
+             !isNaN(new Date(coupon.valid_to).getTime()) && (
+              <DetailRow>
+                <DetailLabel
+                  accessible={true}
+                  accessibilityLabel="Geçerlilik tarihi etiketi">
+                  Geçerlilik Tarihi:
+                </DetailLabel>
+                <DetailValue
+                  accessible={true}
+                  accessibilityLabel={`Geçerlilik tarihi: ${new Date(
+                    coupon.valid_from,
+                  ).toLocaleDateString()} tire ${new Date(
+                    coupon.valid_to,
+                  ).toLocaleDateString()}`}>
+                  {new Date(coupon.valid_from).toLocaleDateString()} -{' '}
+                  {new Date(coupon.valid_to).toLocaleDateString()}
+                </DetailValue>
+              </DetailRow>
+            )}
             {coupon.categories && coupon.categories.length > 0 && (
               <DetailRow>
                 <DetailLabel

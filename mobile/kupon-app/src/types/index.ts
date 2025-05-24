@@ -32,8 +32,8 @@ export interface Coupon {
   description: string;
   discount_type: 'percentage' | 'fixed_amount';
   discount_value: number;
-  start_date: string;
-  end_date: string;
+  valid_from: string; // API'den gelen field ismi
+  valid_to: string; // API'den gelen field ismi
   usage_limit?: number | null;
   usage_count: number;
   is_active: boolean;
