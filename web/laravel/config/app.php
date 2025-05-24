@@ -128,6 +128,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | API Key
+    |--------------------------------------------------------------------------
+    |
+    | This value is used to authenticate API requests from mobile applications.
+    | You should set this to a secure random string in your ".env" file.
+    |
+    */
+
+    'api_key' => env('API_KEY', 'kupon-mobile-app-2024'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |

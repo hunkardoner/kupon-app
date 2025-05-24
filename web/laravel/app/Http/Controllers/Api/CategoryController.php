@@ -28,9 +28,18 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Category $category)
+    public function show($id)
     {
-        return new CategoryResource($category->load(['parent', 'children', 'couponCodes']));
+        $category = Category::with(['parent', 'children', 'couponCodes'])->find($id);
+        
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kategori bulunamadı.'
+            ], 404);
+        }
+        
+        return new CategoryResource($category);
     }
 
     /**

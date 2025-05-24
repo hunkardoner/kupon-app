@@ -28,8 +28,17 @@ class BrandController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Brand $brand)
+    public function show($id)
     {
+        $brand = Brand::where('is_active', true)->find($id);
+        
+        if (!$brand) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Marka bulunamadı.'
+            ], 404);
+        }
+        
         return new BrandResource($brand);
     }
 

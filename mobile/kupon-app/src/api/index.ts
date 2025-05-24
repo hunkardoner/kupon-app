@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { Category, Brand, Coupon, Slider } from '../types'; // Tipleri import et
 
-export const API_BASE_URL = 'http://localhost:8000/api'; // Laravel API adresiniz // Exported constant
+export const API_BASE_URL = 'http://192.168.1.102:8000/api'; // Laravel API adresiniz // Exported constant
+export const API_KEY = 'kupon-mobile-secure-2024-key'; // API anahtarı
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'X-API-Key': API_KEY, // API key'i header olarak ekle
     // Gerekirse buraya Authorization token gibi header'lar eklenebilir
   },
 });

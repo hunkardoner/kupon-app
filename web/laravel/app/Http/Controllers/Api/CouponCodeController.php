@@ -64,9 +64,18 @@ class CouponCodeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CouponCode $couponCode)
+    public function show($id)
     {
-        return new CouponCodeResource($couponCode->load(['brand', 'categories']));
+        $couponCode = CouponCode::with(['brand', 'categories'])->find($id);
+        
+        if (!$couponCode) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kupon kodu bulunamadı.'
+            ], 404);
+        }
+        
+        return new CouponCodeResource($couponCode);
     }
 
     /**
