@@ -33,7 +33,7 @@
                 <h2 class="fw-bold with-line">Popüler Kategoriler</h2>
             </div>
             <div class="col-md-4 text-md-end">
-                <a href="#" class="btn btn-outline-primary rounded-pill">Tüm Kategorileri Gör</a>
+                <a href="{{ route('categories.index') }}" class="btn btn-outline-primary rounded-pill">Tüm Kategorileri Gör</a>
             </div>
         </div>
         
@@ -41,15 +41,17 @@
             @if(isset($categories) && $categories->count() > 0)
                 @foreach($categories->take(8) as $category)
                 <div class="col-6 col-md-3">
-                    <div class="card category-card h-100 border-0 shadow-sm hover-scale">
-                        <div class="card-img-wrapper">
-                            <img src="{{ $category->image ? asset('storage/' . $category->image) : 'https://via.placeholder.com/300x200?text=Category+Image' }}" 
-                                class="card-img-top" alt="{{ $category->name }}" loading="lazy">
-                            <div class="card-img-overlay d-flex align-items-end">
-                                <h5 class="card-title text-white m-0 p-3 w-100 category-label">{{ $category->name }}</h5>
+                    <a href="{{ route('categories.show', $category->slug) }}" class="text-decoration-none">
+                        <div class="card category-card h-100 border-0 shadow-sm hover-scale">
+                            <div class="card-img-wrapper">
+                                <img src="{{ $category->image ? asset('storage/' . $category->image) : 'https://via.placeholder.com/300x200?text=Category+Image' }}" 
+                                    class="card-img-top" alt="{{ $category->name }}" loading="lazy">
+                                <div class="card-img-overlay d-flex align-items-end">
+                                    <h5 class="card-title text-white m-0 p-3 w-100 category-label">{{ $category->name }}</h5>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 @endforeach
             @else
@@ -108,7 +110,7 @@
                 <h2 class="fw-bold with-line">En Yeni Kuponlar</h2>
             </div>
             <div class="col-md-4 text-md-end">
-                <a href="#" class="btn btn-outline-primary rounded-pill">Tüm Kuponları Gör</a>
+                <a href="{{ route('coupons.index') }}" class="btn btn-outline-primary rounded-pill">Tüm Kuponları Gör</a>
             </div>
         </div>
 
@@ -121,7 +123,7 @@
                             <div class="d-flex align-items-center">
                                 <div class="brand-logo me-3">
                                     @if($coupon->brand && isset($coupon->brand->logo))
-                                        <img src="{{ asset('storage/' . $coupon->brand->logo) }}" alt="{{ $coupon->brand->name }}" class="img-fluid rounded-circle">
+                                        <img src="{{ $coupon->brand->logo_url }}" alt="{{ $coupon->brand->name }}" class="img-fluid rounded-circle">
                                     @else
                                         <div class="brand-placeholder rounded-circle d-flex align-items-center justify-content-center">
                                             {{ $coupon->brand ? substr($coupon->brand->name, 0, 1) : '?' }}
@@ -143,6 +145,14 @@
                                 <button class="btn btn-primary copy-btn" data-clipboard-text="{{ $coupon->code }}">
                                     Kopyala
                                 </button>
+                            </div>
+                            <div class="mt-3">
+                                <a href="{{ route('coupons.show', $coupon->id) }}" class="btn btn-outline-secondary btn-sm me-2">Detaylar</a>
+                                @if($coupon->campaign_url)
+                                    <a href="{{ $coupon->campaign_url }}" target="_blank" class="btn btn-success btn-sm">
+                                        {{ $coupon->campaign_title ?: 'Kampanyaya Git' }}
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>

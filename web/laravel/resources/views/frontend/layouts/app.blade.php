@@ -3,19 +3,113 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>@yield('title', 'KuponSal - En İyi İndirim Kuponları ve Fırsatlar')</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="@yield('description', 'Türkiye\'nin en büyük kupon ve indirim sitesi. Binlerce marka için geçerli kupon kodları, indirim fırsatları ve promosyon kodları.')">
+    <meta name="keywords" content="kupon, indirim, promosyon kodu, fırsat, alışveriş, tasarruf">
+    <meta name="author" content="KuponSal">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="@yield('title', 'KuponSal - En İyi İndirim Kuponları')">
+    <meta property="og:description" content="@yield('description', 'Türkiye\'nin en büyük kupon ve indirim sitesi.')">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request()->url() }}">
+    <meta property="og:site_name" content="KuponSal">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('title', 'KuponSal - En İyi İndirim Kuponları')">
+    <meta name="twitter:description" content="@yield('description', 'Türkiye\'nin en büyük kupon ve indirim sitesi.')">
+    
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ request()->url() }}">
+    
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=Nunito:400,600,700" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom Styles -->
+    <style>
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            transform: translateY(-1px);
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #667eea !important;
+        }
+        
+        .navbar-nav .nav-link.active {
+            color: #667eea !important;
+            font-weight: 600;
+        }
+        
+        /* Mobile Search */
+        @media (max-width: 768px) {
+            #searchForm {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            #searchInput {
+                flex: 1;
+            }
+        }
+        
+        /* Sticky Footer */
+        html, body {
+            height: 100%;
+        }
+        
+        #app {
+            min-height: 100vh;
+        }
+        
+        .flex-grow-1 {
+            flex: 1 0 auto;
+        }
+        
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
+    
+    @stack('styles')
+    
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    @stack('styles')
 </head>
 <body>
-    <div id="app">
+    <div id="app" class="d-flex flex-column min-vh-100">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm sticky-top">
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}">
@@ -32,19 +126,38 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('frontend.home') }}">Anasayfa</a>
+                            <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Anasayfa</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Kategoriler</a>
+                            <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">Kategoriler</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Popüler Markalar</a>
+                            <a class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}" href="{{ route('brands.index') }}">Markalar</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Son Fırsatlar</a>
+                            <a class="nav-link {{ request()->routeIs('coupons.*') ? 'active' : '' }}" href="{{ route('coupons.index') }}">Tüm Kuponlar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('blog.*') ? 'active' : '' }}" href="{{ route('blog.index') }}">Blog</a>
                         </li>
                         {{-- Add more navigation links here --}}
                     </ul>
+
+                    <!-- Search Form -->
+                    <div class="d-flex me-3">
+                        <form class="d-flex position-relative" method="GET" action="{{ route('search') }}" id="searchForm">
+                            <input class="form-control me-2" type="search" name="q" placeholder="Kupon, marka ara..." 
+                                   aria-label="Search" id="searchInput" autocomplete="off" 
+                                   value="{{ request('q') }}">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <!-- Search Suggestions Dropdown -->
+                            <div id="searchSuggestions" class="position-absolute bg-white border rounded shadow-sm" 
+                                 style="top: 100%; left: 0; right: 40px; z-index: 1000; display: none; max-height: 300px; overflow-y: auto;">
+                            </div>
+                        </form>
+                    </div>
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
@@ -83,11 +196,11 @@
             </div>
         </nav>
 
-        <main>
+        <main class="flex-grow-1">
             @yield('content')
         </main>
         
-        <footer class="bg-dark text-white pt-5 pb-4">
+        <footer class="bg-dark text-white pt-5 pb-4 mt-auto">
             <div class="container">
                 <div class="row g-4">
                     <div class="col-lg-4 mb-4 mb-lg-0">
@@ -103,11 +216,11 @@
                     <div class="col-6 col-md-4 col-lg-2">
                         <h6 class="fw-bold mb-3">Kategoriler</h6>
                         <ul class="list-unstyled">
-                            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Moda</a></li>
-                            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Elektronik</a></li>
-                            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Seyahat</a></li>
-                            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Yemek</a></li>
-                            <li><a href="#" class="text-white-50 text-decoration-none">Daha Fazla</a></li>
+                            <li class="mb-2"><a href="{{ route('categories.index') }}" class="text-white-50 text-decoration-none">Tüm Kategoriler</a></li>
+                            <li class="mb-2"><a href="{{ route('brands.index') }}" class="text-white-50 text-decoration-none">Markalar</a></li>
+                            <li class="mb-2"><a href="{{ route('coupons.index') }}" class="text-white-50 text-decoration-none">Tüm Kuponlar</a></li>
+                            <li class="mb-2"><a href="{{ route('blog.index') }}" class="text-white-50 text-decoration-none">Blog</a></li>
+                            <li><a href="{{ route('search') }}" class="text-white-50 text-decoration-none">Arama</a></li>
                         </ul>
                     </div>
                     <div class="col-6 col-md-4 col-lg-2">
@@ -142,6 +255,78 @@
         </footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Search Suggestions Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        let timeout = null;
+
+        if (searchInput && searchSuggestions) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeout);
+                const query = this.value.trim();
+
+                if (query.length < 2) {
+                    searchSuggestions.style.display = 'none';
+                    return;
+                }
+
+                timeout = setTimeout(function() {
+                    fetch('{{ route("search.suggestions") }}?q=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                let html = '';
+                                data.forEach(function(item) {
+                                    html += `
+                                        <a href="${item.url}" class="d-block p-2 text-decoration-none text-dark border-bottom suggestion-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="${item.icon} me-2 text-primary"></i>
+                                                <div>
+                                                    <div class="fw-bold">${item.title}</div>
+                                                    ${item.subtitle ? `<small class="text-muted">${item.subtitle}</small>` : ''}
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                searchSuggestions.innerHTML = html;
+                                searchSuggestions.style.display = 'block';
+                            } else {
+                                searchSuggestions.style.display = 'none';
+                            }
+                        })
+                        .catch(function() {
+                            searchSuggestions.style.display = 'none';
+                        });
+                }, 300);
+            });
+
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                    searchSuggestions.style.display = 'none';
+                }
+            });
+
+            // Show suggestions when focusing on input if there's content
+            searchInput.addEventListener('focus', function() {
+                if (this.value.length >= 2 && searchSuggestions.innerHTML.trim() !== '') {
+                    searchSuggestions.style.display = 'block';
+                }
+            });
+        }
+    });
+    </script>
+
+    <style>
+    .suggestion-item:hover {
+        background-color: #f8f9fa;
+    }
+    </style>
+    
     @stack('scripts')
 </body>
 </html>

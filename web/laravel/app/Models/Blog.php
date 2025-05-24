@@ -26,6 +26,35 @@ class Blog extends Model
         'published_at' => 'datetime',
     ];
 
+    /**
+     * Get the image URL with storage path
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image && !str_starts_with($this->image, 'http')) {
+            return asset('storage/' . $this->image);
+        }
+        return $this->image;
+    }
+
+    /**
+     * Get the blog excerpt
+     */
+    public function getExcerptAttribute()
+    {
+        return \Str::limit(strip_tags($this->content), 150);
+    }
+
+    /**
+     * Get reading time in minutes
+     */
+    public function getReadingTimeAttribute()
+    {
+        $wordCount = str_word_count(strip_tags($this->content));
+        $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words per minute
+        return $readingTime;
+    }
+
     protected static function boot()
     {
         parent::boot();

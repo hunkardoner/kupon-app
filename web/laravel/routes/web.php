@@ -11,6 +11,11 @@ use App\Http\Controllers\Admin\CouponCodeController; // CouponCodeController imp
 use App\Http\Controllers\Admin\BlogController; // BlogController import edildi
 use App\Http\Controllers\Admin\PageController; // PageController import edildi
 use App\Http\Controllers\Frontend\HomeController; // HomeController import edildi
+use App\Http\Controllers\Frontend\CategoryController as FrontendCategoryController; // Frontend CategoryController import edildi
+use App\Http\Controllers\Frontend\BrandController as FrontendBrandController; // Frontend BrandController import edildi
+use App\Http\Controllers\Frontend\CouponController as FrontendCouponController; // Frontend CouponController import edildi
+use App\Http\Controllers\Frontend\BlogController as FrontendBlogController; // Frontend BlogController import edildi
+use App\Http\Controllers\Frontend\SearchController; // Frontend SearchController import edildi
 
 Log::info('Routes web.php loaded'); // Moved this line after all use statements
 
@@ -25,7 +30,28 @@ Log::info('Routes web.php loaded'); // Moved this line after all use statements
 |
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('frontend.home');
+// Frontend Routes
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Search Routes
+Route::get('/ara', [SearchController::class, 'index'])->name('search');
+Route::get('/api/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+
+// Categories Routes
+Route::get('/kategoriler', [FrontendCategoryController::class, 'index'])->name('categories.index');
+Route::get('/kategori/{slug}', [FrontendCategoryController::class, 'show'])->name('categories.show');
+
+// Brands Routes
+Route::get('/markalar', [FrontendBrandController::class, 'index'])->name('brands.index');
+Route::get('/marka/{slug}', [FrontendBrandController::class, 'show'])->name('brands.show');
+
+// Coupons Routes
+Route::get('/kuponlar', [FrontendCouponController::class, 'index'])->name('coupons.index');
+Route::get('/kupon/{id}', [FrontendCouponController::class, 'show'])->name('coupons.show');
+
+// Blog Routes
+Route::get('/blog', [FrontendBlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [FrontendBlogController::class, 'show'])->name('blog.show');
 
 // Breeze's default dashboard route, this can be removed or modified.
 // For now, I'm leaving it as is.

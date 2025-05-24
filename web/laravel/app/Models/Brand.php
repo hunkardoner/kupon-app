@@ -16,4 +16,20 @@ class Brand extends Model
         'description',
         'is_active',
     ];
+
+    /**
+     * Get the logo URL with storage path
+     */
+    public function getLogoUrlAttribute()
+    {
+        if ($this->logo && !str_starts_with($this->logo, 'http')) {
+            return asset('storage/' . $this->logo);
+        }
+        return $this->logo;
+    }
+
+    public function couponCodes()
+    {
+        return $this->hasMany(CouponCode::class);
+    }
 }
