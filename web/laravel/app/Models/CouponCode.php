@@ -21,6 +21,7 @@ class CouponCode extends Model
         'min_purchase_amount',
         'is_active',
         'brand_id',
+        'campaign_url',
     ];
 
     /**

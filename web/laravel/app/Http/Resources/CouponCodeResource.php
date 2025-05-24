@@ -26,6 +26,7 @@ class CouponCodeResource extends JsonResource
             'max_uses_user' => $this->max_uses_user,
             'times_used' => $this->times_used,
             'min_purchase_amount' => $this->min_purchase_amount,
+            'campaign_url' => $this->campaign_url,
             'is_active' => (bool) $this->is_active,
             'brand' => new BrandResource($this->whenLoaded('brand')),
             'categories' => CategoryResource::collection($this->whenLoaded('categories')),

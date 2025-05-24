@@ -77,6 +77,20 @@
                     <td>{{ $couponCode->is_active ? 'Yes' : 'No' }}</td>
                 </tr>
                 <tr>
+                    <th>Campaign URL</th>
+                    <td>
+                        @if($couponCode->campaign_url)
+                            <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-primary">
+                                <i class="fas fa-external-link-alt"></i> Visit Campaign
+                            </a>
+                            <br>
+                            <small class="text-muted">{{ $couponCode->campaign_url }}</small>
+                        @else
+                            N/A
+                        @endif
+                    </td>
+                </tr>
+                <tr>
                     <th>Created At</th>
                     <td>{{ $couponCode->created_at->format('Y-m-d H:i:s') }}</td>
                 </tr>

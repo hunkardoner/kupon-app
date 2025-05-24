@@ -38,6 +38,7 @@ export interface Coupon {
   usage_count: number;
   is_active: boolean;
   brand_id: number;
+  campaign_url?: string | null; // Kampanya linki
   brand?: Brand; // İlişkili marka bilgisi (opsiyonel, API'ye göre)
   categories?: Category[]; // Changed to an array of categories
   created_at: string;

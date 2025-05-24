@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
+  Alert,
+  Linking,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
@@ -59,9 +62,9 @@ const CouponCode = styled.Text`
   background-color: ${({ theme }: any) => theme.colors.surface};
   border: 2px solid ${({ theme }: any) => theme.colors.primary};
   border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
   text-align: center;
-  min-width: 200px;
+  flex: 1;
+  margin-right: ${({ theme }: any) => theme.spacing.sm}px;
 `;
 
 const DetailsContainer = styled.View`
@@ -127,6 +130,43 @@ const CategoryTag = styled.Text`
   font-weight: ${({ theme }: any) => theme.typography.weights.medium};
 `;
 
+const CouponCodeContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
+  width: 100%;
+`;
+
+const CopyButton = styled.TouchableOpacity`
+  background-color: ${({ theme }: any) => theme.colors.secondary};
+  padding: ${({ theme }: any) => theme.spacing.sm}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
+  margin-left: ${({ theme }: any) => theme.spacing.md}px;
+`;
+
+const CopyButtonText = styled.Text`
+  color: ${({ theme }: any) => theme.colors.surface};
+  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.medium};
+`;
+
+const CampaignButton = styled.TouchableOpacity`
+  background-color: ${({ theme }: any) => theme.colors.primary};
+  padding-vertical: ${({ theme }: any) => theme.spacing.md}px;
+  padding-horizontal: ${({ theme }: any) => theme.spacing.lg}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
+  width: 100%;
+  align-items: center;
+`;
+
+const CampaignButtonText = styled.Text`
+  color: ${({ theme }: any) => theme.colors.surface};
+  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+`;
+
 type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
 type CouponScreenNavigationProp = StackNavigationProp<
   CouponStackParamList,
@@ -147,6 +187,33 @@ function CouponScreen({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
+
+  // Helper functions
+  const handleCopyCode = async () => {
+    if (coupon?.code) {
+      try {
+        await Clipboard.setStringAsync(coupon.code);
+        Alert.alert('Başarılı', 'Kupon kodu kopyalandı!');
+      } catch (error) {
+        Alert.alert('Hata', 'Kupon kodu kopyalanırken bir hata oluştu.');
+      }
+    }
+  };
+
+  const handleCampaignPress = async () => {
+    if (coupon?.campaign_url) {
+      try {
+        const supported = await Linking.canOpenURL(coupon.campaign_url);
+        if (supported) {
+          await Linking.openURL(coupon.campaign_url);
+        } else {
+          Alert.alert('Hata', 'Bu bağlantı açılamıyor.');
+        }
+      } catch (error) {
+        Alert.alert('Hata', 'Bağlantı açılırken bir hata oluştu.');
+      }
+    }
+  };
 
   useEffect(() => {
     const loadCoupon = async () => {
@@ -221,12 +288,30 @@ function CouponScreen({
             {coupon.brand?.name}
           </BrandName>
           <CouponCodeLabel>Kupon Kodu:</CouponCodeLabel>
-          <CouponCode
-            accessible={true}
-            accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
-            {coupon.code}
-          </CouponCode>
+          <CouponCodeContainer>
+            <CouponCode
+              accessible={true}
+              accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
+              {coupon.code}
+            </CouponCode>
+            <CopyButton
+              accessible={true}
+              accessibilityLabel="Kupon kodunu kopyala"
+              onPress={handleCopyCode}>
+              <CopyButtonText>Kopyala</CopyButtonText>
+            </CopyButton>
+          </CouponCodeContainer>
           
+          {coupon.campaign_url && (
+            <CampaignButton
+              accessible={true}
+              accessibilityLabel="Kampanyaya git"
+              onPress={handleCampaignPress}>
+              <CampaignButtonText>
+                🚀 Kampanyaya Git
+              </CampaignButtonText>
+            </CampaignButton>
+          )}
           <DetailsContainer>
             <DetailRow>
               <DetailLabel

@@ -49,6 +49,15 @@
                 @enderror
             </div>
 
+            <div class="mb-3">
+                <label for="campaign_url" class="form-label">Campaign URL</label>
+                <input type="url" class="form-control @error('campaign_url') is-invalid @enderror" id="campaign_url" name="campaign_url" value="{{ old('campaign_url', $couponCode->campaign_url) }}" placeholder="https://example.com/campaign">
+                @error('campaign_url')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <div class="form-text">Enter the campaign URL where users will be redirected when they click "Go to Campaign" button in the mobile app.</div>
+            </div>
+
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="discount_type" class="form-label">Discount Type</label>

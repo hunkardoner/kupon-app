@@ -46,6 +46,7 @@ class CouponCodeController extends Controller
             'min_purchase_amount' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
             'brand_id' => 'required|exists:brands,id',
+            'campaign_url' => 'nullable|url|max:2048',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id'
         ]);
@@ -84,6 +85,7 @@ class CouponCodeController extends Controller
             'min_purchase_amount' => 'nullable|numeric|min:0',
             'is_active' => 'sometimes|boolean',
             'brand_id' => 'sometimes|required|exists:brands,id',
+            'campaign_url' => 'nullable|url|max:2048',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id'
         ]);

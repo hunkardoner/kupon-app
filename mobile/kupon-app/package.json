@@ -25,7 +25,8 @@
     "react-native-screens": "^4.10.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.20.0",
-    "styled-components": "^6.1.18"
+    "styled-components": "^6.1.18",
+    "expo-clipboard": "~7.1.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

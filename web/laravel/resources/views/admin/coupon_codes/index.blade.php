@@ -20,6 +20,7 @@
                     <th>Discount</th>
                     <th>Valid From</th>
                     <th>Valid To</th>
+                    <th>Campaign URL</th>
                     <th>Active</th>
                     <th>Actions</th>
                 </tr>
@@ -41,6 +42,15 @@
                         </td>
                         <td>{{ $couponCode->start_date ? $couponCode->start_date->format('Y-m-d') : 'N/A' }}</td>
                         <td>{{ $couponCode->end_date ? $couponCode->end_date->format('Y-m-d') : 'N/A' }}</td>
+                        <td>
+                            @if($couponCode->campaign_url)
+                                <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="{{ $couponCode->campaign_url }}">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
+                        </td>
                         <td>{{ $couponCode->is_active ? 'Yes' : 'No' }}</td>
                         <td>
                             <a href="{{ route('admin.coupon-codes.show', $couponCode) }}" class="btn btn-info btn-sm">View</a>
@@ -54,7 +64,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center">No coupon codes found.</td>
+                        <td colspan="9" class="text-center">No coupon codes found.</td>
                     </tr>
                 @endforelse
             </tbody>
