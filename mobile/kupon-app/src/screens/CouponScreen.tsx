@@ -37,58 +37,70 @@ const BrandLogo = styled.Image`
 `;
 
 const BrandName = styled.Text`
-  font-size: 26px;
-  font-weight: bold;
+  font-size: ${({ theme }: any) => theme.typography.sizes.xl}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
   color: ${({ theme }: any) => theme.colors.primary};
-  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
   text-align: center;
 `;
 
 const CouponCodeLabel = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
   color: ${({ theme }: any) => theme.colors.textSecondary};
-  margin-top: ${({ theme }: any) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
 `;
 
 const CouponCode = styled.Text`
-  font-size: 28px;
-  font-weight: bold;
+  font-size: ${({ theme }: any) => theme.typography.sizes.xl}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
   color: ${({ theme }: any) => theme.colors.primary};
-  padding-vertical: ${({ theme }: any) => theme.spacing.sm}px;
+  padding-vertical: ${({ theme }: any) => theme.spacing.md}px;
   padding-horizontal: ${({ theme }: any) => theme.spacing.lg}px;
-  background-color: ${({ theme }: any) => theme.colors.border};
-  border-radius: ${({ theme }: any) => theme.borderRadius.md}px;
+  background-color: ${({ theme }: any) => theme.colors.surface};
+  border: 2px solid ${({ theme }: any) => theme.colors.primary};
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
   margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
   text-align: center;
+  min-width: 200px;
 `;
 
-const Description = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
-  color: ${({ theme }: any) => theme.colors.text};
-  text-align: center;
-  padding-horizontal: ${({ theme }: any) => theme.spacing.sm}px;
+const DetailsContainer = styled.View`
+  width: 100%;
+  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
 `;
 
 const DetailRow = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: flex-start;
   width: 100%;
-  padding-vertical: ${({ theme }: any) => theme.spacing.xs}px;
+  padding-vertical: ${({ theme }: any) => theme.spacing.sm}px;
   border-bottom-width: 1px;
   border-bottom-color: ${({ theme }: any) => theme.colors.border};
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
 `;
 
 const DetailLabel = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
-  font-weight: 600;
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.semiBold};
   color: ${({ theme }: any) => theme.colors.text};
+  flex: 0 0 auto;
+  margin-right: ${({ theme }: any) => theme.spacing.md}px;
 `;
 
 const DetailValue = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
   color: ${({ theme }: any) => theme.colors.textSecondary};
-  flex-shrink: 1;
-  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
+  flex: 1;
+  text-align: right;
+`;
+
+const Description = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.text};
+  text-align: center;
+  line-height: 22px;
+  margin-top: ${({ theme }: any) => theme.spacing.md}px;
 `;
 
 const ErrorText = styled.Text`
@@ -101,18 +113,18 @@ const CategoriesContainer = styled.View`
   flex-wrap: wrap;
   justify-content: flex-end;
   flex: 1;
-  margin-left: ${({ theme }: any) => theme.spacing.xs}px;
 `;
 
 const CategoryTag = styled.Text`
   background-color: ${({ theme }: any) => theme.colors.primary};
-  color: ${({ theme }: any) => theme.colors.white};
-  padding-horizontal: ${({ theme }: any) => theme.spacing.xs}px;
-  padding-vertical: 4px;
-  border-radius: 4px;
-  margin-right: 4px;
-  margin-bottom: 4px;
-  font-size: 12px;
+  color: ${({ theme }: any) => theme.colors.surface};
+  padding-horizontal: ${({ theme }: any) => theme.spacing.sm}px;
+  padding-vertical: ${({ theme }: any) => theme.spacing.xs}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
+  margin-left: ${({ theme }: any) => theme.spacing.xs}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
+  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.medium};
 `;
 
 type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
@@ -214,65 +226,69 @@ function CouponScreen({
             accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
             {coupon.code}
           </CouponCode>
-          <DetailRow>
-            <DetailLabel
-              accessible={true}
-              accessibilityLabel="İndirim etiketi">
-              İndirim:
-            </DetailLabel>
-            <DetailValue
-              accessible={true}
-              accessibilityLabel={`İndirim değeri: ${
-                coupon.discount_type === 'percentage'
+          
+          <DetailsContainer>
+            <DetailRow>
+              <DetailLabel
+                accessible={true}
+                accessibilityLabel="İndirim etiketi">
+                İndirim:
+              </DetailLabel>
+              <DetailValue
+                accessible={true}
+                accessibilityLabel={`İndirim değeri: ${
+                  coupon.discount_type === 'percentage'
+                    ? `%${coupon.discount_value}`
+                    : `${coupon.discount_value} TL`
+                }`}>
+                {coupon.discount_type === 'percentage'
                   ? `%${coupon.discount_value}`
-                  : `${coupon.discount_value} TL`
-              }`}>
-              {coupon.discount_type === 'percentage'
-                ? `%${coupon.discount_value}`
-                : `${coupon.discount_value} TL`}
-            </DetailValue>
-          </DetailRow>
-          <DetailRow>
-            <DetailLabel
-              accessible={true}
-              accessibilityLabel="Geçerlilik tarihi etiketi">
-              Geçerlilik Tarihi:
-            </DetailLabel>
-            <DetailValue
-              accessible={true}
-              accessibilityLabel={`Geçerlilik tarihi: ${new Date(
-                coupon.start_date,
-              ).toLocaleDateString()} tire ${new Date(
-                coupon.end_date,
-              ).toLocaleDateString()}`}>
-              {new Date(coupon.start_date).toLocaleDateString()} -{' '}
-              {new Date(coupon.end_date).toLocaleDateString()}
-            </DetailValue>
-          </DetailRow>
+                  : `${coupon.discount_value} TL`}
+              </DetailValue>
+            </DetailRow>
+            <DetailRow>
+              <DetailLabel
+                accessible={true}
+                accessibilityLabel="Geçerlilik tarihi etiketi">
+                Geçerlilik Tarihi:
+              </DetailLabel>
+              <DetailValue
+                accessible={true}
+                accessibilityLabel={`Geçerlilik tarihi: ${new Date(
+                  coupon.start_date,
+                ).toLocaleDateString()} tire ${new Date(
+                  coupon.end_date,
+                ).toLocaleDateString()}`}>
+                {new Date(coupon.start_date).toLocaleDateString()} -{' '}
+                {new Date(coupon.end_date).toLocaleDateString()}
+              </DetailValue>
+            </DetailRow>
+            {coupon.categories && coupon.categories.length > 0 && (
+              <DetailRow>
+                <DetailLabel
+                  accessible={true}
+                  accessibilityLabel="Kategoriler etiketi">
+                  Kategoriler:
+                </DetailLabel>
+                <CategoriesContainer>
+                  {coupon.categories.map(category => (
+                    <CategoryTag
+                      key={category.id}
+                      accessible={true}
+                      accessibilityLabel={category.name}>
+                      {category.name}
+                    </CategoryTag>
+                  ))}
+                </CategoriesContainer>
+              </DetailRow>
+            )}
+          </DetailsContainer>
+
           <Description
             accessible={true}
             accessibilityLabel={`Açıklama: ${coupon.description}`}>
             {coupon.description}
           </Description>
-          {coupon.categories && coupon.categories.length > 0 && (
-            <DetailRow>
-              <DetailLabel
-                accessible={true}
-                accessibilityLabel="Kategoriler etiketi">
-                Kategoriler:
-              </DetailLabel>
-              <CategoriesContainer>
-                {coupon.categories.map(category => (
-                  <CategoryTag
-                    key={category.id}
-                    accessible={true}
-                    accessibilityLabel={category.name}>
-                    {category.name}
-                  </CategoryTag>
-                ))}
-              </CategoriesContainer>
-            </DetailRow>
-          )}
         </ContentContainer>
       </ScrollView>
     </Container>

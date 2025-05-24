@@ -32,7 +32,7 @@ interface ContainerProps {
 const Container = styled.View<ContainerProps>`
   background-color: ${({ theme }: any) => theme.colors.card};
   border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  padding: ${({ theme }: any) => theme.spacing.medium}px;
+  padding: ${({ theme }: any) => theme.spacing.sm}px;
   margin-vertical: ${({ theme }: any) => theme.spacing.xs}px;
   margin-horizontal: 0px;
   shadow-color: ${({ theme }: any) => theme.colors.shadow};
@@ -41,7 +41,8 @@ const Container = styled.View<ContainerProps>`
   shadow-radius: 4px;
   elevation: 3;
   width: ${({ width, horizontal }: any) => horizontal ? width * 0.42 : (width - 48) / 2}px;
-  height: ${({ horizontal }: any) => horizontal ? 200 : 200}px;
+  height: ${({ horizontal }: any) => horizontal ? 140 : 140}px;
+  justify-content: space-between;
 `;
 
 const TouchableContainer = styled(TouchableOpacity)<ContainerProps>`
@@ -51,16 +52,16 @@ const TouchableContainer = styled(TouchableOpacity)<ContainerProps>`
 
 const CardImage = styled.Image`
   width: 100%;
-  height: 120px;
+  height: 80px;
   border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
 `;
 
 const PlaceholderImage = styled.View`
   width: 100%;
-  height: 120px;
+  height: 80px;
   border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
   background-color: ${({ theme }: any) => theme.colors.secondary};
   justify-content: center;
   align-items: center;
@@ -76,6 +77,8 @@ const ContentContainer = styled.View`
   align-items: center;
   justify-content: flex-start;
   flex: 1;
+  padding-top: ${({ theme }: any) => theme.spacing.xs}px;
+  min-height: 40px;
 `;
 
 const Title = styled.Text`
@@ -84,13 +87,17 @@ const Title = styled.Text`
   color: ${({ theme }: any) => theme.colors.text};
   margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
   text-align: center;
+  line-height: 20px;
+  width: 100%;
 `;
 
 const Subtitle = styled.Text`
   font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
   color: ${({ theme }: any) => theme.colors.textSecondary};
   text-align: center;
-  max-height: 32px;
+  line-height: 16px;
+  width: 100%;
+  flex: 1;
 `;
 
 const CardComponent: React.FC<CardComponentProps> = ({
@@ -172,7 +179,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
           <Title numberOfLines={1}>
             {title}
           </Title>
-          {subtitle && (
+          {subtitle && item.type !== 'coupon' && (
             <Subtitle numberOfLines={2}>
               {subtitle}
             </Subtitle>

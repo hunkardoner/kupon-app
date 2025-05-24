@@ -10,7 +10,6 @@ import { CategoryStackParamList } from '../navigation/types';
 import { fetchCategoryById } from '../api';
 import { Category, Coupon } from '../types';
 import CardComponent from '../components/common/CardComponent';
-import { FlatList } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList, MainTabParamList } from '../navigation/types';
@@ -77,6 +76,13 @@ const SectionTitle = styled.Text`
   font-weight: ${({ theme }: any) => theme.typography.weights.bold};
   color: ${({ theme }: any) => theme.colors.text};
   margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const CouponsContainer = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: ${({ theme }: any) => theme.spacing.sm}px;
 `;
 
 const NoCouponsContainer = styled.View`
@@ -167,19 +173,16 @@ const CategoryScreen: React.FC = () => {
       {coupons.length > 0 ? (
         <CouponsSection>
           <SectionTitle>Bu Kategorideki Kuponlar</SectionTitle>
-          <FlatList
-            data={coupons}
-            renderItem={({ item }) => (
+          <CouponsContainer>
+            {coupons.map((item) => (
               <CardComponent
+                key={item.id}
                 item={{ ...item, type: 'coupon' }}
                 onPress={() => handleCouponPress(item.id)}
+                horizontal={false}
               />
-            )}
-            keyExtractor={item => item.id.toString()}
-            horizontal={false}
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}
-          />
+            ))}
+          </CouponsContainer>
         </CouponsSection>
       ) : (
         <NoCouponsContainer>
