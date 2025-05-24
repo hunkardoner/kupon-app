@@ -38,6 +38,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // 2FA Routes
+    Route::get('/two-factor', [\App\Http\Controllers\Auth\TwoFactorController::class, 'show'])->name('2fa.show');
+    Route::post('/two-factor/enable', [\App\Http\Controllers\Auth\TwoFactorController::class, 'enable'])->name('2fa.enable');
+    Route::post('/two-factor/disable', [\App\Http\Controllers\Auth\TwoFactorController::class, 'disable'])->name('2fa.disable');
+
     Route::prefix('quponsal')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('dashboard');
         Route::resource('categories', CategoryController::class);
@@ -47,6 +52,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('blogs', BlogController::class); // Blog için resourceful route eklendi
         Route::resource('pages', PageController::class); // Page için resourceful route eklendi
     });
+});
+
+// 2FA Verification Routes (accessible without full auth)
+Route::middleware('guest')->group(function () {
+    Route::get('/two-factor/verify', [\App\Http\Controllers\Auth\TwoFactorController::class, 'showVerify'])->name('2fa.verify');
+    Route::post('/two-factor/verify', [\App\Http\Controllers\Auth\TwoFactorController::class, 'verify'])->name('2fa.verify.post');
 });
 
 require __DIR__.'/auth.php';

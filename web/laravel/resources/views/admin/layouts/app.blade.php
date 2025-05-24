@@ -70,6 +70,10 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                                     <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('2fa.show') }}">
+                                        <i class="fas fa-shield-alt me-2"></i>2FA Settings
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form method="POST" action="{{ route('logout') }}">
                                             @csrf

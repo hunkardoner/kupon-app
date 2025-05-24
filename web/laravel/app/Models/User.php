@@ -21,6 +21,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google2fa_secret',
+        'google2fa_enabled',
+        'google2fa_enabled_at',
     ];
 
     /**
@@ -31,6 +34,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'google2fa_secret',
     ];
 
     /**
@@ -41,5 +45,23 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'google2fa_enabled' => 'boolean',
+        'google2fa_enabled_at' => 'datetime',
     ];
+
+    /**
+     * Set the 2FA secret
+     */
+    public function setGoogle2faSecretAttribute($value)
+    {
+        $this->attributes['google2fa_secret'] = encrypt($value);
+    }
+
+    /**
+     * Get the 2FA secret
+     */
+    public function getGoogle2faSecretAttribute($value)
+    {
+        return $value ? decrypt($value) : null;
+    }
 }
