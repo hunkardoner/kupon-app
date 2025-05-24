@@ -1,20 +1,54 @@
-import React from 'react'; // Removed useEffect and useState
+import React from 'react';
 import {
-  View,
-  Text,
   FlatList,
   ActivityIndicator,
-  useWindowDimensions, // Import useWindowDimensions
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import createStyles from './CouponListScreen.styles'; // Import the function
+import styled from 'styled-components/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
 import { Coupon } from '../types';
 import { fetchCouponCodes } from '../api';
-import COLORS from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
-import { useQuery } from '@tanstack/react-query'; // Import useQuery
+import { useQuery } from '@tanstack/react-query';
+import { useTheme } from '../theme';
+
+// Styled Components
+const Container = styled(SafeAreaView)`
+  flex: 1;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const CenteredContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: ${({ theme }: any) => theme.spacing.large}px;
+`;
+
+const LoadingText = styled.Text`
+  margin-top: ${({ theme }: any) => theme.spacing.small}px;
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.text};
+`;
+
+const ErrorText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.error};
+  text-align: center;
+`;
+
+const EmptyText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  text-align: center;
+`;
+
+const CardContainer = styled.View<{ width: number }>`
+  width: ${({ width }: any) => width}px;
+  padding: ${({ theme }: any) => theme.spacing.xs}px;
+`;
 
 // Tip tanımlamaları
 type CouponListScreenNavigationProp = StackNavigationProp<
@@ -29,8 +63,12 @@ interface CouponListScreenProps {
 function CouponListScreen({
   navigation,
 }: CouponListScreenProps): React.JSX.Element {
-  const { width } = useWindowDimensions(); // Get window dimensions
-  const { styles, numColumns } = createStyles(width); // Destructure styles and numColumns
+  const { width } = useWindowDimensions();
+  const { theme } = useTheme();
+
+  // Responsive columns
+  const numColumns = width < 600 ? 2 : 3;
+  const cardWidth = (width - (numColumns + 1) * theme.spacing.md) / numColumns;
 
   const {
     data: coupons,
@@ -38,59 +76,69 @@ function CouponListScreen({
     error,
   } = useQuery<Coupon[], Error>({
     queryKey: ['coupons'],
-    queryFn: () => fetchCouponCodes(), // Adjusted to call fetchCouponCodes
+    queryFn: () => fetchCouponCodes(),
   });
 
   const handleCouponPress = (couponId: number) => {
-    // couponId number olmalı
-    navigation.navigate('CouponDetail', { couponId: couponId }); // toString() kaldırıldı
+    navigation.navigate('CouponDetail', { couponId: couponId });
   };
 
   const renderCouponItem = ({ item }: { item: Coupon }) => (
-    <View style={styles.cardContainer}>
+    <CardContainer width={cardWidth}>
       <CardComponent
-        item={{ ...item, type: 'coupon' }} // CardComponent'e type ile birlikte item gönder
+        item={{ ...item, type: 'coupon' }}
         onPress={() => handleCouponPress(item.id)}
       />
-    </View>
+    </CardContainer>
   );
 
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>Yükleniyor...</Text>
-      </SafeAreaView>
+      <Container>
+        <CenteredContainer>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <LoadingText>Yükleniyor...</LoadingText>
+        </CenteredContainer>
+      </Container>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <Text style={styles.errorText}>
-          Kuponlar yüklenirken bir hata oluştu: {error.message}
-        </Text>
-      </SafeAreaView>
+      <Container>
+        <CenteredContainer>
+          <ErrorText>
+            Kuponlar yüklenirken bir hata oluştu: {error.message}
+          </ErrorText>
+        </CenteredContainer>
+      </Container>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Container>
       {coupons && coupons.length > 0 ? (
         <FlatList
-          data={coupons} // Use data from useQuery
+          data={coupons}
           renderItem={renderCouponItem}
           keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.listContentContainer}
-          numColumns={numColumns} // Use dynamic numColumns from createStyles
-          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={{ padding: theme.spacing.sm }}
+          numColumns={numColumns}
+          columnWrapperStyle={
+            numColumns > 1
+              ? {
+                  justifyContent: 'space-around',
+                  paddingHorizontal: theme.spacing.sm,
+                }
+              : undefined
+          }
         />
       ) : (
-        <View style={styles.centeredContainer}>
-          <Text style={styles.emptyText}>Kupon bulunamadı.</Text>
-        </View>
+        <CenteredContainer>
+          <EmptyText>Kupon bulunamadı.</EmptyText>
+        </CenteredContainer>
       )}
-    </SafeAreaView>
+    </Container>
   );
 }
 

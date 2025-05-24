@@ -1,96 +1,215 @@
 import React from 'react';
 import {
-  View,
-  Text,
   FlatList,
   ActivityIndicator,
-  useWindowDimensions, // Import useWindowDimensions
+  useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import createStyles from './BrandListScreen.styles'; // Import createStyles
+import styled from 'styled-components/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import { BrandStackParamList } from '../navigation/types';
-import { Brand } from '../types';
 import { fetchBrands } from '../api';
-import COLORS from '../constants/colors';
-import CardComponent from '../components/common/CardComponent';
-import { useQuery } from '@tanstack/react-query'; // Import useQuery
+import { Brand } from '../types';
+import { useQuery } from '@tanstack/react-query';
+import { API_BASE_URL } from '../api/index';
 
-// Tip tanımlamaları
-type BrandListScreenNavigationProp = StackNavigationProp<
-  BrandStackParamList,
-  'BrandList'
->;
+// Types
+type BrandListScreenRouteProp = RouteProp<BrandStackParamList, 'BrandList'>;
+type BrandListScreenNavigationProp = StackNavigationProp<BrandStackParamList, 'BrandList'>;
 
 interface BrandListScreenProps {
+  route: BrandListScreenRouteProp;
   navigation: BrandListScreenNavigationProp;
 }
 
-function BrandListScreen({
-  navigation,
-}: BrandListScreenProps): React.JSX.Element {
-  const { width } = useWindowDimensions(); // Get window dimensions
-  const { styles, numColumns } = createStyles(width); // Get styles and numColumns
+// Styled Components
+const Container = styled.SafeAreaView`
+  flex: 1;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const CenteredContainer = styled.SafeAreaView`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const BrandItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  align-items: center;
+  padding: ${({ theme }: any) => theme.spacing.md}px;
+  margin-horizontal: ${({ theme }: any) => theme.spacing.md}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+  background-color: ${({ theme }: any) => theme.colors.card};
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  border-width: 1px;
+  border-color: ${({ theme }: any) => theme.colors.border};
+  shadow-color: ${({ theme }: any) => theme.colors.shadow};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+`;
+
+const BrandLogo = styled.Image`
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  margin-right: ${({ theme }: any) => theme.spacing.md}px;
+  background-color: ${({ theme }: any) => theme.colors.border};
+`;
+
+const BrandInfo = styled.View`
+  flex: 1;
+`;
+
+const BrandName = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.h3.fontSize}px;
+  font-weight: ${({ theme }: any) => theme.typography.h3.fontWeight};
+  color: ${({ theme }: any) => theme.colors.text};
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
+`;
+
+const BrandDescription = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.body.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  line-height: 20px;
+`;
+
+const CouponsCount = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.caption.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.primary};
+  font-weight: 600;
+  margin-top: ${({ theme }: any) => theme.spacing.xs}px;
+`;
+
+const ErrorText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.error};
+  text-align: center;
+  padding: ${({ theme }: any) => theme.spacing.lg}px;
+`;
+
+const EmptyStateContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: ${({ theme }: any) => theme.spacing.lg}px;
+`;
+
+const EmptyStateText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  text-align: center;
+  margin-top: ${({ theme }: any) => theme.spacing.md}px;
+`;
+
+const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
+  const { width } = useWindowDimensions();
 
   const {
     data: brands,
     isLoading,
     error,
+    refetch,
   } = useQuery<Brand[], Error>({
     queryKey: ['brands'],
-    queryFn: () => fetchBrands(), // Call fetchBrands without arguments
+    queryFn: () => fetchBrands(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const handleBrandPress = (brandId: number) => {
-    navigation.navigate('BrandDetail', { brandId: brandId });
+    navigation.navigate('BrandDetail', { brandId });
   };
 
-  const renderBrandItem = ({ item }: { item: Brand }) => (
-    <View style={styles.cardContainer}>
-      <CardComponent
-        item={{ ...item, type: 'brand' }}
-        onPress={() => handleBrandPress(item.id)}
-      />
-    </View>
-  );
+  const renderBrandItem = ({ item }: { item: Brand }) => {
+    // Handle logo URL formatting
+    let logoUrl = item.logo;
+    if (logoUrl && !logoUrl.startsWith('http')) {
+      logoUrl = `${API_BASE_URL.replace('/api', '')}${logoUrl}`;
+    }
+
+    return (
+      <BrandItem onPress={() => handleBrandPress(item.id)}>
+        {logoUrl ? (
+          <BrandLogo
+            source={{ uri: logoUrl }}
+            resizeMode="cover"
+          />
+        ) : (
+          <BrandLogo
+            source={{ uri: 'https://via.placeholder.com/60x60?text=Logo' }}
+            resizeMode="cover"
+          />
+        )}
+        <BrandInfo>
+          <BrandName numberOfLines={1}>{item.name}</BrandName>
+          {item.description && (
+            <BrandDescription numberOfLines={2}>
+              {item.description}
+            </BrandDescription>
+          )}
+          {item.coupons_count !== undefined && (
+            <CouponsCount>
+              {item.coupons_count > 0 
+                ? `${item.coupons_count} aktif kupon` 
+                : 'Henüz kupon yok'
+              }
+            </CouponsCount>
+          )}
+        </BrandInfo>
+      </BrandItem>
+    );
+  };
 
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>Yükleniyor...</Text>
-      </SafeAreaView>
+      <CenteredContainer>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </CenteredContainer>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={[styles.container, styles.centeredContainer]}>
-        <Text style={styles.errorText}>
-          Markalar yüklenirken bir hata oluştu: {error.message}
-        </Text>
-      </SafeAreaView>
+      <CenteredContainer>
+        <ErrorText>
+          {error.message || 'Markalar yüklenirken bir hata oluştu.'}
+        </ErrorText>
+      </CenteredContainer>
+    );
+  }
+
+  if (!brands || brands.length === 0) {
+    return (
+      <Container>
+        <EmptyStateContainer>
+          <EmptyStateText>
+            Henüz hiçbir marka bulunmamaktadır.
+          </EmptyStateText>
+        </EmptyStateContainer>
+      </Container>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {brands && brands.length > 0 ? (
-        <FlatList
-          data={brands} // This should now be correctly typed as Brand[]
-          renderItem={renderBrandItem}
-          keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.listContentContainer}
-          numColumns={numColumns} // Use dynamic numColumns
-          columnWrapperStyle={styles.columnWrapper}
-        />
-      ) : (
-        <View style={styles.centeredContainer}>
-          <Text style={styles.emptyText}>Marka bulunamadı.</Text>
-        </View>
-      )}
-    </SafeAreaView>
+    <Container>
+      <FlatList
+        data={brands}
+        renderItem={renderBrandItem}
+        keyExtractor={(item: Brand) => item.id.toString()}
+        contentContainerStyle={{
+          paddingTop: 16,
+          paddingBottom: 16,
+        }}
+        showsVerticalScrollIndicator={false}
+        onRefresh={refetch}
+        refreshing={isLoading}
+      />
+    </Container>
   );
-}
+};
 
 export default BrandListScreen;

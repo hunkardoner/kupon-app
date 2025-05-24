@@ -1,15 +1,10 @@
 import React, { useEffect } from 'react';
 import {
-  View,
-  Text,
   ActivityIndicator,
-  Image,
   FlatList,
-  TouchableOpacity,
   Linking,
   useWindowDimensions,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import {
@@ -20,7 +15,6 @@ import {
 import { fetchBrandById, fetchCouponCodes } from '../api';
 import { Brand, Coupon } from '../types';
 import { API_BASE_URL } from '../api/index';
-import colors from '../constants/colors';
 import CardComponent from '../components/common/CardComponent';
 import {
   CompositeNavigationProp,
@@ -28,7 +22,97 @@ import {
 } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
-import { createStyles } from './BrandScreen.styles';
+import styled from 'styled-components/native';
+import { useTheme } from 'styled-components/native';
+
+// Styled Components
+const Container = styled.SafeAreaView`
+  flex: 1;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const CenteredContainer = styled.SafeAreaView`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const HeaderContainer = styled.View`
+  align-items: center;
+  padding-vertical: ${({ theme }: any) => theme.spacing.lg}px;
+  padding-horizontal: ${({ theme }: any) => theme.spacing.md}px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${({ theme }: any) => theme.colors.border};
+  background-color: ${({ theme }: any) => theme.colors.card};
+`;
+
+const BrandLogo = styled.Image`
+  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
+`;
+
+const BrandName = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.h2.fontSize}px;
+  font-weight: ${({ theme }: any) => theme.typography.h2.fontWeight};
+  color: ${({ theme }: any) => theme.colors.primary};
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
+  text-align: center;
+`;
+
+const BrandDescription = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.body.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  text-align: center;
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+  padding-horizontal: ${({ theme }: any) => theme.spacing.sm}px;
+`;
+
+const WebsiteLink = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.secondary};
+  font-weight: 600;
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+  text-decoration-line: underline;
+`;
+
+const CouponsHeader = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.h3.fontSize}px;
+  font-weight: ${({ theme }: any) => theme.typography.h3.fontWeight};
+  color: ${({ theme }: any) => theme.colors.text};
+  padding-horizontal: ${({ theme }: any) => theme.spacing.md}px;
+  padding-vertical: ${({ theme }: any) => theme.spacing.sm}px;
+  background-color: ${({ theme }: any) => theme.colors.background};
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
+`;
+
+const CardWrapper = styled.View`
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+`;
+
+const EmptyCouponsContainer = styled.View`
+  padding: ${({ theme }: any) => theme.spacing.lg}px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+`;
+
+const NoCouponsText = styled.Text`
+  text-align: center;
+  margin-top: ${({ theme }: any) => theme.spacing.lg}px;
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+`;
+
+const ErrorText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.error};
+  text-align: center;
+  padding: ${({ theme }: any) => theme.spacing.lg}px;
+`;
+
+const TouchableLink = styled.TouchableOpacity`
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+`;
 
 type BrandScreenRouteProp = RouteProp<BrandStackParamList, 'BrandDetail'>;
 
@@ -48,8 +132,13 @@ function BrandScreen({
   navigation,
 }: BrandScreenProps): React.JSX.Element {
   const { brandId } = route.params;
-  const { width: windowWidth } = useWindowDimensions(); // Get window width
-  const { styles, numColumns } = createStyles(windowWidth); // Get styles and numColumns
+  const { width: windowWidth } = useWindowDimensions();
+  const theme = useTheme();
+  
+  // Calculate responsive values
+  const numColumns = windowWidth < 600 ? 2 : 3;
+  const logoSize = windowWidth * 0.3;
+  const logoHeight = logoSize * 0.5;
 
   const {
     data: brand,
@@ -66,8 +155,8 @@ function BrandScreen({
     error: couponsError,
   } = useQuery<Coupon[], Error>({
     queryKey: ['coupons', 'brand', brandId],
-    queryFn: () => fetchCouponCodes({ brand_id: brandId }), // Pass brandId directly
-    enabled: !!brand, // Only run this query if brand data is available
+    queryFn: () => fetchCouponCodes({ brand_id: brandId }),
+    enabled: !!brand,
   });
 
   useEffect(() => {
@@ -80,7 +169,7 @@ function BrandScreen({
     navigation.navigate('CouponsTab', {
       screen: 'CouponDetail',
       params: { couponId },
-    } as NavigatorScreenParams<CouponStackParamList>); // Type assertion for params
+    } as NavigatorScreenParams<CouponStackParamList>);
   };
 
   const handleWebsitePress = (url: string) => {
@@ -92,90 +181,98 @@ function BrandScreen({
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </SafeAreaView>
+      <CenteredContainer>
+        <ActivityIndicator size="large" color={(theme as any).colors.primary} />
+      </CenteredContainer>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>
+      <CenteredContainer>
+        <ErrorText>
           {error.message || 'Veri yüklenirken bir hata oluştu.'}
-        </Text>
-      </SafeAreaView>
+        </ErrorText>
+      </CenteredContainer>
     );
   }
 
   if (!brand) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text>Marka bulunamadı.</Text>
-      </SafeAreaView>
+      <CenteredContainer>
+        <ErrorText>Marka bulunamadı.</ErrorText>
+      </CenteredContainer>
     );
   }
 
-  const brandLogoUrl = brand.logo // Changed from brand.image to brand.logo
+  const brandLogoUrl = brand.logo
     ? brand.logo.startsWith('http') || brand.logo.startsWith('https')
       ? brand.logo
       : `${API_BASE_URL.replace('/api', '')}${brand.logo}`
     : null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Container>
       <FlatList
         ListHeaderComponent={
           <>
-            <View style={styles.headerContainer}>
+            <HeaderContainer>
               {brandLogoUrl && (
-                <Image
+                <BrandLogo
                   source={{ uri: brandLogoUrl }}
-                  style={styles.brandLogo}
+                  style={{
+                    width: logoSize,
+                    height: logoHeight,
+                  }}
                   resizeMode="contain"
                 />
               )}
-              <Text style={styles.brandName}>{brand.name}</Text>
+              <BrandName>{brand.name}</BrandName>
               {brand.description && (
-                <Text style={styles.brandDescription}>{brand.description}</Text>
+                <BrandDescription>{brand.description}</BrandDescription>
               )}
               {brand.website_url && (
-                <TouchableOpacity
+                <TouchableLink
                   onPress={() => handleWebsitePress(brand.website_url!)}>
-                  <Text style={styles.websiteLink}>Website Git</Text>
-                </TouchableOpacity>
+                  <WebsiteLink>Website Git</WebsiteLink>
+                </TouchableLink>
               )}
-            </View>
+            </HeaderContainer>
             {coupons && coupons.length > 0 && (
-              <Text style={styles.couponsHeader}>Bu Markaya Ait Kuponlar</Text>
+              <CouponsHeader>Bu Markaya Ait Kuponlar</CouponsHeader>
             )}
           </>
         }
-        ListHeaderComponentStyle={styles.listHeaderStyle}
-        data={coupons || []} // Use coupons from useQuery, default to empty array
+        data={coupons || []}
         renderItem={({ item }) => (
-          <View style={styles.cardWrapper}>
+          <CardWrapper>
             <CardComponent
-              item={{ ...item, type: 'coupon' }} // Spread coupon properties and add type
+              item={{ ...item, type: 'coupon' }}
               onPress={() => handleCouponPress(item.id)}
             />
-          </View>
+          </CardWrapper>
         )}
         keyExtractor={item => item.id.toString()}
-        numColumns={numColumns} // Use dynamic numColumns
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.listContentContainer}
+        numColumns={numColumns}
+        columnWrapperStyle={{
+          justifyContent: 'space-between',
+          marginHorizontal: 0,
+        }}
+        contentContainerStyle={{
+          paddingBottom: (theme as any).spacing.sm,
+          paddingHorizontal: (theme as any).spacing.md,
+        }}
         ListEmptyComponent={
           !isLoading && (!coupons || coupons.length === 0) ? (
-            <View style={styles.emptyCouponsContainer}>
-              <Text style={styles.noCouponsText}>
+            <EmptyCouponsContainer>
+              <NoCouponsText>
                 Bu markaya ait aktif kupon bulunmamaktadır.
-              </Text>
-            </View>
+              </NoCouponsText>
+            </EmptyCouponsContainer>
           ) : null
         }
       />
-    </SafeAreaView>
+    </Container>
   );
 }
 

@@ -1,14 +1,11 @@
 import React from 'react';
 import {
-  View,
-  Text,
-  Image,
   TouchableOpacity,
   useWindowDimensions,
 } from 'react-native';
-import createStyles from './CardComponent.styles'; // Import the function
+import styled from 'styled-components/native';
 import { Category, Brand, Coupon } from '../../types';
-import COLORS from '../../constants/colors';
+import { useTheme } from '../../theme';
 
 // API için temel URL - güncellenebilir
 const API_BASE_URL = 'http://localhost:8000';
@@ -26,6 +23,76 @@ interface CardComponentProps {
   horizontal?: boolean; // Add prop to indicate if card is in a horizontal list
 }
 
+// Styled Components
+interface ContainerProps {
+  width: number;
+  horizontal?: boolean;
+}
+
+const Container = styled.View<ContainerProps>`
+  background-color: ${({ theme }: any) => theme.colors.card};
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  padding: ${({ theme }: any) => theme.spacing.medium}px;
+  margin-vertical: ${({ theme }: any) => theme.spacing.xs}px;
+  margin-horizontal: 0px;
+  shadow-color: ${({ theme }: any) => theme.colors.shadow};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 4px;
+  elevation: 3;
+  width: ${({ width, horizontal }: any) => horizontal ? width * 0.42 : (width - 48) / 2}px;
+  height: ${({ horizontal }: any) => horizontal ? 200 : 200}px;
+`;
+
+const TouchableContainer = styled(TouchableOpacity)<ContainerProps>`
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  width: ${({ width, horizontal }: any) => horizontal ? width * 0.42 : (width - 48) / 2}px;
+`;
+
+const CardImage = styled.Image`
+  width: 100%;
+  height: 120px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const PlaceholderImage = styled.View`
+  width: 100%;
+  height: 120px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+  background-color: ${({ theme }: any) => theme.colors.secondary};
+  justify-content: center;
+  align-items: center;
+`;
+
+const PlaceholderText = styled.Text`
+  color: ${({ theme }: any) => theme.colors.surface};
+  font-size: ${({ theme }: any) => theme.typography.sizes.xxxl}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+`;
+
+const ContentContainer = styled.View`
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+`;
+
+const Title = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  color: ${({ theme }: any) => theme.colors.text};
+  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
+  text-align: center;
+`;
+
+const Subtitle = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  text-align: center;
+  max-height: 32px;
+`;
+
 const CardComponent: React.FC<CardComponentProps> = ({
   item,
   onPress,
@@ -33,7 +100,7 @@ const CardComponent: React.FC<CardComponentProps> = ({
   horizontal = false, // Default to false for grid layout
 }) => {
   const { width } = useWindowDimensions(); // Get window dimensions
-  const styles = createStyles(width); // Create styles dynamically
+  const theme = useTheme();
 
   let title = '';
   let subtitle: string | undefined | null = undefined;
@@ -48,78 +115,71 @@ const CardComponent: React.FC<CardComponentProps> = ({
   } else if (item.type === 'brand') {
     title = item.name;
     subtitle = item.description;
-    imageUrl = item.logo; // Changed from item.image to item.logo
+    imageUrl = item.logo; // Changed from logo_url to logo
     accessibilityLabelSuffix = 'markası';
   } else if (item.type === 'coupon') {
-    title = item.code;
+    title = item.code; // Changed from title to code
     subtitle = item.description;
-    imageUrl = item.brand?.logo; // Changed from item.brand?.image to item.brand?.logo
+    imageUrl = item.brand?.logo; // Use brand logo for coupon
     accessibilityLabelSuffix = 'kuponu';
   }
 
-  // Resim URL'sini işle - null olmadığını ve tam URL olduğunu kontrol et
-  let imageSource;
+  // Image source handling
+  let imageSource: { uri: string } | undefined = undefined;
   if (imageUrl) {
-    // Eğer URL http:// veya https:// ile başlamıyorsa, API_BASE_URL ile birleştir
-    // Also remove /api from API_BASE_URL for image paths if they are served from /storage directly
-    const imageApiBaseUrl = API_BASE_URL.replace('/api', '');
-    if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+    // API'den gelen resimleri tam URL'e çevir
+    const imageApiBaseUrl = API_BASE_URL.replace('localhost', '10.0.2.2');
+    if (!imageUrl.startsWith('http')) {
       imageUrl = `${imageApiBaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
     }
     imageSource = { uri: imageUrl };
   }
 
   return (
-    <TouchableOpacity
-      // accessible={true} // Removed: TouchableOpacity is accessible by default
+    <TouchableContainer
+      accessible={true}
       accessibilityLabel={`${title}${subtitle ? `, ${subtitle}` : ''} ${accessibilityLabelSuffix}`}
       accessibilityRole="button"
-      accessibilityState={{ disabled: !onPress }} // Added
-      accessibilityHint={onPress ? `Detayları görmek için dokunun: ${title}` : undefined} // Made conditional
+      accessibilityState={{ disabled: !onPress }}
+      accessibilityHint={onPress ? `Detayları görmek için dokunun: ${title}` : undefined}
       onPress={() => onPress && onPress(item)}
-      style={[
-        styles.touchable,
-        horizontal ? styles.horizontalTouchable : null,
-        style,
-      ]}
-      disabled={!onPress}>
-      <View
-        style={[
-          styles.container,
-          horizontal ? styles.horizontalContainer : null,
-        ]}>
+      style={style}
+      disabled={!onPress}
+      width={width}
+      horizontal={horizontal}
+    >
+      <Container width={width} horizontal={horizontal}>
         {imageSource ? (
-          <Image
+          <CardImage
             source={imageSource}
-            style={styles.image}
             resizeMode="contain"
             accessible={true}
             accessibilityLabel={`${title} ${item.type === 'brand' || (item.type === 'coupon' && item.brand) ? 'logosu' : 'resmi'}`}
             accessibilityRole="image"
           />
         ) : (
-          <View
-            style={[styles.image, styles.placeholderImage]}
+          <PlaceholderImage
             accessible={true}
             accessibilityLabel={`${title} için resim yok, baş harf: ${title.substring(0, 1).toUpperCase()}`}
-            accessibilityRole="image">
-            <Text style={styles.placeholderText}>
+            accessibilityRole="image"
+          >
+            <PlaceholderText>
               {title.substring(0, 1).toUpperCase()}
-            </Text>
-          </View>
+            </PlaceholderText>
+          </PlaceholderImage>
         )}
-        <View style={styles.contentContainer}>
-          <Text style={styles.title} numberOfLines={1}>
+        <ContentContainer>
+          <Title numberOfLines={1}>
             {title}
-          </Text>
+          </Title>
           {subtitle && (
-            <Text style={styles.subtitle} numberOfLines={2}>
+            <Subtitle numberOfLines={2}>
               {subtitle}
-            </Text>
+            </Subtitle>
           )}
-        </View>
-      </View>
-    </TouchableOpacity>
+        </ContentContainer>
+      </Container>
+    </TouchableContainer>
   );
 };
 

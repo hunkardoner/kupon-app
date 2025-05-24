@@ -1,20 +1,119 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
   ActivityIndicator,
-  Image,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
 import { fetchCouponCodeById } from '../api';
 import { Coupon } from '../types';
 import { API_BASE_URL } from '../api/index';
-import colors from '../constants/colors';
-import { couponScreenStyles as styles } from './CouponScreen.styles';
+import styled from 'styled-components/native';
+import { useTheme } from 'styled-components/native';
+
+// Styled Components
+const Container = styled.SafeAreaView`
+  flex: 1;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const CenteredContainer = styled.SafeAreaView`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const ContentContainer = styled.View`
+  padding: ${({ theme }: any) => theme.spacing.lg}px;
+  align-items: center;
+`;
+
+const BrandLogo = styled.Image`
+  width: 150px;
+  height: 75px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
+`;
+
+const BrandName = styled.Text`
+  font-size: 26px;
+  font-weight: bold;
+  color: ${({ theme }: any) => theme.colors.primary};
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+  text-align: center;
+`;
+
+const CouponCodeLabel = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  margin-top: ${({ theme }: any) => theme.spacing.md}px;
+`;
+
+const CouponCode = styled.Text`
+  font-size: 28px;
+  font-weight: bold;
+  color: ${({ theme }: any) => theme.colors.primary};
+  padding-vertical: ${({ theme }: any) => theme.spacing.sm}px;
+  padding-horizontal: ${({ theme }: any) => theme.spacing.lg}px;
+  background-color: ${({ theme }: any) => theme.colors.border};
+  border-radius: ${({ theme }: any) => theme.borderRadius.md}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
+  text-align: center;
+`;
+
+const Description = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.text};
+  text-align: center;
+  padding-horizontal: ${({ theme }: any) => theme.spacing.sm}px;
+`;
+
+const DetailRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  padding-vertical: ${({ theme }: any) => theme.spacing.xs}px;
+  border-bottom-width: 1px;
+  border-bottom-color: ${({ theme }: any) => theme.colors.border};
+`;
+
+const DetailLabel = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  font-weight: 600;
+  color: ${({ theme }: any) => theme.colors.text};
+`;
+
+const DetailValue = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  flex-shrink: 1;
+  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
+`;
+
+const ErrorText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
+  color: ${({ theme }: any) => theme.colors.error};
+`;
+
+const CategoriesContainer = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 1;
+  margin-left: ${({ theme }: any) => theme.spacing.xs}px;
+`;
+
+const CategoryTag = styled.Text`
+  background-color: ${({ theme }: any) => theme.colors.primary};
+  color: ${({ theme }: any) => theme.colors.white};
+  padding-horizontal: ${({ theme }: any) => theme.spacing.xs}px;
+  padding-vertical: 4px;
+  border-radius: 4px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  font-size: 12px;
+`;
 
 type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
 type CouponScreenNavigationProp = StackNavigationProp<
@@ -35,6 +134,7 @@ function CouponScreen({
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const loadCoupon = async () => {
@@ -59,25 +159,25 @@ function CouponScreen({
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </SafeAreaView>
+      <CenteredContainer>
+        <ActivityIndicator size="large" color={(theme as any).colors.primary} />
+      </CenteredContainer>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
-      </SafeAreaView>
+      <CenteredContainer>
+        <ErrorText>{error}</ErrorText>
+      </CenteredContainer>
     );
   }
 
   if (!coupon) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text>Kupon bulunamadı.</Text>
-      </SafeAreaView>
+      <CenteredContainer>
+        <ErrorText>Kupon bulunamadı.</ErrorText>
+      </CenteredContainer>
     );
   }
 
@@ -88,103 +188,94 @@ function CouponScreen({
     : null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Container>
       <ScrollView
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={{ paddingBottom: (theme as any).spacing.lg }}
         accessible={true}
         accessibilityLabel={coupon.brand?.name ? `${coupon.brand.name} kupon detayları` : "Kupon detayları"}>
-        {brandLogoUrl && (
-          <Image
-            source={{ uri: brandLogoUrl }}
-            style={styles.brandLogo}
-            resizeMode="contain"
-            accessible={true}
-            accessibilityLabel={coupon.brand?.name ? `${coupon.brand.name} logosu` : "Marka logosu"}
-            accessibilityRole="image"
-          />
-        )}
-        <Text
-          style={styles.brandName}
-          accessible={true}
-          accessibilityRole="header">
-          {coupon.brand?.name}
-        </Text>
-        <Text style={styles.couponCodeLabel}>Kupon Kodu:</Text>
-        <Text
-          style={styles.couponCode}
-          accessible={true}
-          accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
-          {coupon.code}
-        </Text>
-        <View style={styles.detailRow}>
-          <Text
-            style={styles.detailLabel}
-            accessible={true}
-            accessibilityLabel="İndirim etiketi">
-            İndirim:
-          </Text>
-          <Text
-            style={styles.detailValue}
-            accessible={true}
-            accessibilityLabel={`İndirim değeri: ${
-              coupon.discount_type === 'percentage'
-                ? `%${coupon.discount_value}`
-                : `${coupon.discount_value} TL`
-            }`}>
-            {coupon.discount_type === 'percentage'
-              ? `%${coupon.discount_value}`
-              : `${coupon.discount_value} TL`}
-          </Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text
-            style={styles.detailLabel}
-            accessible={true}
-            accessibilityLabel="Geçerlilik tarihi etiketi">
-            Geçerlilik Tarihi:
-          </Text>
-          <Text
-            style={styles.detailValue}
-            accessible={true}
-            accessibilityLabel={`Geçerlilik tarihi: ${new Date(
-              coupon.start_date,
-            ).toLocaleDateString()} tire ${new Date(
-              coupon.end_date,
-            ).toLocaleDateString()}`}>
-            {new Date(coupon.start_date).toLocaleDateString()} -{' '}
-            {new Date(coupon.end_date).toLocaleDateString()}
-          </Text>
-        </View>
-        <Text
-          style={styles.description}
-          accessible={true}
-          accessibilityLabel={`Açıklama: ${coupon.description}`}>
-          {coupon.description}
-        </Text>
-        {coupon.categories && coupon.categories.length > 0 && (
-          <View style={styles.detailRow}>
-            <Text
-              style={styles.detailLabel}
+        <ContentContainer>
+          {brandLogoUrl && (
+            <BrandLogo
+              source={{ uri: brandLogoUrl }}
+              resizeMode="contain"
               accessible={true}
-              accessibilityLabel="Kategoriler etiketi">
-              Kategoriler:
-            </Text>
-            <View style={styles.categoriesContainer}>
-              {coupon.categories.map(category => (
-                <Text
-                  key={category.id}
-                  style={styles.categoryTag}
-                  accessible={true}
-                  accessibilityLabel={category.name}>
-                  {category.name}
-                </Text>
-              ))}
-            </View>
-          </View>
-        )}
-        {/* Diğer kupon detayları eklenebilir */}
+              accessibilityLabel={coupon.brand?.name ? `${coupon.brand.name} logosu` : "Marka logosu"}
+              accessibilityRole="image"
+            />
+          )}
+          <BrandName
+            accessible={true}
+            accessibilityRole="header">
+            {coupon.brand?.name}
+          </BrandName>
+          <CouponCodeLabel>Kupon Kodu:</CouponCodeLabel>
+          <CouponCode
+            accessible={true}
+            accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
+            {coupon.code}
+          </CouponCode>
+          <DetailRow>
+            <DetailLabel
+              accessible={true}
+              accessibilityLabel="İndirim etiketi">
+              İndirim:
+            </DetailLabel>
+            <DetailValue
+              accessible={true}
+              accessibilityLabel={`İndirim değeri: ${
+                coupon.discount_type === 'percentage'
+                  ? `%${coupon.discount_value}`
+                  : `${coupon.discount_value} TL`
+              }`}>
+              {coupon.discount_type === 'percentage'
+                ? `%${coupon.discount_value}`
+                : `${coupon.discount_value} TL`}
+            </DetailValue>
+          </DetailRow>
+          <DetailRow>
+            <DetailLabel
+              accessible={true}
+              accessibilityLabel="Geçerlilik tarihi etiketi">
+              Geçerlilik Tarihi:
+            </DetailLabel>
+            <DetailValue
+              accessible={true}
+              accessibilityLabel={`Geçerlilik tarihi: ${new Date(
+                coupon.start_date,
+              ).toLocaleDateString()} tire ${new Date(
+                coupon.end_date,
+              ).toLocaleDateString()}`}>
+              {new Date(coupon.start_date).toLocaleDateString()} -{' '}
+              {new Date(coupon.end_date).toLocaleDateString()}
+            </DetailValue>
+          </DetailRow>
+          <Description
+            accessible={true}
+            accessibilityLabel={`Açıklama: ${coupon.description}`}>
+            {coupon.description}
+          </Description>
+          {coupon.categories && coupon.categories.length > 0 && (
+            <DetailRow>
+              <DetailLabel
+                accessible={true}
+                accessibilityLabel="Kategoriler etiketi">
+                Kategoriler:
+              </DetailLabel>
+              <CategoriesContainer>
+                {coupon.categories.map(category => (
+                  <CategoryTag
+                    key={category.id}
+                    accessible={true}
+                    accessibilityLabel={category.name}>
+                    {category.name}
+                  </CategoryTag>
+                ))}
+              </CategoriesContainer>
+            </DetailRow>
+          )}
+        </ContentContainer>
       </ScrollView>
-    </SafeAreaView>
+    </Container>
   );
 }
 

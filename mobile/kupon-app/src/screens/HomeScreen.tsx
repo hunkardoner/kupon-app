@@ -1,12 +1,11 @@
 import React from 'react';
 import {
-  View,
-  Text,
   FlatList,
   ActivityIndicator,
-  ScrollView,
   useWindowDimensions,
+  View,
 } from 'react-native';
+import styled from 'styled-components/native';
 import {
   useNavigation,
   CompositeNavigationProp,
@@ -24,20 +23,59 @@ import { Category, Slider, Coupon, Brand } from '../types';
 import SectionHeaderComponent from '../components/common/SectionHeaderComponent';
 import CardComponent from '../components/common/CardComponent';
 import SliderComponent from '../components/common/SliderComponent';
-import createStyles from './HomeScreen.styles'; // Import createStyles
-import COLORS from '../constants/colors';
 import { useQuery } from '@tanstack/react-query';
+import { useTheme } from '../theme';
+import { 
+  CenteredContainer,
+  Text 
+} from '../components/styled';
+
+// Styled Components
+const Container = styled.ScrollView`
+  flex: 1;
+  background-color: ${(props: any) => props.theme.colors.background};
+`;
+
+const LoadingContainer = styled(CenteredContainer)`
+  background-color: ${(props: any) => props.theme.colors.background};
+`;
+
+const ErrorText = styled(Text)`
+  color: ${(props: any) => props.theme.colors.error};
+  text-align: center;
+  padding: ${(props: any) => props.theme.spacing.lg}px;
+`;
+
+const SectionContainer = styled(View)`
+  margin-bottom: ${(props: any) => props.theme.spacing.lg}px;
+`;
+
+const ItemsContainer = styled(View)<{ numColumns: number }>`
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding-horizontal: ${(props: any) => props.theme.spacing.sm}px;
+`;
+
+const ItemWrapper = styled(View)<{ width: number }>`
+  width: ${(props: any) => props.width}px;
+  margin-bottom: ${(props: any) => props.theme.spacing.sm}px;
+`;
 
 // HomeScreen için birleşik navigasyon tipi
 type HomeScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<HomeStackParamList, 'Home'>, // Changed 'HomeMain' to 'Home'
+  StackNavigationProp<HomeStackParamList, 'Home'>,
   BottomTabNavigationProp<MainTabParamList>
 >;
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { width } = useWindowDimensions(); // Get window dimensions
-  const styles = createStyles(width); // Create styles dynamically
+  const { width } = useWindowDimensions();
+  const { theme } = useTheme();
+
+  // Responsive layout
+  const numColumns = width < 600 ? 2 : 3;
+  const itemWidth = (width - (numColumns + 1) * theme.spacing.md) / numColumns;
 
   const {
     data: categories,
@@ -72,150 +110,163 @@ const HomeScreen: React.FC = () => {
     error: brandsError,
   } = useQuery<Brand[], Error>({
     queryKey: ['popularBrands'],
-    queryFn: () => fetchBrands({ limit: 5, popular: true }),
+    queryFn: () => fetchBrands({ limit: 6, popular: true }),
   });
 
-  const isLoading =
-    categoriesLoading || slidersLoading || couponsLoading || brandsLoading;
-  const error = categoriesError || slidersError || couponsError || brandsError;
-
-  if (isLoading) {
-    return (
-      <ActivityIndicator
-        size="large"
-        color={COLORS.primary}
-        style={styles.centered}
-      />
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>
-          Veri yüklenirken bir hata oluştu: {error.message}
-        </Text>
-      </View>
-    );
-  }
-
-  const handleCategoryPress = (item: Category) => {
-    console.log('Category pressed:', item.name);
-    navigation.navigate('CategoriesTab', {
-      screen: 'CategoryDetail',
-      params: { categoryId: item.id },
-    });
+  // Navigation handlers
+  const handleCouponPress = (coupon: Coupon) => {
+    navigation.navigate('CouponDetail', { couponId: coupon.id });
   };
 
-  const handleCouponPress = (item: Coupon) => {
-    navigation.navigate('CouponsTab', {
-      screen: 'CouponDetail',
-      params: { couponId: item.id },
-    });
+  const handleBrandPress = (brand: Brand) => {
+    navigation.navigate('BrandDetail', { brandId: brand.id });
   };
 
-  const handleBrandPress = (item: Brand) => {
-    navigation.navigate('BrandsTab', {
-      screen: 'BrandDetail',
-      params: { brandId: item.id },
-    });
+  const handleCategoryPress = (category: Category) => {
+    navigation.navigate('CategoryDetail', { categoryId: category.id });
   };
 
   const handleSliderPress = (slider: Slider) => {
     console.log('Slider pressed:', slider.title);
-    if (slider.related_coupon_id) {
-      navigation.navigate('CouponsTab', {
-        screen: 'CouponDetail',
-        params: { couponId: slider.related_coupon_id },
-      });
-    } else if (slider.related_brand_id) {
-      navigation.navigate('BrandsTab', {
-        screen: 'BrandDetail',
-        params: { brandId: slider.related_brand_id },
-      });
-    }
-    // else if (slider.link_url) { /* Open link_url */ }
   };
 
+  const handleSeeAllPress = (section: string) => {
+    switch (section) {
+      case 'coupons':
+        navigation.navigate('CouponsTab', { screen: 'CouponList' });
+        break;
+      case 'brands':
+        navigation.navigate('BrandsTab', { screen: 'BrandList' });
+        break;
+      case 'categories':
+        navigation.navigate('CategoriesTab', { screen: 'CategoryList' });
+        break;
+    }
+  };
+
+  // Render functions
+  const renderCategoryItem = ({ item }: { item: Category }) => (
+    <CardComponent
+      item={{ ...item, type: 'category' }}
+      onPress={() => handleCategoryPress(item)}
+      horizontal={true}
+    />
+  );
+
+  const renderCouponItem = ({ item }: { item: Coupon }) => (
+    <CardComponent
+      item={{ ...item, type: 'coupon' }}
+      onPress={() => handleCouponPress(item)}
+      horizontal={true}
+    />
+  );
+
+  const renderBrandItem = ({ item }: { item: Brand }) => (
+    <CardComponent
+      item={{ ...item, type: 'brand' }}
+      onPress={() => handleBrandPress(item)}
+      horizontal={true}
+    />
+  );
+
+  // Loading and error states
+  if (categoriesLoading || slidersLoading || couponsLoading || brandsLoading) {
+    return (
+      <LoadingContainer>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={{ marginTop: theme.spacing.sm }}>Yükleniyor...</Text>
+      </LoadingContainer>
+    );
+  }
+
+  if (categoriesError || slidersError || couponsError || brandsError) {
+    return (
+      <LoadingContainer>
+        <ErrorText>
+          Veriler yüklenirken bir hata oluştu. Lütfen tekrar deneyiniz.
+        </ErrorText>
+      </LoadingContainer>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <Container contentContainerStyle={{ paddingBottom: theme.spacing.xl }}>
+      {/* Sliders Section */}
       {sliders && sliders.length > 0 && (
-        <SliderComponent sliders={sliders} onPressSlider={handleSliderPress} />
+        <SectionContainer>
+          <SliderComponent 
+            sliders={sliders} 
+            onPress={handleSliderPress} 
+          />
+        </SectionContainer>
       )}
 
+      {/* Popular Categories Section */}
       {categories && categories.length > 0 && (
-        <View style={styles.sectionContainer}>
-          <SectionHeaderComponent title="Kategoriler" />
-          <FlatList
-            data={categories}
-            renderItem={({ item }) => (
-              <CardComponent
-                item={{ ...item, type: 'category' }}
-                onPress={() => handleCategoryPress(item)}
-                horizontal={true}
-              />
-            )}
-            keyExtractor={item => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
-          />
-        </View>
-      )}
-
-      {popularCoupons && popularCoupons.length > 0 && (
-        <View style={styles.sectionContainer}>
+        <SectionContainer>
           <SectionHeaderComponent
-            title="Popüler Kuponlar"
-            onSeeAllPress={() =>
-              navigation.navigate('CouponsTab', { screen: 'CouponList' })
-            }
+            title="Popüler Kategoriler"
+            onSeeAllPress={() => handleSeeAllPress('categories')}
           />
           <FlatList
-            data={popularCoupons}
-            renderItem={({ item }) => (
-              <CardComponent
-                item={{ ...item, type: 'coupon' }}
-                onPress={() => handleCouponPress(item)}
-                horizontal={true}
-              />
-            )}
-            keyExtractor={item => item.id.toString()}
+            data={categories.slice(0, 6)} // Sadece ilk 6 kategori
+            renderItem={renderCategoryItem}
+            keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+            contentContainerStyle={{ 
+              paddingHorizontal: theme.spacing.md,
+              paddingVertical: theme.spacing.xs,
+            }}
+            ItemSeparatorComponent={() => <View style={{ width: theme.spacing.lg }} />}
           />
-        </View>
+        </SectionContainer>
       )}
 
+      {/* Popular Brands Section */}
       {popularBrands && popularBrands.length > 0 && (
-        <View style={styles.sectionContainer}>
+        <SectionContainer>
           <SectionHeaderComponent
             title="Popüler Markalar"
-            onSeeAllPress={() =>
-              navigation.navigate('BrandsTab', { screen: 'BrandList' })
-            }
+            onSeeAllPress={() => handleSeeAllPress('brands')}
           />
           <FlatList
-            data={popularBrands}
-            renderItem={({ item }) => (
-              <CardComponent
-                item={{ ...item, type: 'brand' }}
-                onPress={() => handleBrandPress(item)}
-                horizontal={true}
-              />
-            )}
-            keyExtractor={item => item.id.toString()}
+            data={popularBrands.slice(0, 8)} // Sadece ilk 8 marka
+            renderItem={renderBrandItem}
+            keyExtractor={(item) => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+            contentContainerStyle={{ 
+              paddingHorizontal: theme.spacing.md,
+              paddingVertical: theme.spacing.xs,
+            }}
+            ItemSeparatorComponent={() => <View style={{ width: theme.spacing.lg }} />}
           />
-        </View>
+        </SectionContainer>
       )}
-    </ScrollView>
+
+      {/* Popular Coupons Section */}
+      {popularCoupons && popularCoupons.length > 0 && (
+        <SectionContainer>
+          <SectionHeaderComponent
+            title="Popüler Kuponlar"
+            onSeeAllPress={() => handleSeeAllPress('coupons')}
+          />
+          <FlatList
+            data={popularCoupons.slice(0, 6)} // Sadece ilk 6 kupon
+            renderItem={renderCouponItem}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ 
+              paddingHorizontal: theme.spacing.md,
+              paddingVertical: theme.spacing.xs,
+            }}
+            ItemSeparatorComponent={() => <View style={{ width: theme.spacing.lg }} />}
+          />
+        </SectionContainer>
+      )}
+    </Container>
   );
 };
 

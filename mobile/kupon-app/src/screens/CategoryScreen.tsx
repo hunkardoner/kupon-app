@@ -1,19 +1,15 @@
-import React from 'react'; // Removed useEffect and useState
+import React from 'react';
 import {
-  View,
-  Text,
   ActivityIndicator,
   ScrollView,
-  Image,
   useWindowDimensions,
-} from 'react-native'; // Import useWindowDimensions
+} from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import styled from 'styled-components/native';
 import { CategoryStackParamList } from '../navigation/types';
 import { fetchCategoryById } from '../api';
 import { Category, Coupon } from '../types';
 import CardComponent from '../components/common/CardComponent';
-import COLORS from '../constants/colors';
-import createStyles from './CategoryScreen.styles'; // Import createStyles
 import { FlatList } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -23,7 +19,76 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useQuery } from '@tanstack/react-query'; // Import useQuery
+import { useQuery } from '@tanstack/react-query';
+import { useTheme } from '../theme';
+
+// Styled Components
+const Container = styled(ScrollView)`
+  flex: 1;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const CenteredContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: ${({ theme }: any) => theme.spacing.large}px;
+`;
+
+const ErrorText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.error};
+  text-align: center;
+`;
+
+const HeaderContainer = styled.View`
+  margin-bottom: ${({ theme }: any) => theme.spacing.large}px;
+`;
+
+const CategoryImage = styled.Image`
+  width: 100%;
+  height: 200px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const HeaderTextContainer = styled.View`
+  padding-horizontal: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const CategoryTitle = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.xl}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  color: ${({ theme }: any) => theme.colors.text};
+  margin-bottom: ${({ theme }: any) => theme.spacing.small}px;
+`;
+
+const CategoryDescription = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  line-height: 22px;
+`;
+
+const CouponsSection = styled.View`
+  padding-horizontal: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const SectionTitle = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  color: ${({ theme }: any) => theme.colors.text};
+  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const NoCouponsContainer = styled.View`
+  padding: ${({ theme }: any) => theme.spacing.large}px;
+  align-items: center;
+`;
+
+const NoCouponsText = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  text-align: center;
+`;
 
 type CategoryScreenRouteProp = RouteProp<
   CategoryStackParamList,
@@ -40,8 +105,8 @@ const CategoryScreen: React.FC = () => {
   const route = useRoute<CategoryScreenRouteProp>();
   const navigation = useNavigation<CategoryScreenNavigationProp>();
   const { categoryId } = route.params;
-  const { width } = useWindowDimensions(); // Get window dimensions
-  const styles = createStyles(width); // Create styles dynamically
+  const { width } = useWindowDimensions();
+  const { theme } = useTheme();
 
   const {
     data: category,
@@ -59,77 +124,71 @@ const CategoryScreen: React.FC = () => {
     navigation.navigate('CouponsTab', {
       screen: 'CouponDetail',
       params: { couponId },
-    } as NavigatorScreenParams<CouponStackParamList>); // Type assertion for params
+    } as NavigatorScreenParams<CouponStackParamList>);
   };
 
   if (loading) {
     return (
-      <ActivityIndicator
-        size="large"
-        color={COLORS.primary}
-        style={styles.centered}
-      />
+      <CenteredContainer>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </CenteredContainer>
     );
   }
 
   if (error || !category) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>
+      <CenteredContainer>
+        <ErrorText>
           {error?.message || 'Kategori bulunamadı.'}
-        </Text>
-      </View>
+        </ErrorText>
+      </CenteredContainer>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.headerContainer}>
+    <Container>
+      <HeaderContainer>
         {category.image && (
-          <Image
+          <CategoryImage
             source={{ uri: category.image }}
-            style={styles.categoryImage}
             resizeMode="cover"
           />
         )}
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.categoryTitle}>{category.name}</Text>
+        <HeaderTextContainer>
+          <CategoryTitle>{category.name}</CategoryTitle>
           {category.description && (
-            <Text style={styles.categoryDescription}>
+            <CategoryDescription>
               {category.description}
-            </Text>
+            </CategoryDescription>
           )}
-        </View>
-      </View>
+        </HeaderTextContainer>
+      </HeaderContainer>
 
       {coupons.length > 0 ? (
-        <View style={styles.couponsSection}>
-          <Text style={styles.sectionTitle}>Bu Kategorideki Kuponlar</Text>
+        <CouponsSection>
+          <SectionTitle>Bu Kategorideki Kuponlar</SectionTitle>
           <FlatList
             data={coupons}
             renderItem={({ item }) => (
               <CardComponent
                 item={{ ...item, type: 'coupon' }}
                 onPress={() => handleCouponPress(item.id)}
-                style={styles.couponCard} // This style might need adjustment or removal if CardComponent handles all its layout
               />
             )}
             keyExtractor={item => item.id.toString()}
             horizontal={false}
             showsVerticalScrollIndicator={false}
-            scrollEnabled={false} // Nested scrolling önlemek için
-            // numColumns could be added here if we want multiple columns for coupons on this screen
-            // For now, it defaults to a vertical list (1 column)
+            scrollEnabled={false}
           />
-        </View>
+        </CouponsSection>
       ) : (
-        <View style={styles.noCouponsContainer}>
-          <Text style={styles.noCouponsText}>
+        <NoCouponsContainer>
+          <NoCouponsText>
             Bu kategoride henüz kupon bulunmamaktadır.
-          </Text>
-        </View>
+          </NoCouponsText>
+        </NoCouponsContainer>
       )}
-    </ScrollView>
+    </Container>
   );
 };
 
