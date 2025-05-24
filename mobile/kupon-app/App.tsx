@@ -4,19 +4,36 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from './src/theme';
+import ErrorBoundary from './src/components/common/ErrorBoundary';
 
-// Create a client
-const queryClient = new QueryClient();
+// Create a client with optimized configuration
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 dakika
+      gcTime: 10 * 60 * 1000, // 10 dakika (TanStack Query v5'te cacheTime yerine gcTime)
+      retry: 2,
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+      refetchOnWindowFocus: false,
+      refetchOnMount: 'always',
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <StatusBar style="auto" />
-          <AppNavigator />
-        </QueryClientProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <StatusBar style="auto" />
+            <AppNavigator />
+          </QueryClientProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

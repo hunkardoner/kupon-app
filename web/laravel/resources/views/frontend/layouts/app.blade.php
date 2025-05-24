@@ -143,31 +143,31 @@
                         {{-- Add more navigation links here --}}
                     </ul>
 
-                    <!-- Search Form -->
-                    <div class="d-flex me-3">
-                        <form class="d-flex position-relative" method="GET" action="{{ route('search') }}" id="searchForm">
-                            <input class="form-control me-2" type="search" name="q" placeholder="Kupon, marka ara..." 
-                                   aria-label="Search" id="searchInput" autocomplete="off" 
-                                   value="{{ request('q') }}">
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                            <!-- Search Suggestions Dropdown -->
-                            <div id="searchSuggestions" class="position-absolute bg-white border rounded shadow-sm" 
-                                 style="top: 100%; left: 0; right: 40px; z-index: 1000; display: none; max-height: 300px; overflow-y: auto;">
-                            </div>
-                        </form>
-                    </div>
+                 
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
+                        <div class="d-flex me-3">
+                            <form class="d-flex position-relative" method="GET" action="{{ route('search') }}" id="searchForm">
+                                <input class="form-control me-2" type="search" name="q" placeholder="Kupon, marka ara..." 
+                                    aria-label="Search" id="searchInput" autocomplete="off" 
+                                    value="{{ request('q') }}">
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <!-- Search Suggestions Dropdown -->
+                                <div id="searchSuggestions" class="position-absolute bg-white border rounded shadow-sm" 
+                                    style="top: 100%; left: 0; right: 40px; z-index: 1000; display: none; max-height: 300px; overflow-y: auto;">
+                                </div>
+                            </form>
+                        </div>
                         <!-- Authentication Links -->
                         @guest
-                            @if (Route::has('login'))
+                            <!-- @if (Route::has('login'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Giriş') }}</a>
                                 </li>
-                            @endif
+                            @endif -->
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   FlatList,
-  ActivityIndicator,
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,9 +8,10 @@ import styled from 'styled-components/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../navigation/types';
 import { Coupon } from '../types';
-import { fetchCouponCodes } from '../api';
 import CardComponent from '../components/common/CardComponent';
-import { useQuery } from '@tanstack/react-query';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import ErrorDisplay from '../components/common/ErrorDisplay';
+import { useCoupons } from '../hooks/useQueries';
 import { useTheme } from '../theme';
 
 // Styled Components
@@ -25,18 +25,6 @@ const CenteredContainer = styled.View`
   justify-content: center;
   align-items: center;
   padding: ${({ theme }: any) => theme.spacing.large}px;
-`;
-
-const LoadingText = styled.Text`
-  margin-top: ${({ theme }: any) => theme.spacing.small}px;
-  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
-  color: ${({ theme }: any) => theme.colors.text};
-`;
-
-const ErrorText = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
-  color: ${({ theme }: any) => theme.colors.error};
-  text-align: center;
 `;
 
 const EmptyText = styled.Text`
@@ -74,10 +62,7 @@ function CouponListScreen({
     data: coupons,
     isLoading,
     error,
-  } = useQuery<Coupon[], Error>({
-    queryKey: ['coupons'],
-    queryFn: () => fetchCouponCodes(),
-  });
+  } = useCoupons();
 
   const handleCouponPress = (couponId: number) => {
     navigation.navigate('CouponDetail', { couponId: couponId });
@@ -95,10 +80,7 @@ function CouponListScreen({
   if (isLoading) {
     return (
       <Container>
-        <CenteredContainer>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <LoadingText>Yükleniyor...</LoadingText>
-        </CenteredContainer>
+        <LoadingSpinner message="Kuponlar yükleniyor..." fullScreen />
       </Container>
     );
   }
@@ -106,11 +88,10 @@ function CouponListScreen({
   if (error) {
     return (
       <Container>
-        <CenteredContainer>
-          <ErrorText>
-            Kuponlar yüklenirken bir hata oluştu: {error.message}
-          </ErrorText>
-        </CenteredContainer>
+        <ErrorDisplay
+          error={error}
+          message="Kuponlar yüklenirken bir hata oluştu"
+        />
       </Container>
     );
   }

@@ -3,10 +3,11 @@ import { FlatList, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CategoryStackParamList } from '../navigation/types';
-import { fetchCategories } from '../api';
 import { Category } from '../types';
 import CardComponent from '../components/common/CardComponent';
-import { useQuery } from '@tanstack/react-query';
+import { useCategories } from '../hooks/useQueries';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import ErrorDisplay from '../components/common/ErrorDisplay';
 import styled from 'styled-components/native';
 import { useTheme } from 'styled-components/native';
 
@@ -42,33 +43,25 @@ const CategoryListScreen: React.FC = () => {
     data: categories,
     isLoading: loading,
     error,
-  } = useQuery<Category[], Error>({
-    queryKey: ['categories'],
-    queryFn: fetchCategories,
-  });
+    refetch,
+  } = useCategories();
 
   const handleCategoryPress = (category: Category) => {
     navigation.navigate('CategoryDetail', { categoryId: category.id });
   };
 
   if (loading) {
-    return (
-      <CenteredContainer>
-        <ActivityIndicator
-          size="large"
-          color={(theme as any).colors.primary}
-        />
-      </CenteredContainer>
-    );
+    return <LoadingSpinner fullScreen message="Kategoriler yükleniyor..." />;
   }
 
   if (error) {
     return (
-      <CenteredContainer>
-        <ErrorText>
-          Kategoriler yüklenirken bir hata oluştu: {error.message}
-        </ErrorText>
-      </CenteredContainer>
+      <ErrorDisplay 
+        error={error} 
+        onRetry={refetch}
+        fullScreen
+        message="Kategoriler yüklenirken bir hata oluştu."
+      />
     );
   }
 

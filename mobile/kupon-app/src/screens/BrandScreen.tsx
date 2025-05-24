@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Linking,
   useWindowDimensions,
@@ -12,29 +11,23 @@ import {
   CouponStackParamList,
   MainTabParamList,
 } from '../navigation/types';
-import { fetchBrandById, fetchCouponCodes } from '../api';
 import { Brand, Coupon } from '../types';
 import { API_BASE_URL } from '../api/index';
 import CardComponent from '../components/common/CardComponent';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import ErrorDisplay from '../components/common/ErrorDisplay';
 import {
   CompositeNavigationProp,
   NavigatorScreenParams,
 } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useQuery } from '@tanstack/react-query';
+import { useBrand, useBrandCoupons } from '../hooks/useQueries';
 import styled from 'styled-components/native';
 import { useTheme } from 'styled-components/native';
 
 // Styled Components
 const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: ${({ theme }: any) => theme.colors.background};
-`;
-
-const CenteredContainer = styled.SafeAreaView`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
   background-color: ${({ theme }: any) => theme.colors.background};
 `;
 
@@ -103,13 +96,6 @@ const NoCouponsText = styled.Text`
   color: ${({ theme }: any) => theme.colors.textSecondary};
 `;
 
-const ErrorText = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
-  color: ${({ theme }: any) => theme.colors.error};
-  text-align: center;
-  padding: ${({ theme }: any) => theme.spacing.lg}px;
-`;
-
 const TouchableLink = styled.TouchableOpacity`
   margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
 `;
@@ -144,18 +130,13 @@ function BrandScreen({
     data: brand,
     isLoading: brandLoading,
     error: brandError,
-  } = useQuery<Brand, Error>({
-    queryKey: ['brand', brandId],
-    queryFn: () => fetchBrandById(brandId),
-  });
+  } = useBrand(brandId);
 
   const {
     data: coupons,
     isLoading: couponsLoading,
     error: couponsError,
-  } = useQuery<Coupon[], Error>({
-    queryKey: ['coupons', 'brand', brandId],
-    queryFn: () => fetchCouponCodes({ brand_id: brandId }),
+  } = useBrandCoupons(brandId, {
     enabled: !!brand,
   });
 
@@ -180,28 +161,23 @@ function BrandScreen({
   const error = brandError || couponsError;
 
   if (isLoading) {
-    return (
-      <CenteredContainer>
-        <ActivityIndicator size="large" color={(theme as any).colors.primary} />
-      </CenteredContainer>
-    );
+    return <LoadingSpinner message="Marka detayları yükleniyor..." fullScreen />;
   }
 
   if (error) {
     return (
-      <CenteredContainer>
-        <ErrorText>
-          {error.message || 'Veri yüklenirken bir hata oluştu.'}
-        </ErrorText>
-      </CenteredContainer>
+      <ErrorDisplay
+        error={error}
+        message="Marka detayları yüklenirken bir hata oluştu"
+      />
     );
   }
 
   if (!brand) {
     return (
-      <CenteredContainer>
-        <ErrorText>Marka bulunamadı.</ErrorText>
-      </CenteredContainer>
+      <ErrorDisplay
+        message="Marka bulunamadı"
+      />
     );
   }
 

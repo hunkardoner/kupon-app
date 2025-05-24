@@ -9,10 +9,11 @@ import styled from 'styled-components/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { BrandStackParamList } from '../navigation/types';
-import { fetchBrands } from '../api';
 import { Brand } from '../types';
-import { useQuery } from '@tanstack/react-query';
+import { useBrands } from '../hooks/useQueries';
 import { API_BASE_URL } from '../api/index';
+import ErrorDisplay from '../components/common/ErrorDisplay';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 // Types
 type BrandListScreenRouteProp = RouteProp<BrandStackParamList, 'BrandList'>;
@@ -114,9 +115,7 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
     isLoading,
     error,
     refetch,
-  } = useQuery<Brand[], Error>({
-    queryKey: ['brands'],
-    queryFn: () => fetchBrands(),
+  } = useBrands(undefined, {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -165,20 +164,17 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
   };
 
   if (isLoading) {
-    return (
-      <CenteredContainer>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </CenteredContainer>
-    );
+    return <LoadingSpinner fullScreen message="Markalar yükleniyor..." />;
   }
 
   if (error) {
     return (
-      <CenteredContainer>
-        <ErrorText>
-          {error.message || 'Markalar yüklenirken bir hata oluştu.'}
-        </ErrorText>
-      </CenteredContainer>
+      <ErrorDisplay 
+        error={error} 
+        onRetry={refetch}
+        fullScreen
+        message="Markalar yüklenirken bir hata oluştu."
+      />
     );
   }
 

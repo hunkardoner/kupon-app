@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   FlatList,
-  ActivityIndicator,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -13,17 +12,18 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { HomeStackParamList, MainTabParamList } from '../navigation/types';
-import {
-  fetchCategories,
-  fetchSliders,
-  fetchCouponCodes,
-  fetchBrands,
-} from '../api';
 import { Category, Slider, Coupon, Brand } from '../types';
 import SectionHeaderComponent from '../components/common/SectionHeaderComponent';
 import CardComponent from '../components/common/CardComponent';
 import SliderComponent from '../components/common/SliderComponent';
-import { useQuery } from '@tanstack/react-query';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import ErrorDisplay from '../components/common/ErrorDisplay';
+import { 
+  useCategories, 
+  useSliders, 
+  usePopularCoupons, 
+  usePopularBrands 
+} from '../hooks/useQueries';
 import { useTheme } from '../theme';
 import { 
   CenteredContainer,
@@ -38,12 +38,6 @@ const Container = styled.ScrollView`
 
 const LoadingContainer = styled(CenteredContainer)`
   background-color: ${(props: any) => props.theme.colors.background};
-`;
-
-const ErrorText = styled(Text)`
-  color: ${(props: any) => props.theme.colors.error};
-  text-align: center;
-  padding: ${(props: any) => props.theme.spacing.lg}px;
 `;
 
 const SectionContainer = styled(View)`
@@ -81,37 +75,25 @@ const HomeScreen: React.FC = () => {
     data: categories,
     isLoading: categoriesLoading,
     error: categoriesError,
-  } = useQuery<Category[], Error>({
-    queryKey: ['categories'],
-    queryFn: fetchCategories,
-  });
+  } = useCategories();
 
   const {
     data: sliders,
     isLoading: slidersLoading,
     error: slidersError,
-  } = useQuery<Slider[], Error>({
-    queryKey: ['sliders'],
-    queryFn: fetchSliders,
-  });
+  } = useSliders();
 
   const {
     data: popularCoupons,
     isLoading: couponsLoading,
     error: couponsError,
-  } = useQuery<Coupon[], Error>({
-    queryKey: ['popularCoupons'],
-    queryFn: () => fetchCouponCodes({ limit: 5, popular: true }),
-  });
+  } = usePopularCoupons();
 
   const {
     data: popularBrands,
     isLoading: brandsLoading,
     error: brandsError,
-  } = useQuery<Brand[], Error>({
-    queryKey: ['popularBrands'],
-    queryFn: () => fetchBrands({ limit: 6, popular: true }),
-  });
+  } = usePopularBrands();
 
   // Navigation handlers
   const handleCouponPress = (coupon: Coupon) => {
@@ -173,18 +155,19 @@ const HomeScreen: React.FC = () => {
   if (categoriesLoading || slidersLoading || couponsLoading || brandsLoading) {
     return (
       <LoadingContainer>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={{ marginTop: theme.spacing.sm }}>Yükleniyor...</Text>
+        <LoadingSpinner message="Ana sayfa yükleniyor..." fullScreen />
       </LoadingContainer>
     );
   }
 
   if (categoriesError || slidersError || couponsError || brandsError) {
+    const error = categoriesError || slidersError || couponsError || brandsError;
     return (
       <LoadingContainer>
-        <ErrorText>
-          Veriler yüklenirken bir hata oluştu. Lütfen tekrar deneyiniz.
-        </ErrorText>
+        <ErrorDisplay
+          error={error || undefined}
+          message="Ana sayfa verileri yüklenirken bir hata oluştu"
+        />
       </LoadingContainer>
     );
   }

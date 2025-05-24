@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -12,11 +12,11 @@ import { RouteProp, NavigatorScreenParams, CompositeNavigationProp } from '@reac
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { CouponStackParamList, CategoryStackParamList, MainTabParamList } from '../navigation/types';
-import { fetchCouponCodeById } from '../api';
 import { Coupon } from '../types';
 import { API_BASE_URL } from '../api/index';
 import styled from 'styled-components/native';
 import { useTheme } from 'styled-components/native';
+import { useCoupon } from '../hooks/useQueries';
 
 // Styled Components
 const Container = styled.SafeAreaView`
@@ -217,10 +217,22 @@ function CouponScreen({
   navigation,
 }: CouponScreenProps): React.JSX.Element {
   const { couponId } = route.params;
-  const [coupon, setCoupon] = useState<Coupon | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
+
+  // TanStack Query ile veri çekme
+  const {
+    data: coupon,
+    isLoading,
+    error,
+  } = useCoupon(couponId);
+
+  useEffect(() => {
+    if (coupon) {
+      navigation.setOptions({
+        title: coupon.brand?.name || 'Kupon Detayı',
+      });
+    }
+  }, [coupon, navigation]);
 
   const handleCategoryPress = (categoryId: number, categoryName?: string) => {
     navigation.navigate('CategoriesTab', {
@@ -273,28 +285,7 @@ function CouponScreen({
     }
   };
 
-  useEffect(() => {
-    const loadCoupon = async () => {
-      try {
-        setLoading(true);
-        const fetchedCoupon = await fetchCouponCodeById(couponId);
-        setCoupon(fetchedCoupon);
-        navigation.setOptions({
-          title: fetchedCoupon.brand?.name || 'Kupon Detayı',
-        });
-        setError(null);
-      } catch (e) {
-        console.error('Failed to fetch coupon details', e);
-        setError('Kupon detayları yüklenirken bir hata oluştu.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCoupon();
-  }, [couponId, navigation]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <CenteredContainer>
         <ActivityIndicator size="large" color={(theme as any).colors.primary} />
@@ -305,7 +296,7 @@ function CouponScreen({
   if (error) {
     return (
       <CenteredContainer>
-        <ErrorText>{error}</ErrorText>
+        <ErrorText>{error.message || 'Kupon detayları yüklenirken bir hata oluştu.'}</ErrorText>
       </CenteredContainer>
     );
   }

@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  ActivityIndicator,
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { CategoryStackParamList } from '../navigation/types';
-import { fetchCategoryById } from '../api';
 import { Category, Coupon } from '../types';
 import CardComponent from '../components/common/CardComponent';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import ErrorDisplay from '../components/common/ErrorDisplay';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList, MainTabParamList } from '../navigation/types';
@@ -18,26 +18,13 @@ import {
   NavigatorScreenParams,
 } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { useQuery } from '@tanstack/react-query';
+import { useCategory } from '../hooks/useQueries';
 import { useTheme } from '../theme';
 
 // Styled Components
 const Container = styled(ScrollView)`
   flex: 1;
   background-color: ${({ theme }: any) => theme.colors.background};
-`;
-
-const CenteredContainer = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  padding: ${({ theme }: any) => theme.spacing.large}px;
-`;
-
-const ErrorText = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
-  color: ${({ theme }: any) => theme.colors.error};
-  text-align: center;
 `;
 
 const HeaderContainer = styled.View`
@@ -118,10 +105,7 @@ const CategoryScreen: React.FC = () => {
     data: category,
     isLoading: loading,
     error,
-  } = useQuery<Category, Error>({
-    queryKey: ['category', categoryId],
-    queryFn: () => fetchCategoryById(categoryId),
-  });
+  } = useCategory(categoryId);
 
   // Coupons are part of the category data
   const coupons = category?.coupon_codes || [];
@@ -134,20 +118,15 @@ const CategoryScreen: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <CenteredContainer>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-      </CenteredContainer>
-    );
+    return <LoadingSpinner message="Kategori yükleniyor..." fullScreen />;
   }
 
   if (error || !category) {
     return (
-      <CenteredContainer>
-        <ErrorText>
-          {error?.message || 'Kategori bulunamadı.'}
-        </ErrorText>
-      </CenteredContainer>
+      <ErrorDisplay
+        error={error || undefined}
+        message={error?.message || 'Kategori bulunamadı.'}
+      />
     );
   }
 
