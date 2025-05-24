@@ -49,6 +49,14 @@ const BrandName = styled.Text`
   text-align: center;
 `;
 
+const CampaignTitle = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.semiBold};
+  color: ${({ theme }: any) => theme.colors.text};
+  margin-bottom: ${({ theme }: any) => theme.spacing.sm}px;
+  text-align: center;
+`;
+
 const CouponCodeLabel = styled.Text`
   font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
   color: ${({ theme }: any) => theme.colors.textSecondary};
@@ -321,7 +329,15 @@ function CouponScreen({
             accessibilityRole="header">
             {coupon.brand?.name}
           </BrandName>
-          <CouponCodeLabel>Kupon Kodu:</CouponCodeLabel>
+
+          <CampaignTitle
+            accessible={true}
+            accessibilityLabel={`Kampanya: ${coupon.campaign_title || 'Kampanya Detayı'}`}>
+            {coupon.campaign_title || 'Kampanya Detayı'}
+          </CampaignTitle>
+
+          {/* <CouponCodeLabel>Kupon Kodu:</CouponCodeLabel> */}
+          
           <CouponCodeContainer>
             <CouponCode
               accessible={true}

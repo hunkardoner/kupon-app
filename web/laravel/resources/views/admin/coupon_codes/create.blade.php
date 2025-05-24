@@ -57,6 +57,15 @@
                 <div class="form-text">Enter the campaign URL where users will be redirected when they click "Go to Campaign" button in the mobile app.</div>
             </div>
 
+            <div class="mb-3">
+                <label for="campaign_title" class="form-label">Campaign Title</label>
+                <input type="text" class="form-control @error('campaign_title') is-invalid @enderror" id="campaign_title" name="campaign_title" value="{{ old('campaign_title') }}" placeholder="Special Offer">
+                @error('campaign_title')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <div class="form-text">Optional title for the campaign button (e.g., "Special Offer", "Shop Now"). If not provided, "Go to Campaign" will be used.</div>
+            </div>
+
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="discount_type" class="form-label">Discount Type</label>

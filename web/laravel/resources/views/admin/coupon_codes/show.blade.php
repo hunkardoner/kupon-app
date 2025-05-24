@@ -81,7 +81,7 @@
                     <td>
                         @if($couponCode->campaign_url)
                             <a href="{{ $couponCode->campaign_url }}" target="_blank" class="btn btn-sm btn-success">
-                                <i class="fas fa-rocket"></i> Kampanyaya Git
+                                <i class="fas fa-rocket"></i> {{ $couponCode->campaign_title ?: 'Kampanyaya Git' }}
                             </a>
                             <br>
                             <small class="text-muted">{{ $couponCode->campaign_url }}</small>
@@ -89,6 +89,10 @@
                             N/A
                         @endif
                     </td>
+                </tr>
+                <tr>
+                    <th>Campaign Title</th>
+                    <td>{{ $couponCode->campaign_title ?: 'N/A' }}</td>
                 </tr>
                 <tr>
                     <th>Created At</th>

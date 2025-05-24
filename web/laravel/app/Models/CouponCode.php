@@ -22,6 +22,7 @@ class CouponCode extends Model
         'is_active',
         'brand_id',
         'campaign_url',
+        'campaign_title',
     ];
 
     /**
