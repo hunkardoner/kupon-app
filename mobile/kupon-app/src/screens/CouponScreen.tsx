@@ -74,7 +74,7 @@ const CouponCode = styled.Text`
   border: 2px solid ${({ theme }: any) => theme.colors.primary};
   border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
   text-align: center;
-  flex: 1;
+  min-width: 60%;
   margin-right: ${({ theme }: any) => theme.spacing.sm}px;
 `;
 
@@ -147,9 +147,14 @@ const CategoryTagText = styled.Text`
 const CouponCodeContainer = styled.View`
   flex-direction: row;
   align-items: stretch;
-  justify-content: center;
+  justify-content: space-between;
   margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
   width: 100%;
+`;
+
+const ButtonGroup = styled.View`
+  flex-direction: row;
+  align-items: stretch;
 `;
 
 const CopyButton = styled.TouchableOpacity`
@@ -160,7 +165,7 @@ const CopyButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   min-height: 56px;
-  flex: 1;
+  min-width: 56px;
 `;
 
 const ShareButton = styled.TouchableOpacity`
@@ -171,7 +176,7 @@ const ShareButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   min-height: 56px;
-  flex: 1;
+  min-width: 56px;
 `;
 
 // const CopyButtonText = styled.Text`
@@ -355,20 +360,22 @@ function CouponScreen({
               accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
               {coupon.code}
             </CouponCode>
-            <CopyButton
-              accessible={true}
-              accessibilityLabel="Kupon kodunu kopyala"
-              onPress={handleCopyCode}>
-              <Ionicons name="copy-outline" size={20} color="white" />
-            </CopyButton>
-            <ShareButton
-              accessible={true}
-              accessibilityLabel="Kupon kodunu paylaş"
-              onPress={handleShareCode}>
-              <Ionicons name="share-outline" size={20} color="white" />
-            </ShareButton>
+            <ButtonGroup>
+              <CopyButton
+                accessible={true}
+                accessibilityLabel="Kupon kodunu kopyala"
+                onPress={handleCopyCode}>
+                <Ionicons name="copy-outline" size={20} color="white" />
+              </CopyButton>
+              <ShareButton
+                accessible={true}
+                accessibilityLabel="Kupon kodunu paylaş"
+                onPress={handleShareCode}>
+                <Ionicons name="share-outline" size={20} color="white" />
+              </ShareButton>
+            </ButtonGroup>
           </CouponCodeContainer>
-          
+          <ButtonGroup>
           {coupon.campaign_url && (
             <CampaignButton
               accessible={true}
@@ -379,6 +386,7 @@ function CouponScreen({
               </CampaignButtonText>
             </CampaignButton>
           )}
+          </ButtonGroup>
           <DetailsContainer>
             <DetailRow>
               <DetailLabel
