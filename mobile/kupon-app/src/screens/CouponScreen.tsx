@@ -8,9 +8,10 @@ import {
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, NavigatorScreenParams, CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { CouponStackParamList } from '../navigation/types';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { CouponStackParamList, CategoryStackParamList, MainTabParamList } from '../navigation/types';
 import { fetchCouponCodeById } from '../api';
 import { Coupon } from '../types';
 import { API_BASE_URL } from '../api/index';
@@ -128,14 +129,17 @@ const CategoriesContainer = styled.View`
   flex: 1;
 `;
 
-const CategoryTag = styled.Text`
+const CategoryTag = styled.TouchableOpacity`
   background-color: ${({ theme }: any) => theme.colors.primary};
-  color: ${({ theme }: any) => theme.colors.surface};
   padding-horizontal: ${({ theme }: any) => theme.spacing.sm}px;
   padding-vertical: ${({ theme }: any) => theme.spacing.xs}px;
   border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
   margin-left: ${({ theme }: any) => theme.spacing.xs}px;
   margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
+`;
+
+const CategoryTagText = styled.Text`
+  color: ${({ theme }: any) => theme.colors.surface};
   font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
   font-weight: ${({ theme }: any) => theme.typography.weights.medium};
 `;
@@ -193,9 +197,9 @@ const CampaignButtonText = styled.Text`
 `;
 
 type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
-type CouponScreenNavigationProp = StackNavigationProp<
-  CouponStackParamList,
-  'CouponDetail'
+type CouponScreenNavigationProp = CompositeNavigationProp<
+  StackNavigationProp<CouponStackParamList, 'CouponDetail'>,
+  BottomTabNavigationProp<MainTabParamList>
 >;
 
 interface CouponScreenProps {
@@ -212,6 +216,13 @@ function CouponScreen({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const theme = useTheme();
+
+  const handleCategoryPress = (categoryId: number, categoryName?: string) => {
+    navigation.navigate('CategoriesTab', {
+      screen: 'CategoryDetail',
+      params: { categoryId },
+    });
+  };
 
   // Helper functions
   const handleCopyCode = async () => {
@@ -420,8 +431,11 @@ function CouponScreen({
                     <CategoryTag
                       key={category.id}
                       accessible={true}
-                      accessibilityLabel={category.name}>
-                      {category.name}
+                      accessibilityLabel={category.name}
+                      onPress={() => handleCategoryPress(category.id, category.name)}>
+                      <CategoryTagText>
+                        {category.name}
+                      </CategoryTagText>
                     </CategoryTag>
                   ))}
                 </CategoriesContainer>
