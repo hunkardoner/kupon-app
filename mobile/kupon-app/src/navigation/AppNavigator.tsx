@@ -138,21 +138,45 @@ function MainTabNavigator() {
         name="HomeTab"
         component={HomeStackNavigator}
         options={{ title: 'Anasayfa' }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Home tab'ına basıldığında Home stack'ini root'a resetle
+            navigation.navigate('HomeTab', { screen: 'Home' });
+          },
+        })}
       />
       <Tab.Screen
         name="CouponsTab"
         component={CouponStackNavigator}
         options={{ title: 'Kuponlar' }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Coupon tab'ına basıldığında Coupon stack'ini root'a resetle
+            navigation.navigate('CouponsTab', { screen: 'CouponList' });
+          },
+        })}
       />
       <Tab.Screen
         name="BrandsTab"
         component={BrandStackNavigator}
         options={{ title: 'Markalar' }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Brand tab'ına basıldığında Brand stack'ini root'a resetle
+            navigation.navigate('BrandsTab', { screen: 'BrandList' });
+          },
+        })}
       />
       <Tab.Screen
         name="CategoriesTab"
         component={CategoryStackNavigator}
         options={{ title: 'Kategoriler' }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Category tab'ına basıldığında Category stack'ini root'a resetle
+            navigation.navigate('CategoriesTab', { screen: 'CategoryList' });
+          },
+        })}
       />
     </Tab.Navigator>
   );
