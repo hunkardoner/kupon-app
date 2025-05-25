@@ -1,5 +1,6 @@
 // src/hooks/useQueries.ts
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import {
   fetchCategories,
   fetchCategoryById,
@@ -102,13 +103,16 @@ export const useCoupon = (
   });
 };
 
-// Popular Content Hooks
+// Popular Content Hooks with memoization
 export const usePopularCoupons = (
   options?: Omit<UseQueryOptions<Coupon[], Error>, 'queryKey' | 'queryFn'>
 ) => {
+  const queryKey = useMemo(() => queryKeys.popularCoupons, []);
+  const queryFn = useMemo(() => () => fetchCouponCodes({ limit: 5, popular: true }), []);
+  
   return useQuery({
-    queryKey: queryKeys.popularCoupons,
-    queryFn: () => fetchCouponCodes({ limit: 5, popular: true }),
+    queryKey,
+    queryFn,
     staleTime: 5 * 60 * 1000,
     ...options,
   });
@@ -117,9 +121,12 @@ export const usePopularCoupons = (
 export const usePopularBrands = (
   options?: Omit<UseQueryOptions<Brand[], Error>, 'queryKey' | 'queryFn'>
 ) => {
+  const queryKey = useMemo(() => queryKeys.popularBrands, []);
+  const queryFn = useMemo(() => () => fetchBrands({ limit: 6, popular: true }), []);
+  
   return useQuery({
-    queryKey: queryKeys.popularBrands,
-    queryFn: () => fetchBrands({ limit: 6, popular: true }),
+    queryKey,
+    queryFn,
     staleTime: 10 * 60 * 1000,
     ...options,
   });

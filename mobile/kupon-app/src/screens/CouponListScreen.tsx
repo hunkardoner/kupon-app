@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   FlatList,
   useWindowDimensions,
@@ -48,15 +48,18 @@ interface CouponListScreenProps {
   navigation: CouponListScreenNavigationProp;
 }
 
-function CouponListScreen({
+const CouponListScreen: React.FC<CouponListScreenProps> = React.memo(({
   navigation,
-}: CouponListScreenProps): React.JSX.Element {
+}) => {
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
 
-  // Responsive columns
-  const numColumns = width < 600 ? 2 : 3;
-  const cardWidth = (width - (numColumns + 1) * theme.spacing.md) / numColumns;
+  // Memoized responsive columns calculation
+  const layoutConfig = useMemo(() => {
+    const numColumns = width < 600 ? 2 : 3;
+    const cardWidth = (width - (numColumns + 1) * theme.spacing.md) / numColumns;
+    return { numColumns, cardWidth };
+  }, [width, theme.spacing.md]);
 
   const {
     data: coupons,
@@ -64,18 +67,37 @@ function CouponListScreen({
     error,
   } = useCoupons();
 
-  const handleCouponPress = (couponId: number) => {
+  // Memoized navigation handler
+  const handleCouponPress = useCallback((couponId: number) => {
     navigation.navigate('CouponDetail', { couponId: couponId });
-  };
+  }, [navigation]);
 
-  const renderCouponItem = ({ item }: { item: Coupon }) => (
-    <CardContainer width={cardWidth}>
+  // Memoized render function
+  const renderCouponItem = useCallback(({ item }: { item: Coupon }) => (
+    <CardContainer width={layoutConfig.cardWidth}>
       <CardComponent
         item={{ ...item, type: 'coupon' }}
         onPress={() => handleCouponPress(item.id)}
       />
     </CardContainer>
+  ), [layoutConfig.cardWidth, handleCouponPress]);
+
+  // Memoized key extractor
+  const keyExtractor = useCallback((item: Coupon) => item.id.toString(), []);
+
+  // Memoized column wrapper style
+  const columnWrapperStyle = useMemo(() => 
+    layoutConfig.numColumns > 1 ? {
+      justifyContent: 'space-around' as const,
+      paddingHorizontal: theme.spacing.sm,
+    } : undefined,
+    [layoutConfig.numColumns, theme.spacing.sm]
   );
+
+  // Memoized content container style
+  const contentContainerStyle = useMemo(() => ({ 
+    padding: theme.spacing.sm 
+  }), [theme.spacing.sm]);
 
   if (isLoading) {
     return (
@@ -102,17 +124,14 @@ function CouponListScreen({
         <FlatList
           data={coupons}
           renderItem={renderCouponItem}
-          keyExtractor={item => item.id.toString()}
-          contentContainerStyle={{ padding: theme.spacing.sm }}
-          numColumns={numColumns}
-          columnWrapperStyle={
-            numColumns > 1
-              ? {
-                  justifyContent: 'space-around',
-                  paddingHorizontal: theme.spacing.sm,
-                }
-              : undefined
-          }
+          keyExtractor={keyExtractor}
+          contentContainerStyle={contentContainerStyle}
+          numColumns={layoutConfig.numColumns}
+          columnWrapperStyle={columnWrapperStyle}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          removeClippedSubviews={true}
+          getItemLayout={undefined} // Auto calculate for performance
         />
       ) : (
         <CenteredContainer>
@@ -121,6 +140,9 @@ function CouponListScreen({
       )}
     </Container>
   );
-}
+});
+
+// Display name for better debugging
+CouponListScreen.displayName = 'CouponListScreen';
 
 export default CouponListScreen;

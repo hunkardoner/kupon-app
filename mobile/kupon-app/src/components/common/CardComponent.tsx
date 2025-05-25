@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   TouchableOpacity,
   useWindowDimensions,
@@ -100,7 +100,7 @@ const Subtitle = styled.Text`
   flex: 1;
 `;
 
-const CardComponent: React.FC<CardComponentProps> = ({
+const CardComponent: React.FC<CardComponentProps> = React.memo(({
   item,
   onPress,
   style,
@@ -109,47 +109,59 @@ const CardComponent: React.FC<CardComponentProps> = ({
   const { width } = useWindowDimensions(); // Get window dimensions
   const theme = useTheme();
 
-  let title = '';
-  let subtitle: string | undefined | null = undefined;
-  let imageUrl: string | undefined | null = undefined;
-  let accessibilityLabelSuffix = '';
+  // Memoize card properties to avoid recalculation on each render
+  const cardProps = useMemo(() => {
+    let title = '';
+    let subtitle: string | undefined | null = undefined;
+    let imageUrl: string | undefined | null = undefined;
+    let accessibilityLabelSuffix = '';
 
-  if (item.type === 'category') {
-    title = item.name;
-    subtitle = item.description;
-    imageUrl = item.image; // Changed from item.image_url to item.image
-    accessibilityLabelSuffix = 'kategorisi';
-  } else if (item.type === 'brand') {
-    title = item.name;
-    subtitle = item.description;
-    imageUrl = item.logo; // Changed from logo_url to logo
-    accessibilityLabelSuffix = 'markası';
-  } else if (item.type === 'coupon') {
-    title = item.code; // Changed from title to code
-    subtitle = item.description;
-    imageUrl = item.brand?.logo; // Use brand logo for coupon
-    accessibilityLabelSuffix = 'kuponu';
-  }
+    if (item.type === 'category') {
+      title = item.name;
+      subtitle = item.description;
+      imageUrl = item.image; // Changed from item.image_url to item.image
+      accessibilityLabelSuffix = 'kategorisi';
+    } else if (item.type === 'brand') {
+      title = item.name;
+      subtitle = item.description;
+      imageUrl = item.logo; // Changed from logo_url to logo
+      accessibilityLabelSuffix = 'markası';
+    } else if (item.type === 'coupon') {
+      title = item.code; // Changed from title to code
+      subtitle = item.description;
+      imageUrl = item.brand?.logo; // Use brand logo for coupon
+      accessibilityLabelSuffix = 'kuponu';
+    }
 
-  // Image source handling
-  let imageSource: { uri: string } | undefined = undefined;
-  if (imageUrl) {
+    return { title, subtitle, imageUrl, accessibilityLabelSuffix };
+  }, [item]);
+
+  // Memoize image source to avoid recalculation
+  const imageSource = useMemo(() => {
+    if (!cardProps.imageUrl) return undefined;
+    
+    let imageUrl = cardProps.imageUrl;
     // API'den gelen resimleri tam URL'e çevir
     const imageApiBaseUrl = API_BASE_URL.replace('localhost', '10.0.2.2');
     if (!imageUrl.startsWith('http')) {
       imageUrl = `${imageApiBaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
     }
-    imageSource = { uri: imageUrl };
-  }
+    return { uri: imageUrl };
+  }, [cardProps.imageUrl]);
+
+  // Memoize press handler to prevent unnecessary re-renders
+  const handlePress = useCallback(() => {
+    onPress?.(item);
+  }, [onPress, item]);
 
   return (
     <TouchableContainer
       accessible={true}
-      accessibilityLabel={`${title}${subtitle ? `, ${subtitle}` : ''} ${accessibilityLabelSuffix}`}
+      accessibilityLabel={`${cardProps.title}${cardProps.subtitle ? `, ${cardProps.subtitle}` : ''} ${cardProps.accessibilityLabelSuffix}`}
       accessibilityRole="button"
       accessibilityState={{ disabled: !onPress }}
-      accessibilityHint={onPress ? `Detayları görmek için dokunun: ${title}` : undefined}
-      onPress={() => onPress && onPress(item)}
+      accessibilityHint={onPress ? `Detayları görmek için dokunun: ${cardProps.title}` : undefined}
+      onPress={handlePress}
       style={style}
       disabled={!onPress}
       width={width}
@@ -161,33 +173,33 @@ const CardComponent: React.FC<CardComponentProps> = ({
             source={imageSource}
             resizeMode="contain"
             accessible={true}
-            accessibilityLabel={`${title} ${item.type === 'brand' || (item.type === 'coupon' && item.brand) ? 'logosu' : 'resmi'}`}
+            accessibilityLabel={`${cardProps.title} ${item.type === 'brand' || (item.type === 'coupon' && item.brand) ? 'logosu' : 'resmi'}`}
             accessibilityRole="image"
           />
         ) : (
           <PlaceholderImage
             accessible={true}
-            accessibilityLabel={`${title} için resim yok, baş harf: ${title.substring(0, 1).toUpperCase()}`}
+            accessibilityLabel={`${cardProps.title} için resim yok, baş harf: ${cardProps.title.substring(0, 1).toUpperCase()}`}
             accessibilityRole="image"
           >
             <PlaceholderText>
-              {title.substring(0, 1).toUpperCase()}
+              {cardProps.title.substring(0, 1).toUpperCase()}
             </PlaceholderText>
           </PlaceholderImage>
         )}
         <ContentContainer>
           <Title numberOfLines={1}>
-            {title}
+            {cardProps.title}
           </Title>
-          {subtitle && item.type !== 'coupon' && (
+          {cardProps.subtitle && item.type !== 'coupon' && (
             <Subtitle numberOfLines={2}>
-              {subtitle}
+              {cardProps.subtitle}
             </Subtitle>
           )}
         </ContentContainer>
       </Container>
     </TouchableContainer>
   );
-};
+});
 
 export default CardComponent;

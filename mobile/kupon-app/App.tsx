@@ -5,6 +5,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from './src/theme';
 import ErrorBoundary from './src/components/common/ErrorBoundary';
+import { Platform } from 'react-native';
+
+// DevTools sadece web development modunda import et
+const ReactQueryDevtools = __DEV__ && Platform.OS === 'web' 
+  ? require('@tanstack/react-query-devtools').ReactQueryDevtools 
+  : null;
 
 // Create a client with optimized configuration
 const queryClient = new QueryClient({

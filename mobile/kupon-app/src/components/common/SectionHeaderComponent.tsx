@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
@@ -31,21 +31,28 @@ const SeeAllText = styled.Text`
   color: ${({ theme }: any) => theme.colors.primary};
 `;
 
-function SectionHeaderComponent({
+const SectionHeaderComponent: React.FC<SectionHeaderProps> = React.memo(({
   title,
   onSeeAllPress, // onViewMore -> onSeeAllPress olarak düzeltildi
   seeAllText = 'Tümünü Gör',
-}: SectionHeaderProps): React.JSX.Element {
+}) => {
+  const handlePress = useCallback(() => {
+    onSeeAllPress?.();
+  }, [onSeeAllPress]);
+
   return (
     <Container>
       <Title>{title}</Title>
       {onSeeAllPress && (
-        <SeeAllButton onPress={onSeeAllPress}>
+        <SeeAllButton onPress={handlePress}>
           <SeeAllText>{seeAllText}</SeeAllText>
         </SeeAllButton>
       )}
     </Container>
   );
-}
+});
+
+// Display name for better debugging
+SectionHeaderComponent.displayName = 'SectionHeaderComponent';
 
 export default SectionHeaderComponent;

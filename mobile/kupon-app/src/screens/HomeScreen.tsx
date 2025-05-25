@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   FlatList,
   useWindowDimensions,
@@ -62,14 +62,17 @@ type HomeScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList>
 >;
 
-const HomeScreen: React.FC = () => {
+const HomeScreen: React.FC = React.memo(() => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { width } = useWindowDimensions();
   const { theme } = useTheme();
 
-  // Responsive layout
-  const numColumns = width < 600 ? 2 : 3;
-  const itemWidth = (width - (numColumns + 1) * theme.spacing.md) / numColumns;
+  // Responsive layout - memoized to avoid recalculation
+  const layoutConfig = useMemo(() => {
+    const numColumns = width < 600 ? 2 : 3;
+    const itemWidth = (width - (numColumns + 1) * theme.spacing.md) / numColumns;
+    return { numColumns, itemWidth };
+  }, [width, theme.spacing.md]);
 
   const {
     data: categories,
@@ -95,24 +98,24 @@ const HomeScreen: React.FC = () => {
     error: brandsError,
   } = usePopularBrands();
 
-  // Navigation handlers
-  const handleCouponPress = (coupon: Coupon) => {
+  // Memoized navigation handlers to prevent unnecessary re-renders
+  const handleCouponPress = useCallback((coupon: Coupon) => {
     navigation.navigate('CouponDetail', { couponId: coupon.id });
-  };
+  }, [navigation]);
 
-  const handleBrandPress = (brand: Brand) => {
+  const handleBrandPress = useCallback((brand: Brand) => {
     navigation.navigate('BrandDetail', { brandId: brand.id });
-  };
+  }, [navigation]);
 
-  const handleCategoryPress = (category: Category) => {
+  const handleCategoryPress = useCallback((category: Category) => {
     navigation.navigate('CategoryDetail', { categoryId: category.id });
-  };
+  }, [navigation]);
 
-  const handleSliderPress = (slider: Slider) => {
+  const handleSliderPress = useCallback((slider: Slider) => {
     console.log('Slider pressed:', slider.title);
-  };
+  }, []);
 
-  const handleSeeAllPress = (section: string) => {
+  const handleSeeAllPress = useCallback((section: string) => {
     switch (section) {
       case 'coupons':
         navigation.navigate('CouponsTab', { screen: 'CouponList' });
@@ -124,35 +127,46 @@ const HomeScreen: React.FC = () => {
         navigation.navigate('CategoriesTab', { screen: 'CategoryList' });
         break;
     }
-  };
+  }, [navigation]);
 
-  // Render functions
-  const renderCategoryItem = ({ item }: { item: Category }) => (
+  // Memoized render functions to avoid recreation on each render
+  const renderCategoryItem = useCallback(({ item }: { item: Category }) => (
     <CardComponent
       item={{ ...item, type: 'category' }}
       onPress={() => handleCategoryPress(item)}
       horizontal={true}
     />
-  );
+  ), [handleCategoryPress]);
 
-  const renderCouponItem = ({ item }: { item: Coupon }) => (
+  const renderCouponItem = useCallback(({ item }: { item: Coupon }) => (
     <CardComponent
       item={{ ...item, type: 'coupon' }}
       onPress={() => handleCouponPress(item)}
       horizontal={true}
     />
-  );
+  ), [handleCouponPress]);
 
-  const renderBrandItem = ({ item }: { item: Brand }) => (
+  const renderBrandItem = useCallback(({ item }: { item: Brand }) => (
     <CardComponent
       item={{ ...item, type: 'brand' }}
       onPress={() => handleBrandPress(item)}
       horizontal={true}
     />
+  ), [handleBrandPress]);
+
+  // Memoized loading and error states
+  const isLoading = useMemo(() => 
+    categoriesLoading || slidersLoading || couponsLoading || brandsLoading,
+    [categoriesLoading, slidersLoading, couponsLoading, brandsLoading]
+  );
+
+  const error = useMemo(() => 
+    categoriesError || slidersError || couponsError || brandsError,
+    [categoriesError, slidersError, couponsError, brandsError]
   );
 
   // Loading and error states
-  if (categoriesLoading || slidersLoading || couponsLoading || brandsLoading) {
+  if (isLoading) {
     return (
       <LoadingContainer>
         <LoadingSpinner message="Ana sayfa yükleniyor..." fullScreen />
@@ -160,8 +174,7 @@ const HomeScreen: React.FC = () => {
     );
   }
 
-  if (categoriesError || slidersError || couponsError || brandsError) {
-    const error = categoriesError || slidersError || couponsError || brandsError;
+  if (error) {
     return (
       <LoadingContainer>
         <ErrorDisplay
@@ -251,6 +264,9 @@ const HomeScreen: React.FC = () => {
       )}
     </Container>
   );
-};
+});
+
+// Display name for better debugging
+HomeScreen.displayName = 'HomeScreen';
 
 export default HomeScreen;
