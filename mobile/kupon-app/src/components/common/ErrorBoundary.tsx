@@ -20,37 +20,37 @@ const ErrorContainer = styled(View)`
   flex: 1;
   justify-content: center;
   align-items: center;
-  padding: ${(props: { theme: AppTheme }) => props.theme.spacing.lg}px;
-  background-color: ${(props: { theme: AppTheme }) => props.theme.colors.background};
+  padding: ${(props: { theme?: AppTheme }) => props.theme?.spacing?.lg || 20}px;
+  background-color: ${(props: { theme?: AppTheme }) => props.theme?.colors?.background || '#ffffff'};
 `;
 
 const ErrorTitle = styled(Text)`
-  font-size: ${(props: { theme: AppTheme }) => props.theme.typography.sizes.xl}px;
-  font-weight: ${(props: { theme: AppTheme }) => props.theme.typography.weights.bold};
-  color: ${(props: { theme: AppTheme }) => props.theme.colors.error};
+  font-size: ${(props: { theme?: AppTheme }) => props.theme?.typography?.sizes?.xl || 24}px;
+  font-weight: ${(props: { theme?: AppTheme }) => props.theme?.typography?.weights?.bold || 'bold'};
+  color: ${(props: { theme?: AppTheme }) => props.theme?.colors?.error || '#ff0000'};
   text-align: center;
-  margin-bottom: ${(props: { theme: AppTheme }) => props.theme.spacing.md}px;
+  margin-bottom: ${(props: { theme?: AppTheme }) => props.theme?.spacing?.md || 16}px;
 `;
 
 const ErrorMessage = styled(Text)`
-  font-size: ${(props: { theme: AppTheme }) => props.theme.typography.sizes.md}px;
-  color: ${(props: { theme: AppTheme }) => props.theme.colors.textSecondary};
+  font-size: ${(props: { theme?: AppTheme }) => props.theme?.typography?.sizes?.md || 16}px;
+  color: ${(props: { theme?: AppTheme }) => props.theme?.colors?.textSecondary || '#666666'};
   text-align: center;
-  margin-bottom: ${(props: { theme: AppTheme }) => props.theme.spacing.lg}px;
+  margin-bottom: ${(props: { theme?: AppTheme }) => props.theme?.spacing?.lg || 20}px;
   line-height: 24px;
 `;
 
 const RetryButton = styled(TouchableOpacity)`
-  background-color: ${(props: { theme: AppTheme }) => props.theme.colors.primary};
-  padding-horizontal: ${(props: { theme: AppTheme }) => props.theme.spacing.lg}px;
-  padding-vertical: ${(props: { theme: AppTheme }) => props.theme.spacing.md}px;
-  border-radius: ${(props: { theme: AppTheme }) => props.theme.borders.radius.md}px;
+  background-color: ${(props: { theme?: AppTheme }) => props.theme?.colors?.primary || '#007bff'};
+  padding-horizontal: ${(props: { theme?: AppTheme }) => props.theme?.spacing?.lg || 20}px;
+  padding-vertical: ${(props: { theme?: AppTheme }) => props.theme?.spacing?.md || 16}px;
+  border-radius: ${(props: { theme?: AppTheme }) => props.theme?.borders?.radius?.md || 8}px;
 `;
 
 const RetryButtonText = styled(Text)`
-  color: ${(props: { theme: AppTheme }) => props.theme.colors.white};
-  font-size: ${(props: { theme: AppTheme }) => props.theme.typography.sizes.lg}px;
-  font-weight: ${(props: { theme: AppTheme }) => props.theme.typography.weights.semiBold};
+  color: ${(props: { theme?: AppTheme }) => props.theme?.colors?.white || '#ffffff'};
+  font-size: ${(props: { theme?: AppTheme }) => props.theme?.typography?.sizes?.lg || 18}px;
+  font-weight: ${(props: { theme?: AppTheme }) => props.theme?.typography?.weights?.semiBold || '600'};
 `;
 
 class ErrorBoundary extends Component<Props, State> {

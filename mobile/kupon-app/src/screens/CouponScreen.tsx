@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -144,6 +144,58 @@ const CategoryTagText = styled.Text`
   font-weight: ${({ theme }: any) => theme.typography.weights.medium};
 `;
 
+const RevealCodeButton = styled.TouchableOpacity`
+  background-color: #667eea;
+  padding: ${({ theme }: any) => theme.spacing.md}px ${({ theme }: any) => theme.spacing.lg}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
+  shadow-color: #764ba2;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.3;
+  shadow-radius: 8px;
+  elevation: 8;
+  border: 2px solid #ffd700;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+`;
+
+const RevealCodeButtonText = styled.Text`
+  color: #ffffff;
+  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+`;
+
+const RevealCodeHint = styled.Text`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
+  margin-top: 4px;
+  text-align: center;
+`;
+
+const UTMButton = styled.TouchableOpacity`
+  background-color: ${({ theme }: any) => theme.colors.success};
+  padding: ${({ theme }: any) => theme.spacing.md}px ${({ theme }: any) => theme.spacing.lg}px;
+  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
+  margin-top: ${({ theme }: any) => theme.spacing.md}px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  shadow-color: ${({ theme }: any) => theme.colors.success};
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.2;
+  shadow-radius: 4px;
+  elevation: 4;
+`;
+
+const UTMButtonText = styled.Text`
+  color: ${({ theme }: any) => theme.colors.surface};
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  margin-left: ${({ theme }: any) => theme.spacing.sm}px;
+`;
+
 const CouponCodeContainer = styled.View`
   flex-direction: row;
   align-items: stretch;
@@ -218,6 +270,9 @@ function CouponScreen({
 }: CouponScreenProps): React.JSX.Element {
   const { couponId } = route.params;
   const theme = useTheme();
+  
+  // Kupon kodu açılma durumu
+  const [isCodeRevealed, setIsCodeRevealed] = useState(false);
 
   // TanStack Query ile veri çekme
   const {
@@ -242,6 +297,29 @@ function CouponScreen({
   };
 
   // Helper functions
+  const handleRevealCode = () => {
+    setIsCodeRevealed(true);
+    // Analytics tracking burada eklenebilir
+  };
+
+  const handleUTMRedirect = async () => {
+    if (coupon?.campaign_url) {
+      try {
+        // UTM parametrelerini ekle
+        const utmUrl = `${coupon.campaign_url}${coupon.campaign_url.includes('?') ? '&' : '?'}utm_source=kupon_app&utm_medium=mobile&utm_campaign=coupon_reveal&utm_content=${coupon.code}`;
+        
+        const canOpen = await Linking.canOpenURL(utmUrl);
+        if (canOpen) {
+          await Linking.openURL(utmUrl);
+        } else {
+          Alert.alert('Hata', 'Kampanya sayfası açılamadı.');
+        }
+      } catch (error) {
+        Alert.alert('Hata', 'Kampanya sayfasına yönlendirilirken bir hata oluştu.');
+      }
+    }
+  };
+
   const handleCopyCode = async () => {
     if (coupon?.code) {
       try {
@@ -343,41 +421,49 @@ function CouponScreen({
             {coupon.campaign_title || 'Kampanya Detayı'}
           </CampaignTitle>
 
-          {/* <CouponCodeLabel>Kupon Kodu:</CouponCodeLabel> */}
-          
-          <CouponCodeContainer>
-            <CouponCode
+          {/* Kupon Kodu Gösterme */}
+          {!isCodeRevealed ? (
+            <RevealCodeButton
               accessible={true}
-              accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
-              {coupon.code}
-            </CouponCode>
-            <ButtonGroup>
-              <CopyButton
+              accessibilityLabel="Kupon kodunu göster"
+              onPress={handleRevealCode}>
+              <RevealCodeButtonText>🎁 Kupon Kodunu Gör</RevealCodeButtonText>
+              <RevealCodeHint>Koda ulaşmak için dokunun</RevealCodeHint>
+            </RevealCodeButton>
+          ) : (
+            <CouponCodeContainer>
+              <CouponCode
                 accessible={true}
-                accessibilityLabel="Kupon kodunu kopyala"
-                onPress={handleCopyCode}>
-                <Ionicons name="copy-outline" size={20} color="white" />
-              </CopyButton>
-              <ShareButton
-                accessible={true}
-                accessibilityLabel="Kupon kodunu paylaş"
-                onPress={handleShareCode}>
-                <Ionicons name="share-outline" size={20} color="white" />
-              </ShareButton>
-            </ButtonGroup>
-          </CouponCodeContainer>
-          <ButtonGroup>
+                accessibilityLabel={`Kupon kodu: ${coupon.code}`}>
+                {coupon.code}
+              </CouponCode>
+              <ButtonGroup>
+                <CopyButton
+                  accessible={true}
+                  accessibilityLabel="Kupon kodunu kopyala"
+                  onPress={handleCopyCode}>
+                  <Ionicons name="copy-outline" size={20} color="white" />
+                </CopyButton>
+                <ShareButton
+                  accessible={true}
+                  accessibilityLabel="Kupon kodunu paylaş"
+                  onPress={handleShareCode}>
+                  <Ionicons name="share-outline" size={20} color="white" />
+                </ShareButton>
+              </ButtonGroup>
+            </CouponCodeContainer>
+          )}
+
+          {/* UTM Yönlendirme Butonu */}
           {coupon.campaign_url && (
-            <CampaignButton
+            <UTMButton
               accessible={true}
               accessibilityLabel="Kampanyaya git"
-              onPress={handleCampaignPress}>
-              <CampaignButtonText>
-                <Ionicons name="rocket-outline" size={20} color="white" /> Kampanyaya Git
-              </CampaignButtonText>
-            </CampaignButton>
+              onPress={handleUTMRedirect}>
+              <Ionicons name="rocket-outline" size={20} color="white" />
+              <UTMButtonText>Kampanyaya Git</UTMButtonText>
+            </UTMButton>
           )}
-          </ButtonGroup>
           <DetailsContainer>
             <DetailRow>
               <DetailLabel
