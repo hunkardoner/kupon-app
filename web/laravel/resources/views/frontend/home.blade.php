@@ -5,7 +5,7 @@
     <!-- Hero Section with Gradient Background -->
     <div class="hero-section position-relative overflow-hidden text-center bg-gradient-primary text-white py-5">
         <div class="container py-5">
-            <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">{{ config('app.name', 'KuponSal') }}</h1>
+            <h1 class="display-4 fw-bold animate__animated animate__fadeInDown">{{ config('app.name', 'Kupon Cepte') }}</h1>
             <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">Özel fırsatlar ve indirimlerle büyük tasarruf edin</p>
             <div class="search-container col-md-8 col-lg-6 mx-auto animate__animated animate__fadeIn animate__delay-2s">
                 <div class="input-group mb-4">

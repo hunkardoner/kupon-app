@@ -3,23 +3,23 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'KuponSal - En İyi İndirim Kuponları ve Fırsatlar')</title>
+    <title>@yield('title', 'Kupon Cepte - En İyi İndirim Kuponları ve Fırsatlar')</title>
     
     <!-- SEO Meta Tags -->
     <meta name="description" content="@yield('description', 'Türkiye\'nin en büyük kupon ve indirim sitesi. Binlerce marka için geçerli kupon kodları, indirim fırsatları ve promosyon kodları.')">
     <meta name="keywords" content="kupon, indirim, promosyon kodu, fırsat, alışveriş, tasarruf">
-    <meta name="author" content="KuponSal">
+    <meta name="author" content="Kupon Cepte">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="@yield('title', 'KuponSal - En İyi İndirim Kuponları')">
+    <meta property="og:title" content="@yield('title', 'Kupon Cepte - En İyi İndirim Kuponları')">
     <meta property="og:description" content="@yield('description', 'Türkiye\'nin en büyük kupon ve indirim sitesi.')">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request()->url() }}">
-    <meta property="og:site_name" content="KuponSal">
+    <meta property="og:site_name" content="Kupon Cepte">
     
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', 'KuponSal - En İyi İndirim Kuponları')">
+    <meta name="twitter:title" content="@yield('title', 'Kupon Cepte - En İyi İndirim Kuponları')">
     <meta name="twitter:description" content="@yield('description', 'Türkiye\'nin en büyük kupon ve indirim sitesi.')">
     
     <!-- CSRF Token -->
@@ -116,7 +116,7 @@
                     <span class="me-2 text-primary">
                         <i class="bi bi-ticket-perforated-fill"></i>
                     </span>
-                    <span class="fw-bold">{{ config('app.name', 'KuponSal') }}</span>
+                    <span class="fw-bold">{{ config('app.name', 'Kupon Cepte') }}</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -204,7 +204,7 @@
             <div class="container">
                 <div class="row g-4">
                     <div class="col-lg-4 mb-4 mb-lg-0">
-                        <h5 class="fw-bold mb-3">{{ config('app.name', 'KuponSal') }}</h5>
+                        <h5 class="fw-bold mb-3">{{ config('app.name', 'Kupon Cepte') }}</h5>
                         <p class="mb-3">En iyi fırsatlar, indirimler ve kupon kodları için nihai adresiniz.</p>
                         <div class="social-icons">
                             <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
@@ -236,7 +236,7 @@
                     <div class="col-md-4 col-lg-4">
                         <h6 class="fw-bold mb-3">İletişim</h6>
                         <ul class="list-unstyled">
-                            <li class="mb-2"><i class="bi bi-envelope me-2"></i> info@kuponsal.com</li>
+                            <li class="mb-2"><i class="bi bi-envelope me-2"></i> info@Kupon Cepte.com</li>
                             <li class="mb-2"><i class="bi bi-geo-alt me-2"></i> İstanbul, Türkiye</li>
                             <li><i class="bi bi-telephone me-2"></i> +90 123 456 7890</li>
                         </ul>
@@ -245,7 +245,7 @@
                 <hr class="my-4">
                 <div class="row">
                     <div class="col-md-6 mb-3 mb-md-0">
-                        <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'KuponSal') }}. Tüm hakları saklıdır.</p>
+                        <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'Kupon Cepte') }}. Tüm hakları saklıdır.</p>
                     </div>
                     <div class="col-md-6 text-md-end">
                         <p class="mb-0">İstanbul'da <i class="bi bi-heart-fill text-danger"></i> ile yapılmıştır</p>
