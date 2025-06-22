@@ -1,2 +1,51 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/*
+node_modules/
+mobile/android/*
+/mobile/kupon-app/android/
+/mobile/kupon-app/ios
+/mobile/kupon-app/assets
+
+**/*.sh
+**/*.apk
+
+# Expo
+.expo/*
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
 .DS_Store
-web/screens/scraped_www_kuponburada_com_20250611_134813.json
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# Build outputs (but keep source folders)
+mobile/android/app/build/
+mobile/android/.gradle/
+mobile/ios/build/
