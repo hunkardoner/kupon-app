@@ -17,13 +17,13 @@ import { FavoritesProvider } from './src/context/FavoritesContext';
 // Screens
 import { Dashboard } from './src/components/screens/Dashboard';
 import { AuthScreen } from './src/components/screens/AuthScreen';
-import ProfileScreen from './src/screens/ProfileScreen';
-import CouponListScreen from './src/screens/CouponListScreen';
-import CouponScreen from './src/screens/CouponDetailScreen';
-import BrandListScreen from './src/screens/BrandListScreen';
-import BrandScreen from './src/screens/BrandDetailScreen';
-import CategoryListScreen from './src/screens/CategoryListScreen';
-import CategoryScreen from './src/screens/CategoryDetailScreen';
+import ProfileScreen from './src/screens/profile'; // Updated to new folder structure
+import CouponListScreen from './src/screens/coupons/coupon-list'; // Updated to new folder structure
+import CouponScreen from './src/screens/coupons/coupon-detail'; // Updated to new folder structure
+import BrandListScreen from './src/screens/brands/brand-list'; // Updated to new folder structure
+import BrandScreen from './src/screens/brands/brand-detail'; // Updated to new folder structure
+import CategoryListScreen from './src/screens/categories/category-list'; // Updated to new folder structure
+import CategoryScreen from './src/screens/categories/category-detail'; // Updated to new folder structure
 
 // Services
 import { notificationService } from './src/services/notificationService';
@@ -73,6 +73,10 @@ function CouponsTab({ navigation }: any) {
 
 function BrandsTab({ navigation, route }: any) {
   return <BrandListScreen navigation={navigation} route={{ ...route, name: 'BrandList' }} />;
+}
+
+function CategoriesTab({ navigation, route }: any) {
+  return <CategoryListScreen navigation={navigation} route={{ ...route, name: 'CategoryList' }} />;
 }
 
 // Main Tab Navigator
@@ -138,7 +142,7 @@ function MainTabNavigator() {
       />
       <MainTab.Screen 
         name="Categories" 
-        component={CategoryListScreen}
+        component={CategoriesTab}
         options={{ title: 'Kategoriler' }}
       />
       <MainTab.Screen 

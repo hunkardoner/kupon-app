@@ -11,6 +11,7 @@ export interface Category {
   created_at: string;
   updated_at: string;
   coupon_codes?: Coupon[]; // Added to include related coupons
+  coupons_count?: number; // Added for displaying coupon count
 }
 
 export interface Brand {
@@ -24,6 +25,7 @@ export interface Brand {
   created_at: string;
   updated_at: string;
   coupons_count?: number; // API'den geliyorsa
+  category?: string; // Added for displaying brand category
 }
 
 export interface Coupon {

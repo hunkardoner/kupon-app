@@ -4,57 +4,33 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import styled from 'styled-components/native';
 import {
   useNavigation,
   CompositeNavigationProp,
 } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { HomeStackParamList, MainTabParamList } from '../navigation/types';
-import { Category, Slider, Coupon, Brand } from '../types';
-import SectionHeaderComponent from '../components/common/SectionHeaderComponent';
-import CardComponent from '../components/common/CardComponent';
-import SliderComponent from '../components/common/SliderComponent';
-import LoadingSpinner from '../components/common/LoadingSpinner';
-import ErrorDisplay from '../components/common/ErrorDisplay';
+import { HomeStackParamList, MainTabParamList } from '../../navigation/types';
+import { Category, Slider, Coupon, Brand } from '../../types';
+import SectionHeaderComponent from '../../components/common/SectionHeaderComponent';
+import CardComponent from '../../components/common/CardComponent';
+import SliderComponent from '../../components/common/SliderComponent';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorDisplay from '../../components/common/ErrorDisplay';
 import { 
   useCategories, 
   useSliders, 
   usePopularCoupons, 
   usePopularBrands 
-} from '../hooks/useQueries';
-import { useTheme } from '../theme';
+} from '../../hooks/useQueries';
+import { useTheme } from '../../theme';
 import { 
-  CenteredContainer,
-  Text 
-} from '../components/styled';
-
-// Styled Components
-const Container = styled.ScrollView`
-  flex: 1;
-  background-color: ${(props: any) => props.theme.colors.background};
-`;
-
-const LoadingContainer = styled(CenteredContainer)`
-  background-color: ${(props: any) => props.theme.colors.background};
-`;
-
-const SectionContainer = styled(View)`
-  margin-bottom: ${(props: any) => props.theme.spacing.lg}px;
-`;
-
-const ItemsContainer = styled(View)<{ numColumns: number }>`
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding-horizontal: ${(props: any) => props.theme.spacing.sm}px;
-`;
-
-const ItemWrapper = styled(View)<{ width: number }>`
-  width: ${(props: any) => props.width}px;
-  margin-bottom: ${(props: any) => props.theme.spacing.sm}px;
-`;
+  Container,
+  LoadingContainer,
+  SectionContainer,
+  ItemsContainer,
+  ItemWrapper
+} from './style';
 
 // HomeScreen için birleşik navigasyon tipi
 type HomeScreenNavigationProp = CompositeNavigationProp<

@@ -12,14 +12,14 @@ import {
   CategoryStackParamList,
 } from './types';
 
-import HomeScreen from '../screens/HomeScreen';
+import HomeScreen from '../screens/home'; // Updated to new folder structure
 import { Dashboard } from '../components/screens/Dashboard';
-import CouponListScreen from '../screens/CouponListScreen'; // Kupon liste ekranı
-import BrandListScreen from '../screens/BrandListScreen'; // Marka liste ekranı
-import CouponScreen from '../screens/CouponDetailScreen'; // Kupon detay ekranı
-import BrandScreen from '../screens/BrandDetailScreen'; // Marka detay ekranı
-import CategoryListScreen from '../screens/CategoryListScreen'; // Kategori liste ekranı
-import CategoryScreen from '../screens/CategoryDetailScreen'; // Kategori detay ekranı
+import CouponListScreen from '../screens/coupons/coupon-list'; // Yeni klasör yapısı
+import BrandListScreen from '../screens/brands/brand-list'; // Yeni klasör yapısı
+import CouponScreen from '../screens/coupons/coupon-detail'; // Yeni klasör yapısı
+import BrandScreen from '../screens/brands/brand-detail'; // Yeni klasör yapısı
+import CategoryListScreen from '../screens/categories/category-list'; // Yeni klasör yapısı
+import CategoryScreen from '../screens/categories/category-detail'; // Yeni klasör yapısı
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import COLORS from '../constants/colors'; // Renk sabitleri

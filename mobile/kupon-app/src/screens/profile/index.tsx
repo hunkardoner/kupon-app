@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   Alert,
-  Dimensions,
   Image,
   Switch,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
-import { userAPI } from '../api/index';
+import { useAuth } from '../../context/AuthContext';
+import { userAPI } from '../../api/index';
+import { styles } from './style';
 
 const { width } = Dimensions.get('window');
 
@@ -116,9 +116,6 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.profileImage}>
           <Ionicons name="person" size={40} color="#666" />
         </View>
-        <TouchableOpacity style={styles.editButton}>
-          <Ionicons name="camera" size={16} color="#fff" />
-        </TouchableOpacity>
       </View>
       
       <Text style={styles.userName}>{user?.name || 'Kullanıcı'}</Text>
@@ -318,175 +315,5 @@ const ProfileScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  header: {
-    backgroundColor: 'white',
-    padding: 24,
-    alignItems: 'center',
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  profileImageContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    borderColor: '#e0e0e0',
-  },
-  editButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#2196F3',
-    borderRadius: 16,
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: 'white',
-  },
-  userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 16,
-    padding: 20,
-    width: '100%',
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#e0e0e0',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-  },
-  section: {
-    marginHorizontal: 20,
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 12,
-    marginLeft: 4,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  menuIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#e3f2fd',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
-  },
-  destructiveIcon: {
-    backgroundColor: '#ffebee',
-  },
-  menuContent: {
-    flex: 1,
-  },
-  menuTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
-  },
-  destructiveText: {
-    color: '#f44336',
-  },
-  menuSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 18,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  bottomSpacer: {
-    height: 40,
-  },
-});
 
 export default ProfileScreen;

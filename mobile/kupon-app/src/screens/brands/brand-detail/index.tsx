@@ -2,23 +2,23 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   ScrollView,
   FlatList,
   Image,
-  Dimensions,
   RefreshControl,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { BrandStackParamList } from '../navigation/types';
-import { Brand, Coupon } from '../types';
-import { API_BASE_URL, dataAPI } from '../api/index';
-import { useFavorites } from '../context/FavoritesContext';
+import { BrandStackParamList } from '../../../navigation/types';
+import { Brand, Coupon } from '../../../types';
+import { API_BASE_URL, dataAPI } from '../../../api/index';
+import { useFavorites } from '../../../context/FavoritesContext';
+import { styles } from './style';
 
 const { width } = Dimensions.get('window');
 
@@ -30,7 +30,7 @@ interface BrandScreenProps {
   navigation: BrandScreenNavigationProp;
 }
 
-const BrandScreen: React.FC<BrandScreenProps> = ({ route, navigation }) => {
+const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) => {
   const { brandId } = route.params;
   const [brand, setBrand] = useState<Brand | null>(null);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -284,266 +284,4 @@ const BrandScreen: React.FC<BrandScreenProps> = ({ route, navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  listContainer: {
-    paddingBottom: 20,
-  },
-  header: {
-    backgroundColor: 'white',
-    padding: 20,
-    marginBottom: 16,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  brandInfo: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  brandLogo: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 16,
-    backgroundColor: '#f0f0f0',
-  },
-  brandName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  brandDescription: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 22,
-    paddingHorizontal: 20,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 16,
-    padding: 20,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#e0e0e0',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-  },
-  couponCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 16,
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  expiredCard: {
-    opacity: 0.6,
-  },
-  discountBadge: {
-    position: 'absolute',
-    top: -8,
-    left: 16,
-    backgroundColor: '#4CAF50',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    zIndex: 1,
-  },
-  expiredBadge: {
-    backgroundColor: '#999',
-  },
-  discountText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  expiredText: {
-    color: '#999',
-  },
-  favoriteButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-  },
-  couponContent: {
-    paddingTop: 8,
-  },
-  couponTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-    lineHeight: 22,
-  },
-  couponDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    lineHeight: 20,
-  },
-  couponFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  codeContainer: {
-    flex: 1,
-  },
-  codeLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 2,
-  },
-  codeText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    letterSpacing: 1,
-  },
-  expiryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  expiryText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  expiredExpiryText: {
-    color: '#f44336',
-  },
-  expiredOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  expiredOverlayText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#f44336',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    minHeight: 300,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#f44336',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  errorSubtitle: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  retryButton: {
-    backgroundColor: '#f44336',
-    borderRadius: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  retryButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-});
-
-export default BrandScreen;
+export default BrandDetailScreen;
