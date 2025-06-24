@@ -1,9 +1,11 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
+node_modules/*
 node_modules/
 
 # Expo
+.expo/*
 .expo/
 dist/
 web-build/
@@ -35,3 +37,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Build outputs (but keep source folders)
+android/app/build/
+android/.gradle/
+ios/build/
