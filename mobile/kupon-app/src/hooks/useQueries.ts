@@ -1,15 +1,7 @@
 // src/hooks/useQueries.ts
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import {
-  fetchCategories,
-  fetchCategoryById,
-  fetchBrands,
-  fetchBrandById,
-  fetchCouponCodes,
-  fetchCouponCodeById,
-  fetchSliders,
-} from '../api';
+import { dataAPI } from '../api';
 import { Category, Brand, Coupon, Slider } from '../types';
 
 // Query Keys - Centralized key management
@@ -32,7 +24,7 @@ export const useCategories = (
 ) => {
   return useQuery({
     queryKey: queryKeys.categories,
-    queryFn: fetchCategories,
+    queryFn: () => dataAPI.getCategories(),
     staleTime: 10 * 60 * 1000, // 10 dakika - kategoriler çok değişmez
     ...options,
   });
@@ -44,7 +36,7 @@ export const useCategory = (
 ) => {
   return useQuery({
     queryKey: queryKeys.category(id),
-    queryFn: () => fetchCategoryById(id),
+    queryFn: () => dataAPI.getCategory(id),
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
     ...options,
@@ -58,7 +50,7 @@ export const useBrands = (
 ) => {
   return useQuery({
     queryKey: queryKeys.brands(params),
-    queryFn: () => fetchBrands(params),
+    queryFn: () => dataAPI.getBrands(params),
     staleTime: 5 * 60 * 1000,
     ...options,
   });
@@ -70,7 +62,7 @@ export const useBrand = (
 ) => {
   return useQuery({
     queryKey: queryKeys.brand(id),
-    queryFn: () => fetchBrandById(id),
+    queryFn: () => dataAPI.getBrand(id),
     staleTime: 10 * 60 * 1000,
     enabled: !!id,
     ...options,
@@ -84,7 +76,7 @@ export const useCoupons = (
 ) => {
   return useQuery({
     queryKey: queryKeys.coupons(params),
-    queryFn: () => fetchCouponCodes(params),
+    queryFn: () => dataAPI.getCoupons(params),
     staleTime: 2 * 60 * 1000, // 2 dakika - kuponlar daha sık güncellenebilir
     ...options,
   });
@@ -96,7 +88,7 @@ export const useCoupon = (
 ) => {
   return useQuery({
     queryKey: queryKeys.coupon(id),
-    queryFn: () => fetchCouponCodeById(id),
+    queryFn: () => dataAPI.getCoupon(id),
     staleTime: 5 * 60 * 1000,
     enabled: !!id,
     ...options,
@@ -108,7 +100,7 @@ export const usePopularCoupons = (
   options?: Omit<UseQueryOptions<Coupon[], Error>, 'queryKey' | 'queryFn'>
 ) => {
   const queryKey = useMemo(() => queryKeys.popularCoupons, []);
-  const queryFn = useMemo(() => () => fetchCouponCodes({ limit: 5, popular: true }), []);
+  const queryFn = useMemo(() => () => dataAPI.getCoupons({ limit: 5, popular: true }), []);
   
   return useQuery({
     queryKey,
@@ -122,7 +114,7 @@ export const usePopularBrands = (
   options?: Omit<UseQueryOptions<Brand[], Error>, 'queryKey' | 'queryFn'>
 ) => {
   const queryKey = useMemo(() => queryKeys.popularBrands, []);
-  const queryFn = useMemo(() => () => fetchBrands({ limit: 6, popular: true }), []);
+  const queryFn = useMemo(() => () => dataAPI.getBrands({ limit: 6, popular: true }), []);
   
   return useQuery({
     queryKey,
@@ -139,7 +131,7 @@ export const useBrandCoupons = (
 ) => {
   return useQuery({
     queryKey: queryKeys.brandCoupons(brandId),
-    queryFn: () => fetchCouponCodes({ brand_id: brandId }),
+    queryFn: () => dataAPI.getCoupons({ brand_id: brandId }),
     staleTime: 5 * 60 * 1000,
     enabled: !!brandId,
     ...options,
@@ -152,7 +144,7 @@ export const useSliders = (
 ) => {
   return useQuery({
     queryKey: queryKeys.sliders,
-    queryFn: fetchSliders,
+    queryFn: () => dataAPI.getSliders(),
     staleTime: 15 * 60 * 1000, // 15 dakika - slider'lar çok nadir değişir
     ...options,
   });

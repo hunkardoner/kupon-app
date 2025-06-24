@@ -2,6 +2,7 @@ import { NavigatorScreenParams } from '@react-navigation/native';
 
 export type HomeStackParamList = {
   Home: undefined;
+  Dashboard: undefined;
   CouponDetail: { couponId: number };
   BrandDetail: { brandId: number };
   CategoryDetail: { categoryId: number }; // Added for consistency, was commented out

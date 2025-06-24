@@ -13,6 +13,7 @@ import {
 } from './types';
 
 import HomeScreen from '../screens/HomeScreen';
+import { Dashboard } from '../components/screens/Dashboard';
 import CouponListScreen from '../screens/CouponListScreen'; // Kupon liste ekranı
 import BrandListScreen from '../screens/BrandListScreen'; // Marka liste ekranı
 import CouponScreen from '../screens/CouponScreen'; // Kupon detay ekranı
@@ -30,8 +31,13 @@ function HomeStackNavigator() {
     <HomeStack.Navigator>
       <HomeStack.Screen
         name="Home"
-        component={HomeScreen}
+        component={Dashboard}
         options={{ title: 'Anasayfa' }}
+      />
+      <HomeStack.Screen
+        name="Dashboard"
+        component={Dashboard}
+        options={{ title: 'Dashboard' }}
       />
       {/* Detail screens are typically part of their respective stacks or a common modal stack */}
       {/* For navigating from Home to details in other tabs, the navigation action will target the tab first */}
