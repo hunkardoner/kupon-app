@@ -16,10 +16,10 @@ import HomeScreen from '../screens/HomeScreen';
 import { Dashboard } from '../components/screens/Dashboard';
 import CouponListScreen from '../screens/CouponListScreen'; // Kupon liste ekranı
 import BrandListScreen from '../screens/BrandListScreen'; // Marka liste ekranı
-import CouponScreen from '../screens/CouponScreen'; // Kupon detay ekranı
-import BrandScreen from '../screens/BrandScreen'; // Marka detay ekranı
+import CouponScreen from '../screens/CouponDetailScreen'; // Kupon detay ekranı
+import BrandScreen from '../screens/BrandDetailScreen'; // Marka detay ekranı
 import CategoryListScreen from '../screens/CategoryListScreen'; // Kategori liste ekranı
-import CategoryScreen from '../screens/CategoryScreen'; // Kategori detay ekranı
+import CategoryScreen from '../screens/CategoryDetailScreen'; // Kategori detay ekranı
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import COLORS from '../constants/colors'; // Renk sabitleri

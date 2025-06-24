@@ -17,13 +17,13 @@ import { FavoritesProvider } from './src/context/FavoritesContext';
 // Screens
 import { Dashboard } from './src/components/screens/Dashboard';
 import { AuthScreen } from './src/components/screens/AuthScreen';
-import { ProfileScreen } from './src/components/screens/ProfileScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 import CouponListScreen from './src/screens/CouponListScreen';
-import CouponScreen from './src/screens/CouponScreen';
+import CouponScreen from './src/screens/CouponDetailScreen';
 import BrandListScreen from './src/screens/BrandListScreen';
-import BrandScreen from './src/screens/BrandScreen';
+import BrandScreen from './src/screens/BrandDetailScreen';
 import CategoryListScreen from './src/screens/CategoryListScreen';
-import CategoryScreen from './src/screens/CategoryScreen';
+import CategoryScreen from './src/screens/CategoryDetailScreen';
 
 // Services
 import { notificationService } from './src/services/notificationService';

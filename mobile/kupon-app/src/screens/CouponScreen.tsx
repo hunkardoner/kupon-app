@@ -1,53 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
   ScrollView,
+  Image,
   Alert,
-  Linking,
   Share,
+  Dimensions,
+  ActivityIndicator,
+  Linking,
 } from 'react-native';
-import * as Clipboard from 'expo-clipboard';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { RouteProp, NavigatorScreenParams, CompositeNavigationProp } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { CouponStackParamList, CategoryStackParamList, MainTabParamList } from '../navigation/types';
+import * as Clipboard from 'expo-clipboard';
+import { CouponStackParamList } from '../navigation/types';
 import { Coupon } from '../types';
-import { API_BASE_URL } from '../api/index';
-import styled from 'styled-components/native';
-import { useTheme } from 'styled-components/native';
-import { useCoupon } from '../hooks/useQueries';
+import { API_BASE_URL, dataAPI } from '../api/index';
+import { useFavorites } from '../context/FavoritesContext';
 
-// Styled Components
-const Container = styled.SafeAreaView`
-  flex: 1;
-  background-color: ${({ theme }: any) => theme.colors.background};
-`;
+const { width, height } = Dimensions.get('window');
 
-const CenteredContainer = styled.SafeAreaView`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }: any) => theme.colors.background};
-`;
+type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
+type CouponScreenNavigationProp = StackNavigationProp<CouponStackParamList, 'CouponDetail'>;
 
-const ContentContainer = styled.View`
-  padding: ${({ theme }: any) => theme.spacing.lg}px;
-  align-items: center;
-`;
+interface CouponScreenProps {
+  route: CouponScreenRouteProp;
+  navigation: CouponScreenNavigationProp;
+}
 
-const BrandLogo = styled.Image`
-  width: 150px;
-  height: 75px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
-`;
+const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
+  const { couponId } = route.params;
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
 
-const BrandName = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.sizes.xl}px;
-  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
-  color: ${({ theme }: any) => theme.colors.primary};
-  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
-  text-align: center;
+  const isFavorite = coupon ? favorites.includes(coupon.id.toString()) : false;
+
+  useEffect(() => {
+    loadCoupon();
+  }, [couponId]);
 `;
 
 const CampaignTitle = styled.Text`
@@ -115,163 +112,11 @@ const Description = styled.Text`
   text-align: center;
   line-height: 22px;
   margin-top: ${({ theme }: any) => theme.spacing.md}px;
-`;
-
-const ErrorText = styled.Text`
-  font-size: ${({ theme }: any) => theme.typography.subtitle.fontSize}px;
-  color: ${({ theme }: any) => theme.colors.error};
-`;
-
-const CategoriesContainer = styled.View`
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  flex: 1;
-`;
-
-const CategoryTag = styled.TouchableOpacity`
-  background-color: ${({ theme }: any) => theme.colors.primary};
-  padding-horizontal: ${({ theme }: any) => theme.spacing.sm}px;
-  padding-vertical: ${({ theme }: any) => theme.spacing.xs}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.small}px;
-  margin-left: ${({ theme }: any) => theme.spacing.xs}px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.xs}px;
-`;
-
-const CategoryTagText = styled.Text`
-  color: ${({ theme }: any) => theme.colors.surface};
-  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
-  font-weight: ${({ theme }: any) => theme.typography.weights.medium};
-`;
-
-const RevealCodeButton = styled.TouchableOpacity`
-  background-color: #667eea;
-  padding: ${({ theme }: any) => theme.spacing.md}px ${({ theme }: any) => theme.spacing.lg}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
-  shadow-color: #764ba2;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.3;
-  shadow-radius: 8px;
-  elevation: 8;
-  border: 2px solid #ffd700;
-  align-items: center;
-  justify-content: center;
-  min-height: 60px;
-`;
-
-const RevealCodeButtonText = styled.Text`
-  color: #ffffff;
-  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
-  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
-  text-shadow: 0px 1px 2px rgba(0,0,0,0.3);
-`;
-
-const RevealCodeHint = styled.Text`
-  color: rgba(255, 255, 255, 0.8);
-  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
-  margin-top: 4px;
-  text-align: center;
-`;
-
-const UTMButton = styled.TouchableOpacity`
-  background-color: ${({ theme }: any) => theme.colors.success};
-  padding: ${({ theme }: any) => theme.spacing.md}px ${({ theme }: any) => theme.spacing.lg}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  margin-top: ${({ theme }: any) => theme.spacing.md}px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  shadow-color: ${({ theme }: any) => theme.colors.success};
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.2;
-  shadow-radius: 4px;
-  elevation: 4;
-`;
-
-const UTMButtonText = styled.Text`
-  color: ${({ theme }: any) => theme.colors.surface};
-  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
-  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
-  margin-left: ${({ theme }: any) => theme.spacing.sm}px;
-`;
-
-const CouponCodeContainer = styled.View`
-  flex-direction: row;
-  align-items: stretch;
-  justify-content: space-between;
-  margin-bottom: ${({ theme }: any) => theme.spacing.md}px;
-  width: 100%;
-`;
-
-const ButtonGroup = styled.View`
-  flex-direction: row;
-  align-items: stretch;
-`;
-
-const CopyButton = styled.TouchableOpacity`
-  background-color: ${({ theme }: any) => theme.colors.primary};
-  padding: ${({ theme }: any) => theme.spacing.md}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  margin-left: ${({ theme }: any) => theme.spacing.sm}px;
-  justify-content: center;
-  align-items: center;
-  min-height: 56px;
-  min-width: 56px;
-`;
-
-const ShareButton = styled.TouchableOpacity`
-  background-color: ${({ theme }: any) => theme.colors.secondary || theme.colors.primary};
-  padding: ${({ theme }: any) => theme.spacing.md}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  margin-left: ${({ theme }: any) => theme.spacing.sm}px;
-  justify-content: center;
-  align-items: center;
-  min-height: 56px;
-  min-width: 56px;
-`;
-
-// const CopyButtonText = styled.Text`
-//   color: ${({ theme }: any) => theme.colors.surface};
-//   font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
-//   font-weight: ${({ theme }: any) => theme.typography.weights.medium};
-// `;
-
-const CampaignButton = styled.TouchableOpacity`
-  background-color: ${({ theme }: any) => theme.colors.primary};
-  padding-vertical: ${({ theme }: any) => theme.spacing.md}px;
-  padding-horizontal: ${({ theme }: any) => theme.spacing.lg}px;
-  border-radius: ${({ theme }: any) => theme.borders.radius.medium}px;
-  margin-bottom: ${({ theme }: any) => theme.spacing.lg}px;
-  width: 100%;
-  align-items: center;
-`;
-
-const CampaignButtonText = styled.Text`
-  color: ${({ theme }: any) => theme.colors.surface};
-  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
-  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
-`;
-
-type CouponScreenRouteProp = RouteProp<CouponStackParamList, 'CouponDetail'>;
-type CouponScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<CouponStackParamList, 'CouponDetail'>,
-  BottomTabNavigationProp<MainTabParamList>
->;
-
-interface CouponScreenProps {
-  route: CouponScreenRouteProp;
-  navigation: CouponScreenNavigationProp;
-}
-
-function CouponScreen({
-  route,
-  navigation,
-}: CouponScreenProps): React.JSX.Element {
+// Component starts here
+const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
   const { couponId } = route.params;
-  const theme = useTheme();
   
-  // Kupon kodu açılma durumu
+  // State definitions
   const [isCodeRevealed, setIsCodeRevealed] = useState(false);
 
   // TanStack Query ile veri çekme

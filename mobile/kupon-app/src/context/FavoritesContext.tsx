@@ -35,6 +35,8 @@ interface FavoritesContextType {
   isLoading: boolean;
   addToFavorites: (couponId: string) => Promise<void>;
   removeFromFavorites: (couponId: string) => Promise<void>;
+  addFavorite: (couponId: string) => Promise<void>; // Alias for addToFavorites
+  removeFavorite: (couponId: string) => Promise<void>; // Alias for removeFromFavorites
   isFavorite: (couponId: string) => boolean;
   refreshFavorites: () => Promise<void>;
 }
@@ -154,6 +156,8 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         addToFavorites,
         removeFromFavorites,
+        addFavorite: addToFavorites, // Alias
+        removeFavorite: removeFromFavorites, // Alias
         isFavorite,
         refreshFavorites,
       }}

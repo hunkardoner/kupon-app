@@ -29,17 +29,23 @@ export interface Brand {
 export interface Coupon {
   id: number;
   code: string;
+  title: string; // Added title field
   description: string;
   discount_type: 'percentage' | 'fixed_amount';
   discount_value: number;
+  discount_amount?: number; // Alias for discount_value
   valid_from: string; // API'den gelen field ismi
   valid_to: string; // API'den gelen field ismi
+  expiry_date?: string; // Alias for valid_to
   usage_limit?: number | null;
   usage_count: number;
+  minimum_amount?: number | null; // Minimum purchase amount
   is_active: boolean;
   brand_id: number;
   campaign_url?: string | null; // Kampanya linki
+  link?: string; // Alias for campaign_url
   campaign_title?: string | null; // Kampanya başlığı
+  terms?: string | null; // Terms and conditions
   brand?: Brand; // İlişkili marka bilgisi (opsiyonel, API'ye göre)
   categories?: Category[]; // Changed to an array of categories
   created_at: string;
