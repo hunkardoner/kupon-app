@@ -64,7 +64,7 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
           style={styles.filterButton}
           onPress={() => {/* TODO: Filter modal */}}
         >
-          <Ionicons name="filter" size={24} color="#666" />
+          <Ionicons name="options-outline" size={20} color="#666" />
         </TouchableOpacity>
       </View>
 
@@ -76,6 +76,8 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor="#999"
+          returnKeyType="search"
+          clearButtonMode="while-editing"
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity
@@ -90,27 +92,39 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
   );
 
   const renderCategoryItem = ({ item }: { item: Category }) => {
+    const couponCount = item.coupons_count || 0;
+    const isHot = couponCount > 10;
+    const isNew = item.id % 3 === 0; // Mock logic for new categories
+
     return (
       <TouchableOpacity
         style={styles.categoryItem}
         onPress={() => handleCategoryPress(item.id)}
+        activeOpacity={0.7}
       >
+        {(isHot || isNew) && (
+          <View style={[styles.badge, isHot ? styles.hotBadge : styles.newBadge]}>
+            <Text style={styles.badgeText}>
+              {isHot ? 'HOT' : 'NEW'}
+            </Text>
+          </View>
+        )}
+        
         <View style={styles.categoryIcon}>
-          <Ionicons name="grid-outline" size={24} color="#2196f3" />
+          <Ionicons 
+            name="library-outline" 
+            size={24} 
+            color="#2196F3" 
+          />
         </View>
         
-        <Text style={styles.categoryName} numberOfLines={1}>
+        <Text style={styles.categoryName} numberOfLines={2}>
           {item.name}
         </Text>
         
-        <View style={styles.categoryStats}>
-          <Text style={styles.couponCount}>
-            {item.coupons_count && item.coupons_count > 0 
-              ? `${item.coupons_count} kupon` 
-              : 'Kupon yok'
-            }
-          </Text>
-        </View>
+        <Text style={styles.couponCount}>
+          {couponCount} kupon
+        </Text>
       </TouchableOpacity>
     );
   };
@@ -118,7 +132,7 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <View style={styles.emptyIcon}>
-        <Ionicons name="grid-outline" size={48} color="#adb5bd" />
+        <Ionicons name="library-outline" size={40} color="#ccc" />
       </View>
       <Text style={styles.emptyTitle}>
         {searchQuery ? 'Aradığınız kategori bulunamadı' : 'Henüz kategori bulunmuyor'}
@@ -142,14 +156,14 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
 
   const renderLoadingState = () => (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#007bff" />
+      <ActivityIndicator size="large" color="#2196F3" />
       <Text style={styles.loadingText}>Kategoriler yükleniyor...</Text>
     </View>
   );
 
   const renderErrorState = () => (
     <View style={styles.errorContainer}>
-      <Ionicons name="alert-circle-outline" size={64} color="#dc3545" />
+      <Ionicons name="alert-circle-outline" size={48} color="#f44336" />
       <Text style={styles.errorTitle}>Bir hata oluştu</Text>
       <Text style={styles.errorSubtitle}>
         {error?.message || 'Kategoriler yüklenirken bir sorun yaşandı'}
@@ -188,11 +202,12 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
         ListEmptyComponent={renderEmptyState}
         numColumns={2}
         contentContainerStyle={styles.listContainer}
-        columnWrapperStyle={styles.gridContainer}
+        columnWrapperStyle={filteredCategories.length > 0 ? styles.gridContainer : undefined}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        ItemSeparatorComponent={null}
       />
     </SafeAreaView>
   );

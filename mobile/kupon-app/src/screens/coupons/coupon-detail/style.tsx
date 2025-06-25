@@ -10,15 +10,23 @@ export const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   backButton: {
     width: 40,
@@ -30,7 +38,7 @@ export const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   actionButton: {
     width: 40,
@@ -40,69 +48,78 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  
+  // Main coupon card
   couponCard: {
     backgroundColor: 'white',
-    margin: 20,
-    borderRadius: 20,
-    padding: 24,
+    margin: 16,
+    borderRadius: 12,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 1,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
+  
+  // Brand section
   brandSection: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   brandLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 12,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 12,
     backgroundColor: '#f0f0f0',
   },
   brandName: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
     color: '#666',
   },
   couponTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    textAlign: 'center',
+    lineHeight: 26,
     marginBottom: 16,
-    lineHeight: 30,
   },
+  
+  // Discount badge
   discountBadge: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
     backgroundColor: '#4CAF50',
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    alignSelf: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
   discountText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
+  
+  // Code section
   codeContainer: {
     backgroundColor: '#f8f9fa',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: '#2196F3',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
     borderStyle: 'dashed',
   },
   expiredCodeContainer: {
     backgroundColor: '#f5f5f5',
-    borderColor: '#999',
+    borderColor: '#ccc',
   },
   codeLabel: {
     fontSize: 14,
@@ -117,10 +134,10 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   codeText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2196F3',
-    letterSpacing: 2,
+    letterSpacing: 1,
   },
   expiredText: {
     color: '#999',
@@ -145,6 +162,8 @@ export const styles = StyleSheet.create({
   disabledButtonText: {
     color: '#999',
   },
+  
+  // Action buttons
   actionButtons: {
     marginBottom: 16,
   },
@@ -154,7 +173,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#2196F3',
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 14,
     gap: 8,
   },
   primaryButtonText: {
@@ -162,6 +181,8 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  
+  // Expiry section
   expirySection: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -175,15 +196,18 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ffebee',
   },
   expiryText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#4CAF50',
     textAlign: 'center',
+    flex: 1,
   },
+  
+  // Details section
   detailsSection: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 16,
@@ -209,9 +233,9 @@ export const styles = StyleSheet.create({
     marginBottom: 8,
   },
   detailValue: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#333',
-    lineHeight: 22,
+    lineHeight: 20,
   },
   categoriesContainer: {
     flexDirection: 'row',
@@ -220,7 +244,7 @@ export const styles = StyleSheet.create({
   },
   categoryTag: {
     backgroundColor: '#e3f2fd',
-    borderRadius: 20,
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
@@ -245,10 +269,12 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   infoText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#666',
     flex: 1,
   },
+  
+  // Loading and error states
   centerContent: {
     flex: 1,
     justifyContent: 'center',
@@ -261,14 +287,14 @@ export const styles = StyleSheet.create({
     marginTop: 16,
   },
   errorTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#f44336',
     marginTop: 16,
     marginBottom: 8,
   },
   errorSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
     textAlign: 'center',
     marginBottom: 20,
@@ -281,7 +307,7 @@ export const styles = StyleSheet.create({
   },
   retryButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   bottomSpacer: {
