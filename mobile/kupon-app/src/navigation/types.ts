@@ -41,8 +41,14 @@ export type RootStackParamList = {
   // Profile screens
   EditProfile: undefined;
   Favorites: undefined;
+  // Search screen
+  Search: undefined;
   // Auth screen
   Auth: undefined;
+  // Support screens
+  PrivacyPolicy: undefined;
+  Contact: undefined;
+  HelpCenter: undefined;
   // Modals or other screens outside tabs can be defined here
   // Example: NotFound: undefined;
 };

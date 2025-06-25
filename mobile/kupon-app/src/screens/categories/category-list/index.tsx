@@ -61,10 +61,10 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
           </Text>
         </View>
         <TouchableOpacity
-          style={styles.filterButton}
-          onPress={() => {/* TODO: Filter modal */}}
+          style={[styles.filterButton, styles.disabledButton]}
+          disabled={true}
         >
-          <Ionicons name="options-outline" size={20} color="#666" />
+          <Ionicons name="options-outline" size={20} color="#ccc" />
         </TouchableOpacity>
       </View>
 

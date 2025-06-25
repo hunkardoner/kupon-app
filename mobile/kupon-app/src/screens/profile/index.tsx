@@ -116,14 +116,18 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <View style={styles.profileImageContainer}>
-        <View style={styles.profileImage}>
-          <Ionicons name="person" size={40} color="#666" />
+      <View style={styles.userInfoContainer}>
+        <View style={styles.profileImageContainer}>
+          <View style={styles.profileImage}>
+            <Ionicons name="person" size={40} color="#666" />
+          </View>
+        </View>
+        
+        <View style={styles.userDetails}>
+          <Text style={styles.userName}>{user?.name || 'Kullanıcı'}</Text>
+          <Text style={styles.userEmail}>{user?.email || 'email@example.com'}</Text>
         </View>
       </View>
-      
-      <Text style={styles.userName}>{user?.name || 'Kullanıcı'}</Text>
-      <Text style={styles.userEmail}>{user?.email || 'email@example.com'}</Text>
       
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
@@ -283,21 +287,21 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
             'help-circle-outline',
             'Yardım Merkezi',
             'Sık sorulan sorular ve destek',
-            () => {/* TODO: Navigate to help */},
+            () => navigation.navigate('HelpCenter'),
             'chevron-forward'
           )}
           {renderMenuItem(
             'chatbubble-outline',
             'İletişim',
             'Bizimle iletişime geçin',
-            () => {/* TODO: Navigate to contact */},
+            () => navigation.navigate('Contact'),
             'chevron-forward'
           )}
           {renderMenuItem(
             'document-text-outline',
             'Gizlilik Politikası',
             'Gizlilik ve kullanım koşulları',
-            () => {/* TODO: Navigate to privacy */},
+            () => navigation.navigate('PrivacyPolicy'),
             'chevron-forward'
           )}
         </View>

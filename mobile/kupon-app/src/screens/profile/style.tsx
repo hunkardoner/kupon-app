@@ -35,15 +35,16 @@ export const styles = StyleSheet.create({
     color: 'white',
   },
   userName: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#212529',
-    marginBottom: 8,
+    marginBottom: 4,
+    textAlign: 'left',
   },
   userEmail: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#6c757d',
-    marginBottom: 16,
+    textAlign: 'left',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -128,10 +129,18 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   // Additional styles
+  userInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  userDetails: {
+    flex: 1,
+    marginLeft: 16,
+  },
   profileImageContainer: {
     alignItems: 'center',
     position: 'relative',
-    marginBottom: 16,
   },
   profileImage: {
     width: 100,

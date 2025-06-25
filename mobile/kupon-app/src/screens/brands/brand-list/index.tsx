@@ -17,6 +17,7 @@ import { RouteProp } from '@react-navigation/native';
 import { BrandStackParamList } from '../../../navigation/types';
 import { Brand } from '../../../types';
 import { useBrands } from '../../../hooks/useQueries';
+import { AlphabetFilterModal } from '../../../components/common/AlphabetFilterModal';
 import { API_BASE_URL } from '../../../api/index';
 import { styles } from './style';
 
@@ -34,6 +35,8 @@ interface BrandListScreenProps {
 const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [alphabetFilterVisible, setAlphabetFilterVisible] = useState(false);
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
   const {
     data: brands,
@@ -44,9 +47,16 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const filteredBrands = brands?.filter(brand =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredBrands = brands?.filter(brand => {
+    // Search query filter
+    const matchesSearch = brand.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Letter filter
+    const matchesLetter = selectedLetter === null || 
+      brand.name.toUpperCase().startsWith(selectedLetter);
+    
+    return matchesSearch && matchesLetter;
+  }) || [];
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -69,9 +79,14 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.filterButton}
-          onPress={() => {/* TODO: Filter modal */}}
+          onPress={() => setAlphabetFilterVisible(true)}
         >
-          <Ionicons name="filter" size={24} color="#666" />
+          <Ionicons name="filter" size={24} color={selectedLetter ? "#2196F3" : "#666"} />
+          {selectedLetter && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{selectedLetter}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -214,6 +229,13 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+      />
+      
+      <AlphabetFilterModal
+        visible={alphabetFilterVisible}
+        onClose={() => setAlphabetFilterVisible(false)}
+        onSelectLetter={setSelectedLetter}
+        selectedLetter={selectedLetter}
       />
     </SafeAreaView>
   );

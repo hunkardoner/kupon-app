@@ -48,6 +48,10 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  disabledButton: {
+    backgroundColor: '#f0f0f0',
+    opacity: 0.6,
+  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',

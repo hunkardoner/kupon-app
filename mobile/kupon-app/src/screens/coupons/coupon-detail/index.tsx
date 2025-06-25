@@ -13,10 +13,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as Clipboard from 'expo-clipboard';
-import { CouponStackParamList } from '../../../navigation/types';
+import { CouponStackParamList, RootStackParamList } from '../../../navigation/types';
 import { Coupon } from '../../../types';
 import { API_BASE_URL, dataAPI, userAPI } from '../../../api/index';
 import { useFavorites } from '../../../context/FavoritesContext';
@@ -32,7 +32,8 @@ interface CouponScreenProps {
   navigation: CouponScreenNavigationProp;
 }
 
-const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
+const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation: stackNavigation }) => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { couponId } = route.params;
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,8 +79,8 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
         `"${coupon.code}" kupon kodu panoya kopyalandı. Şimdi markaya giderek kuponu kullanabilirsiniz.`,
         [
           {
-            text: 'Markaya Git',
-            onPress: () => handleGoToStore(),
+            text: 'Kuponu Kullan',
+            onPress: () => handleUseCoupon(),
           },
           {
             text: 'Tamam',
@@ -92,15 +93,24 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
     }
   };
 
-  const handleGoToStore = () => {
-    if (!coupon?.link) {
-      Alert.alert('Hata', 'Mağaza bağlantısı bulunamadı');
+  const handleUseCoupon = () => {
+    if (!coupon?.campaign_url) {
+      Alert.alert('Hata', 'Kupon bağlantısı bulunamadı');
       return;
     }
 
-    Linking.openURL(coupon.link).catch(() => {
-      Alert.alert('Hata', 'Mağaza açılırken bir hata oluştu');
+    Linking.openURL(coupon.campaign_url).catch(() => {
+      Alert.alert('Hata', 'Kupon açılırken bir hata oluştu');
     });
+  };
+
+  const handleBrandPress = () => {
+    if (!coupon?.brand?.id) return;
+    navigation.navigate('BrandDetail', { brandId: coupon.brand.id });
+  };
+
+  const handleCategoryPress = (categoryId: number) => {
+    navigation.navigate('CategoryDetail', { categoryId });
   };
 
   const handleFavoriteToggle = async () => {
@@ -149,7 +159,7 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
     <View style={styles.header}>
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => navigation.goBack()}
+        onPress={() => stackNavigation.goBack()}
       >
         <Ionicons name="arrow-back" size={24} color="#333" />
       </TouchableOpacity>
@@ -189,7 +199,7 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
     return (
       <View style={styles.couponCard}>
         {/* Brand Info */}
-        <View style={styles.brandSection}>
+        <TouchableOpacity style={styles.brandSection} onPress={handleBrandPress}>
           <Image
             source={{
               uri: logoUrl || 'https://via.placeholder.com/80x80?text=Logo'
@@ -198,7 +208,7 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
             resizeMode="contain"
           />
           <Text style={styles.brandName}>{coupon.brand?.name || 'Marka'}</Text>
-        </View>
+        </TouchableOpacity>
 
         {/* Coupon Title */}
         <Text style={styles.couponTitle}>{coupon.title}</Text>
@@ -241,16 +251,16 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={[styles.primaryButton, expired && styles.disabledButton]}
-            onPress={handleGoToStore}
-            disabled={expired || !coupon.link}
+            onPress={handleUseCoupon}
+            disabled={expired || !coupon.campaign_url}
           >
             <Ionicons
-              name="storefront-outline"
+              name="gift-outline"
               size={20}
               color={expired ? '#999' : 'white'}
             />
             <Text style={[styles.primaryButtonText, expired && styles.disabledButtonText]}>
-              Mağazaya Git
+              Kuponu Kullan
             </Text>
           </TouchableOpacity>
         </View>
@@ -304,9 +314,13 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation }) => {
             <Text style={styles.detailLabel}>Kategoriler</Text>
             <View style={styles.categoriesContainer}>
               {coupon.categories.map((category: any, index: number) => (
-                <View key={index} style={styles.categoryTag}>
+                <TouchableOpacity
+                  key={index}
+                  style={styles.categoryTag}
+                  onPress={() => handleCategoryPress(category.id)}
+                >
                   <Text style={styles.categoryTagText}>{category.name}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>

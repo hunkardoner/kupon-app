@@ -15,7 +15,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../../../navigation/types';
 import { Coupon } from '../../../types';
 import { FavoriteButton } from '../../../components/common/FavoriteButton';
+import { FilterModal, FilterOptions } from '../../../components/common/FilterModal';
 import { useCoupons } from '../../../hooks/useQueries';
+import { dataAPI } from '../../../api';
 import { styles } from './style';
 
 const { width } = Dimensions.get('window');
@@ -34,6 +36,13 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'popular' | 'ending'>('newest');
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [filters, setFilters] = useState<FilterOptions>({
+    discountType: 'all',
+    sortBy: 'newest',
+    onlyAvailable: true,
+  });
+  const [categories, setCategories] = useState<Array<{ id: number; name: string }>>([]);
 
   const {
     data: coupons,
@@ -42,11 +51,51 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
     refetch,
   } = useCoupons();
 
-  const filteredAndSortedCoupons = coupons?.filter(coupon =>
-    coupon.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (coupon.brand && typeof coupon.brand === 'object' && 
-     coupon.brand.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  ).sort((a, b) => {
+  // Load categories for filter
+  React.useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await dataAPI.getCategories();
+        setCategories(response || []);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const filteredAndSortedCoupons = coupons?.filter(coupon => {
+    // Search query filter
+    const matchesSearch = coupon.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (coupon.brand && typeof coupon.brand === 'object' && 
+       coupon.brand.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    if (!matchesSearch) return false;
+
+    // Discount type filter
+    if (filters.discountType && filters.discountType !== 'all') {
+      if (filters.discountType === 'percentage' && coupon.discount_type !== 'percentage') return false;
+      if (filters.discountType === 'fixed' && coupon.discount_type !== 'fixed_amount') return false;
+    }
+
+    // Category filter
+    if (filters.category) {
+      const hasCategory = coupon.categories?.some(cat => 
+        typeof cat === 'object' && cat.name === filters.category
+      );
+      if (!hasCategory) return false;
+    }
+
+    // Only available filter
+    if (filters.onlyAvailable) {
+      const now = new Date();
+      const expiryDate = coupon.expires_at || coupon.valid_to;
+      if (expiryDate && new Date(expiryDate) < now) return false;
+    }
+
+    return true;
+  }).sort((a, b) => {
+    const sortBy = filters.sortBy || 'newest';
     switch (sortBy) {
       case 'newest':
         return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
@@ -69,6 +118,13 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
     navigation.navigate('CouponDetail', { couponId });
   }, [navigation]);
 
+  const handleFilterApply = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
+    if (newFilters.sortBy) {
+      setSortBy(newFilters.sortBy as 'newest' | 'popular' | 'ending');
+    }
+  };
+
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTop}>
@@ -80,7 +136,7 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.filterButton}
-          onPress={() => {/* TODO: Filter modal */}}
+          onPress={() => setFilterModalVisible(true)}
         >
           <Ionicons name="filter" size={24} color="#666" />
         </TouchableOpacity>
@@ -284,6 +340,14 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+      />
+      
+      <FilterModal
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        onApply={handleFilterApply}
+        initialFilters={filters}
+        categories={categories}
       />
     </SafeAreaView>
   );

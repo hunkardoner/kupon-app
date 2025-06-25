@@ -114,7 +114,10 @@ const FavoritesScreen: React.FC<FavoritesProps> = ({ navigation }) => {
       </Text>
       <TouchableOpacity
         style={styles.browseButton}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('MainTabs', { 
+          screen: 'Coupons', 
+          params: { screen: 'CouponList' } 
+        })}
       >
         <Text style={styles.browseButtonText}>Kuponları Keşfet</Text>
       </TouchableOpacity>

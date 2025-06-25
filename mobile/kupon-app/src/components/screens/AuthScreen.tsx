@@ -16,7 +16,7 @@ import { socialAuthService } from '../../services/socialAuthService';
 import * as AppleAuthentication from 'expo-apple-authentication';
 
 interface AuthScreenProps {
-  navigation: any;
+  navigation?: any;
   onGuestContinue?: () => void;
 }
 
