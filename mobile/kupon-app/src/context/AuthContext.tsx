@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import { authAPI } from '../api';
+import { User, UserPreferences } from '../types';
 
 // Platform-aware secure storage helpers
 const secureStorage = {
@@ -31,34 +32,6 @@ const secureStorage = {
   },
 };
 
-interface User {
-  id: number;
-  email: string;
-  name: string;
-  role: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-  email_verified_at?: string | null;
-  google2fa_enabled?: boolean;
-  google2fa_enabled_at?: string | null;
-  permissions?: any;
-  // Optional fields for backwards compatibility
-  preferences?: UserPreferences;
-  favoriteCategories?: string[];
-  totalSavings?: number;
-  memberSince?: string;
-}
-
-interface UserPreferences {
-  notifications: boolean;
-  emailAlerts: boolean;
-  favoriteCategories: string[];
-  priceAlertThreshold: number;
-  language: string;
-  currency: string;
-}
-
 interface AuthState {
   user: User | null;
   isLoading: boolean;
@@ -72,6 +45,8 @@ interface AuthContextType extends AuthState {
   logout: () => Promise<void>;
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   refreshUser: () => Promise<void>;
+  googleLogin: (accessToken: string) => Promise<void>;
+  appleLogin: (identityToken: string, userIdentifier: string, email?: string, fullName?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -202,6 +177,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const googleLogin = async (accessToken: string) => {
+    try {
+      dispatch({ type: 'AUTH_START' });
+      console.log('Google login attempt with token:', accessToken);
+      const response = await authAPI.googleLogin(accessToken);
+      console.log('Google login response:', response);
+      
+      if (response.success && response.token) {
+        console.log('Google login successful, dispatching AUTH_SUCCESS with user:', response.user);
+        dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
+      } else {
+        console.log('Google login failed - no token or unsuccessful:', response);
+        dispatch({ type: 'AUTH_ERROR', payload: response.message || 'Google ile giriş başarısız' });
+      }
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      const errorMessage = error.response?.data?.message || 'Google ile giriş sırasında hata oluştu';
+      dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+    }
+  };
+
+  const appleLogin = async (identityToken: string, userIdentifier: string, email?: string, fullName?: string) => {
+    try {
+      dispatch({ type: 'AUTH_START' });
+      console.log('Apple login attempt with token:', identityToken);
+      const response = await authAPI.appleLogin(identityToken, userIdentifier, email, fullName);
+      console.log('Apple login response:', response);
+      
+      if (response.success && response.token) {
+        console.log('Apple login successful, dispatching AUTH_SUCCESS with user:', response.user);
+        dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
+      } else {
+        console.log('Apple login failed - no token or unsuccessful:', response);
+        dispatch({ type: 'AUTH_ERROR', payload: response.message || 'Apple ile giriş başarısız' });
+      }
+    } catch (error: any) {
+      console.error('Apple login error:', error);
+      const errorMessage = error.response?.data?.message || 'Apple ile giriş sırasında hata oluştu';
+      dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+    }
+  };
+
   // Check for existing auth on app start
   useEffect(() => {
     const checkAuth = async () => {
@@ -237,6 +254,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         updatePreferences,
         refreshUser,
+        googleLogin,
+        appleLogin,
       }}
     >
       {children}

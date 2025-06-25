@@ -31,7 +31,11 @@ interface NotificationSettings {
   remindersEnabled: boolean;
 }
 
-const ProfileScreen: React.FC = () => {
+interface ProfileScreenProps {
+  navigation: any;
+}
+
+const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState<UserStats>({
     favoriteCount: 0,
@@ -63,7 +67,7 @@ const ProfileScreen: React.FC = () => {
         ]);
 
         const favoriteCount = favoritesResponse.status === 'fulfilled' 
-          ? favoritesResponse.value.length 
+          ? (favoritesResponse.value.coupons?.length || 0) + (favoritesResponse.value.brands?.length || 0)
           : 0;
 
         const savingsData = savingsResponse.status === 'fulfilled' 
@@ -227,14 +231,14 @@ const ProfileScreen: React.FC = () => {
             'person-outline',
             'Kişisel Bilgiler',
             'Profil bilgilerinizi düzenleyin',
-            () => {/* TODO: Navigate to edit profile */},
+            () => navigation.navigate('EditProfile'),
             'chevron-forward'
           )}
           {renderMenuItem(
             'heart-outline',
             'Favorilerim',
             `${stats.favoriteCount} favori kuponunuz var`,
-            () => {/* TODO: Navigate to favorites */},
+            () => navigation.navigate('Favorites'),
             'chevron-forward'
           )}
           {renderMenuItem(

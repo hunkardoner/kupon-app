@@ -1,42 +1,24 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
+import { userAPI } from '../api';
+import { Coupon, Brand } from '../types';
 
 // Storage key constant
 const STORAGE_KEYS = {
   FAVORITES: 'user_favorites',
 };
 
-// Temporary inline service for favorites operations
-const favoritesService = {
-  async addFavorite(couponId: string) {
-    // Mock implementation
-    return { success: true, message: 'Favorilere eklendi' };
-  },
-
-  async removeFavorite(couponId: string) {
-    // Mock implementation  
-    return { success: true, message: 'Favorilerden çıkarıldı' };
-  },
-
-  async getFavorites() {
-    // Mock implementation
-    return { success: true, data: [] };
-  },
-
-  async syncFavorites(localFavorites: string[]) {
-    // Mock implementation
-    return { success: true, data: localFavorites };
-  },
-};
-
 interface FavoritesContextType {
   favorites: string[];
+  favoriteCoupons: Coupon[];
+  favoriteBrands: Brand[];
   isLoading: boolean;
   addToFavorites: (couponId: string) => Promise<void>;
   removeFromFavorites: (couponId: string) => Promise<void>;
   addFavorite: (couponId: string) => Promise<void>; // Alias for addToFavorites
   removeFavorite: (couponId: string) => Promise<void>; // Alias for removeFromFavorites
+  toggleFavorite: (couponId: string | number) => Promise<void>; // Toggle function
   isFavorite: (couponId: string) => boolean;
   refreshFavorites: () => Promise<void>;
 }
@@ -45,22 +27,30 @@ const FavoritesContext = createContext<FavoritesContextType | null>(null);
 
 export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [favoriteCoupons, setFavoriteCoupons] = useState<Coupon[]>([]);
+  const [favoriteBrands, setFavoriteBrands] = useState<Brand[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, user } = useAuth();
 
   const loadFavorites = async () => {
     try {
-      if (isAuthenticated && user) {
-        // Authenticated user - fetch from server
-        const response = await favoritesService.getFavorites();
-        if (response.success) {
-          setFavorites(response.data || []);
-        }
+      setIsLoading(true);
+      
+      if (isAuthenticated) {
+        // Load from server
+        const response = await userAPI.getFavorites();
+        setFavoriteCoupons(response.coupons || []);
+        setFavoriteBrands(response.brands || []);
+        
+        // Extract coupon IDs for compatibility
+        const couponIds = (response.coupons || []).map(coupon => coupon.id.toString());
+        setFavorites(couponIds);
       } else {
-        // Anonymous user - load from local storage
-        const storedFavorites = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
-        if (storedFavorites) {
-          setFavorites(JSON.parse(storedFavorites));
+        // Load from local storage
+        const localFavorites = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
+        if (localFavorites) {
+          const parsedFavorites = JSON.parse(localFavorites);
+          setFavorites(parsedFavorites);
         }
       }
     } catch (error) {
@@ -77,7 +67,9 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
       if (isAuthenticated) {
         // Sync with server
-        await favoritesService.addFavorite(couponId);
+        await userAPI.addFavorite(parseInt(couponId));
+        // Refresh to get updated data
+        await loadFavorites();
       } else {
         // Save locally
         await AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(newFavorites));
@@ -96,7 +88,9 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
       if (isAuthenticated) {
         // Sync with server
-        await favoritesService.removeFavorite(couponId);
+        await userAPI.removeFavorite(parseInt(couponId));
+        // Refresh to get updated data
+        await loadFavorites();
       } else {
         // Save locally
         await AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(newFavorites));
@@ -117,6 +111,15 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     await loadFavorites();
   };
 
+  const toggleFavorite = async (couponId: string | number) => {
+    const id = couponId.toString();
+    if (isFavorite(id)) {
+      await removeFromFavorites(id);
+    } else {
+      await addToFavorites(id);
+    }
+  };
+
   // Load favorites when context initializes or auth state changes
   useEffect(() => {
     loadFavorites();
@@ -133,7 +136,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
             const parsedLocal = JSON.parse(localFavorites);
             // Sync each local favorite with server
             for (const couponId of parsedLocal) {
-              await favoritesService.addFavorite(couponId);
+              await userAPI.addFavorite(parseInt(couponId));
             }
             // Clear local storage
             await AsyncStorage.removeItem(STORAGE_KEYS.FAVORITES);
@@ -153,11 +156,14 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
     <FavoritesContext.Provider
       value={{
         favorites,
+        favoriteCoupons,
+        favoriteBrands,
         isLoading,
         addToFavorites,
         removeFromFavorites,
         addFavorite: addToFavorites, // Alias
         removeFavorite: removeFromFavorites, // Alias
+        toggleFavorite,
         isFavorite,
         refreshFavorites,
       }}

@@ -31,17 +31,22 @@ export interface Brand {
 export interface Coupon {
   id: number;
   code: string;
-  title: string; // Added title field
+  title?: string; // Mobile app için alias
   description: string;
   discount_type: 'percentage' | 'fixed_amount';
   discount_value: number;
   discount_amount?: number; // Alias for discount_value
   valid_from: string; // API'den gelen field ismi
   valid_to: string; // API'den gelen field ismi
+  expires_at?: string; // Alias for valid_to
   expiry_date?: string; // Alias for valid_to
-  usage_limit?: number | null;
-  usage_count: number;
-  minimum_amount?: number | null; // Minimum purchase amount
+  max_uses?: number | null; // API field name
+  max_uses_user?: number; // API field name
+  usage_limit?: number | null; // Alias for max_uses
+  usage_count?: number; // Calculated field
+  times_used?: number; // API field name
+  minimum_amount?: number | null; // Alias for min_purchase_amount
+  min_purchase_amount?: number | null; // API field name
   is_active: boolean;
   brand_id: number;
   campaign_url?: string | null; // Kampanya linki
@@ -50,6 +55,13 @@ export interface Coupon {
   terms?: string | null; // Terms and conditions
   brand?: Brand; // İlişkili marka bilgisi (opsiyonel, API'ye göre)
   categories?: Category[]; // Changed to an array of categories
+  // Enhanced data fields (from /enhanced endpoint)
+  average_rating?: string | number;
+  reviews_count?: string | number;
+  is_favorited?: boolean | string;
+  expires_in_days?: string | null;
+  is_expiring_soon?: boolean | string;
+  is_new?: boolean | string;
   created_at: string;
   updated_at: string;
 }
@@ -66,6 +78,42 @@ export interface Slider {
   sort_order?: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface UserPreferences {
+  notifications: boolean;
+  emailAlerts: boolean;
+  favoriteCategories: string[];
+  priceAlertThreshold: number;
+  language: string;
+  currency: string;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  email_verified_at?: string | null;
+  google2fa_enabled?: boolean;
+  google2fa_enabled_at?: string | null;
+  permissions?: any;
+  // Social login fields - API'den gelen
+  google_id?: string;
+  apple_id?: string;
+  avatar?: string; // Google login'de geliyor
+  social_verified_at?: string;
+  // Additional profile fields
+  phone?: string;
+  bio?: string;
+  // Optional fields for backwards compatibility
+  preferences?: UserPreferences;
+  favoriteCategories?: string[];
+  totalSavings?: number;
+  memberSince?: string;
 }
 
 // Diğer genel tipler buraya eklenebilir

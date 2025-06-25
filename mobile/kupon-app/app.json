@@ -18,7 +18,10 @@
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "associatedDomains": [
+        "applinks:kupon.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +31,8 @@
       "package": "com.kuponce.app",
       "versionCode": 1,
       "edgeToEdgeEnabled": true,
-      "jsEngine": "hermes"
+      "jsEngine": "hermes",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/android/mipmap-mdpi/kuponcepte.png"
@@ -51,7 +55,14 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.647075040650-6lrv93le5hvr78qdi6c7e73k2mbbpb1r"
+        }
+      ],
+      "expo-apple-authentication"
     ]
   }
 }

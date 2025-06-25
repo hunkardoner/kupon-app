@@ -25,15 +25,24 @@ export type CategoryStackParamList = {
 
 // Ensure all tabs are correctly defined for MainTabParamList
 export type MainTabParamList = {
-  HomeTab: NavigatorScreenParams<HomeStackParamList>;
-  CouponsTab: NavigatorScreenParams<CouponStackParamList>;
-  BrandsTab: NavigatorScreenParams<BrandStackParamList>; // This was missing, added now
-  CategoriesTab: NavigatorScreenParams<CategoryStackParamList>; 
-  // SettingsTab: undefined; // Example for another potential tab
+  Dashboard: NavigatorScreenParams<HomeStackParamList>;
+  Coupons: NavigatorScreenParams<CouponStackParamList>;
+  Brands: NavigatorScreenParams<BrandStackParamList>;
+  Categories: NavigatorScreenParams<CategoryStackParamList>;
+  Profile: undefined;
 };
 
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList>; // MainTabs now uses the corrected MainTabParamList
+  // Detail screens as modals
+  CouponDetail: { couponId: number };
+  BrandDetail: { brandId: number };
+  CategoryDetail: { categoryId: number };
+  // Profile screens
+  EditProfile: undefined;
+  Favorites: undefined;
+  // Auth screen
+  Auth: undefined;
   // Modals or other screens outside tabs can be defined here
   // Example: NotFound: undefined;
 };

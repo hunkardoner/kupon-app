@@ -18,12 +18,17 @@ import { FavoritesProvider } from './src/context/FavoritesContext';
 import { Dashboard } from './src/components/screens/Dashboard';
 import { AuthScreen } from './src/components/screens/AuthScreen';
 import ProfileScreen from './src/screens/profile'; // Updated to new folder structure
+import EditProfileScreen from './src/screens/profile/edit-profile';
+import FavoritesScreen from './src/screens/profile/favorites';
 import CouponListScreen from './src/screens/coupons/coupon-list'; // Updated to new folder structure
 import CouponScreen from './src/screens/coupons/coupon-detail'; // Updated to new folder structure
 import BrandListScreen from './src/screens/brands/brand-list'; // Updated to new folder structure
 import BrandScreen from './src/screens/brands/brand-detail'; // Updated to new folder structure
 import CategoryListScreen from './src/screens/categories/category-list'; // Updated to new folder structure
 import CategoryScreen from './src/screens/categories/category-detail'; // Updated to new folder structure
+
+// Navigation types
+import { RootStackParamList, MainTabParamList } from './src/navigation/types';
 
 // Services
 import { notificationService } from './src/services/notificationService';
@@ -44,23 +49,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// Navigation Types
-type MainTabParamList = {
-  Dashboard: undefined;
-  Coupons: undefined;
-  Brands: undefined;
-  Categories: undefined;
-  Profile: undefined;
-};
-
-type RootStackParamList = {
-  MainTabs: undefined;
-  Auth: undefined;
-  CouponDetail: { couponId: number };
-  BrandDetail: { brandId: number };
-  CategoryDetail: { categoryId: number };
-};
 
 // Create navigators
 const MainTab = createBottomTabNavigator<MainTabParamList>();
@@ -147,9 +135,10 @@ function MainTabNavigator() {
       />
       <MainTab.Screen 
         name="Profile" 
-        component={ProfileScreen} 
         options={{ title: 'Profil' }}
-      />
+      >
+        {({ navigation }) => <ProfileScreen navigation={navigation} />}
+      </MainTab.Screen>
     </MainTab.Navigator>
   );
 }
@@ -238,6 +227,22 @@ function AppNavigator() {
               options={{ 
                 headerShown: true,
                 title: 'Kategori Detayı',
+                presentation: 'modal'
+              }}
+            />
+            <RootStack.Screen 
+              name="EditProfile" 
+              component={EditProfileScreen}
+              options={{ 
+                headerShown: false,
+                presentation: 'modal'
+              }}
+            />
+            <RootStack.Screen 
+              name="Favorites" 
+              component={FavoritesScreen}
+              options={{ 
+                headerShown: false,
                 presentation: 'modal'
               }}
             />

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
-import { Category, Brand, Coupon, Slider } from '../types';
+import { Category, Brand, Coupon, Slider, User } from '../types';
 
 export const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -72,14 +72,14 @@ interface FetchParams {
 interface LoginResponse {
   success: boolean;
   token: string;
-  user: any;
+  user: User;
   message: string;
 }
 
 interface RegisterResponse {
   success: boolean;
   token: string;
-  user: any;
+  user: User;
   message: string;
 }
 
@@ -89,21 +89,21 @@ export const authAPI = {
     const response = await apiClient.post('/login', { email, password });
     console.log('Raw API response:', response.data);
     
-    // Laravel API response yapısına göre token ve user'ı kontrol et
-    const token = response.data.token || response.data.access_token || response.data.data?.access_token;
-    const user = response.data.user || response.data.data?.user;
+    // API response: { success, message, token, token_type, user, data: { user, access_token, token_type } }
+    const responseData = response.data;
+    const token = responseData.token || responseData.data?.access_token;
+    const user = responseData.user || responseData.data?.user;
     
     if (token) {
       await setStorageItem('auth_token', token);
       await setStorageItem('user_data', JSON.stringify(user));
     }
     
-    // Standart response formatına dönüştür
     return {
-      success: response.data.success || (!!token),
+      success: responseData.success || (!!token),
       token: token,
       user: user,
-      message: response.data.message || 'Login successful'
+      message: responseData.message || 'Login successful'
     };
   },
 
@@ -115,21 +115,21 @@ export const authAPI = {
       password_confirmation
     });
     
-    // Laravel API response yapısına göre token ve user'ı kontrol et
-    const token = response.data.token || response.data.access_token || response.data.data?.access_token;
-    const user = response.data.user || response.data.data?.user;
+    // API response: { success, message, token, token_type, user, data: { user, access_token, token_type } }
+    const responseData = response.data;
+    const token = responseData.token || responseData.data?.access_token;
+    const user = responseData.user || responseData.data?.user;
     
     if (token) {
       await setStorageItem('auth_token', token);
       await setStorageItem('user_data', JSON.stringify(user));
     }
     
-    // Standart response formatına dönüştür
     return {
-      success: response.data.success || (!!token),
+      success: responseData.success || (!!token),
       token: token,
       user: user,
-      message: response.data.message || 'Registration successful'
+      message: responseData.message || 'Registration successful'
     };
   },
 
@@ -142,9 +142,58 @@ export const authAPI = {
     }
   },
 
-  async getUser(): Promise<any> {
+  async getUser(): Promise<User> {
     const response = await apiClient.get('/user');
-    return response.data;
+    return response.data.data || response.data;
+  },
+
+  async googleLogin(accessToken: string): Promise<LoginResponse> {
+    const response = await apiClient.post('/auth/google', { 
+      access_token: accessToken 
+    });
+    
+    // API response: { success, message, data: { access_token, token_type, user } }
+    const responseData = response.data;
+    const token = responseData.data?.access_token || responseData.token;
+    const user = responseData.data?.user || responseData.user;
+    
+    if (token) {
+      await setStorageItem('auth_token', token);
+      await setStorageItem('user_data', JSON.stringify(user));
+    }
+    
+    return {
+      success: responseData.success || (!!token),
+      token: token,
+      user: user,
+      message: responseData.message || 'Google login successful'
+    };
+  },
+
+  async appleLogin(identityToken: string, userIdentifier: string, email?: string, fullName?: string): Promise<LoginResponse> {
+    const response = await apiClient.post('/auth/apple', { 
+      identity_token: identityToken,
+      user_identifier: userIdentifier,
+      email: email,
+      full_name: fullName
+    });
+    
+    // API response: { success, message, data: { access_token, token_type, user } }
+    const responseData = response.data;
+    const token = responseData.data?.access_token || responseData.token;
+    const user = responseData.data?.user || responseData.user;
+    
+    if (token) {
+      await setStorageItem('auth_token', token);
+      await setStorageItem('user_data', JSON.stringify(user));
+    }
+    
+    return {
+      success: responseData.success || (!!token),
+      token: token,
+      user: user,
+      message: responseData.message || 'Apple login successful'
+    };
   },
 };
 
@@ -250,9 +299,15 @@ export const dataAPI = {
 
 // User APIs (requires authentication)
 export const userAPI = {
-  async getProfile(): Promise<any> {
+  async getProfile(): Promise<User> {
     const response = await apiClient.get('/user/profile');
-    return response.data;
+    return response.data.data || response.data;
+  },
+
+  async updateProfile(profileData: Partial<User>): Promise<User> {
+    // API'de /user/profile PUT endpoint'i yoksa /user endpoint'ini kullanabiliriz
+    const response = await apiClient.put('/user', profileData);
+    return response.data.data || response.data;
   },
 
   async updatePreferences(preferences: any): Promise<any> {
@@ -260,22 +315,34 @@ export const userAPI = {
     return response.data;
   },
 
-  async getFavorites(): Promise<Coupon[]> {
+  async getFavorites(): Promise<{ coupons: Coupon[]; brands: Brand[] }> {
     const response = await apiClient.get('/user/favorites');
-    return response.data.data || response.data;
+    // API response: { success: boolean, data: { coupons: [], brands: [] } }
+    return response.data.data || { coupons: [], brands: [] };
   },
 
   async addFavorite(couponId: number): Promise<void> {
-    await apiClient.post('/user/favorites', { coupon_id: couponId });
+    await apiClient.post('/user/favorites', { 
+      favoritable_type: 'App\\Models\\CouponCode',
+      favoritable_id: couponId 
+    });
   },
 
   async removeFavorite(couponId: number): Promise<void> {
-    await apiClient.delete('/user/favorites', { data: { coupon_id: couponId } });
+    await apiClient.delete('/user/favorites', { 
+      params: { 
+        favoritable_type: 'App\\Models\\CouponCode',
+        favoritable_id: couponId 
+      }
+    });
   },
 
   async toggleFavorite(couponId: number): Promise<{ is_favorite: boolean }> {
     const response = await apiClient.post('/favorites/toggle', { coupon_id: couponId });
-    return response.data;
+    // API response: { success: boolean, favorited: boolean, message: string }
+    return { 
+      is_favorite: response.data.favorited || false 
+    };
   },
 
   async trackCategoryView(categoryId: number): Promise<void> {

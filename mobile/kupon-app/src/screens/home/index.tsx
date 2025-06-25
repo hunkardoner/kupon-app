@@ -7,10 +7,11 @@ import {
 import {
   useNavigation,
   CompositeNavigationProp,
+  NavigationProp,
 } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { HomeStackParamList, MainTabParamList } from '../../navigation/types';
+import { HomeStackParamList, MainTabParamList, RootStackParamList } from '../../navigation/types';
 import { Category, Slider, Coupon, Brand } from '../../types';
 import SectionHeaderComponent from '../../components/common/SectionHeaderComponent';
 import CardComponent from '../../components/common/CardComponent';
@@ -32,11 +33,8 @@ import {
   ItemWrapper
 } from './style';
 
-// HomeScreen için birleşik navigasyon tipi
-type HomeScreenNavigationProp = CompositeNavigationProp<
-  StackNavigationProp<HomeStackParamList, 'Home'>,
-  BottomTabNavigationProp<MainTabParamList>
->;
+// HomeScreen için birleşik navigasyon tipi - hem tab navigation hem root navigation için
+type HomeScreenNavigationProp = NavigationProp<RootStackParamList & MainTabParamList>;
 
 const HomeScreen: React.FC = React.memo(() => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -94,13 +92,13 @@ const HomeScreen: React.FC = React.memo(() => {
   const handleSeeAllPress = useCallback((section: string) => {
     switch (section) {
       case 'coupons':
-        navigation.navigate('CouponsTab', { screen: 'CouponList' });
+        navigation.navigate('Coupons', { screen: 'CouponList' });
         break;
       case 'brands':
-        navigation.navigate('BrandsTab', { screen: 'BrandList' });
+        navigation.navigate('Brands', { screen: 'BrandList' });
         break;
       case 'categories':
-        navigation.navigate('CategoriesTab', { screen: 'CategoryList' });
+        navigation.navigate('Categories', { screen: 'CategoryList' });
         break;
     }
   }, [navigation]);

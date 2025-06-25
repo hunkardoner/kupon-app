@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
+import { socialAuthService } from '../../services/socialAuthService';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 interface AuthScreenProps {
   navigation: any;
@@ -27,7 +29,7 @@ export function AuthScreen({ navigation, onGuestContinue }: AuthScreenProps) {
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
-  const { login, register, isLoading, error } = useAuth();
+  const { login, register, googleLogin, appleLogin, isLoading, error } = useAuth();
 
   const handleSubmit = async () => {
     try {
@@ -62,6 +64,60 @@ export function AuthScreen({ navigation, onGuestContinue }: AuthScreenProps) {
       // No manual navigation needed since conditional rendering will handle it
     } catch (error) {
       console.error('Auth error:', error);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        const result = await socialAuthService.signInWithGoogleWeb();
+        if (result && result.accessToken) {
+          await googleLogin(result.accessToken);
+        }
+      } else {
+        const result = await socialAuthService.signInWithGoogle();
+        if (result && result.type === 'success') {
+          // Use ID token for backend verification if available
+          if (result.data.idToken) {
+            await googleLogin(result.data.idToken);
+          } else if (result.data.serverAuthCode) {
+            // Fallback to server auth code
+            await googleLogin(result.data.serverAuthCode);
+          } else {
+            Alert.alert('Hata', 'Google giriş bilgileri alınamadı');
+          }
+        } else {
+          Alert.alert('Hata', 'Google giriş başarısız');
+        }
+      }
+    } catch (error: any) {
+      console.error('Google Sign-In Error:', error);
+      if (error.code !== 'SIGN_IN_CANCELLED') {
+        Alert.alert('Hata', 'Google ile giriş sırasında hata oluştu');
+      }
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      const result = await socialAuthService.signInWithApple();
+      if (result) {
+        const fullName = result.fullName 
+          ? `${result.fullName.givenName || ''} ${result.fullName.familyName || ''}`.trim()
+          : undefined;
+        
+        await appleLogin(
+          result.identityToken,
+          result.user,
+          result.email,
+          fullName
+        );
+      }
+    } catch (error: any) {
+      console.error('Apple Sign-In Error:', error);
+      if (error.code !== 'ERR_CANCELED') {
+        Alert.alert('Hata', 'Apple ile giriş sırasında hata oluştu');
+      }
     }
   };
 
@@ -159,6 +215,38 @@ export function AuthScreen({ navigation, onGuestContinue }: AuthScreenProps) {
     </View>
   );
 
+  const renderSocialLogin = () => (
+    <View style={styles.socialLoginContainer}>
+      <View style={styles.dividerContainer}>
+        <View style={styles.divider} />
+        <Text style={styles.dividerText}>veya</Text>
+        <View style={styles.divider} />
+      </View>
+      
+      <View style={styles.socialButtonsContainer}>
+        <TouchableOpacity
+          style={styles.googleButton}
+          onPress={handleGoogleSignIn}
+          disabled={isLoading}
+        >
+          <Ionicons name="logo-google" size={20} color="#DB4437" />
+          <Text style={styles.googleButtonText}>Google ile {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}</Text>
+        </TouchableOpacity>
+
+        {Platform.OS === 'ios' && (
+          <TouchableOpacity
+            style={styles.appleButton}
+            onPress={handleAppleSignIn}
+            disabled={isLoading}
+          >
+            <Ionicons name="logo-apple" size={20} color="white" />
+            <Text style={styles.appleButtonText}>Apple ile {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+
   const renderSwitchMode = () => (
     <View style={styles.switchContainer}>
       <Text style={styles.switchText}>
@@ -240,6 +328,7 @@ export function AuthScreen({ navigation, onGuestContinue }: AuthScreenProps) {
         </View>
 
         {renderForm()}
+        {renderSocialLogin()}
         {renderSwitchMode()}
         {renderGuestAccess()}
         {renderBenefits()}
@@ -402,5 +491,58 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginLeft: 12,
+  },
+  socialLoginContainer: {
+    marginBottom: 20,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#e0e0e0',
+  },
+  dividerText: {
+    fontSize: 14,
+    color: '#666',
+    marginHorizontal: 16,
+  },
+  socialButtonsContainer: {
+    gap: 12,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 12,
+    height: 50,
+    paddingHorizontal: 16,
+  },
+  googleButtonText: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 12,
+    fontWeight: '500',
+  },
+  appleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#000',
+    borderRadius: 12,
+    height: 50,
+    paddingHorizontal: 16,
+  },
+  appleButtonText: {
+    fontSize: 16,
+    color: 'white',
+    marginLeft: 12,
+    fontWeight: '500',
   },
 });
