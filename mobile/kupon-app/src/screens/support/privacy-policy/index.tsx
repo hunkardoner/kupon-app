@@ -31,7 +31,13 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {renderHeader()}
       
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        bounces={true}
+        alwaysBounceVertical={false}
+      >
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>1. Genel Bilgiler</Text>
           <Text style={styles.paragraph}>

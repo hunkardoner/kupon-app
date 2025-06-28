@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { Category, Brand, Coupon, Slider, User } from '../types';
 
-export const API_BASE_URL = 'http://localhost:8000/api';
+export const API_BASE_URL = 'https://www.kuponcepte.com.tr/api';
 
 // Platform-aware storage
 const getStorageItem = async (key: string) => {

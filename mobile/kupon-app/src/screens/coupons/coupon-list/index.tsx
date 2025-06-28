@@ -66,11 +66,14 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
 
   const filteredAndSortedCoupons = coupons?.filter(coupon => {
     // Search query filter
-    const matchesSearch = coupon.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (coupon.brand && typeof coupon.brand === 'object' && 
-       coupon.brand.name.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    if (!matchesSearch) return false;
+    if (searchQuery && searchQuery.trim() !== '') {
+      const query = searchQuery.toLowerCase().trim();
+      const matchesDescription = coupon.description && coupon.description.toLowerCase().includes(query);
+      const matchesBrand = coupon.brand && typeof coupon.brand === 'object' && 
+                          coupon.brand.name && coupon.brand.name.toLowerCase().includes(query);
+      
+      if (!matchesDescription && !matchesBrand) return false;
+    }
 
     // Discount type filter
     if (filters.discountType && filters.discountType !== 'all') {

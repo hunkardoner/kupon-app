@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -29,7 +29,12 @@ export const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   sectionTitle: {
     fontSize: 18,
@@ -221,6 +226,6 @@ export const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomSpacer: {
-    height: 40,
+    height: 80,
   },
 });

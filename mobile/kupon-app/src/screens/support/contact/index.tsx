@@ -107,12 +107,17 @@ const ContactScreen: React.FC<ContactProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView 
-        style={styles.container} 
+        style={styles.keyboardContainer} 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         {renderHeader()}
         
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.introSection}>
             <Text style={styles.introTitle}>Bizimle İletişime Geçin</Text>
             <Text style={styles.introText}>

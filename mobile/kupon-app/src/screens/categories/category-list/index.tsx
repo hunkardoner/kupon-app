@@ -38,7 +38,7 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
   } = useCategories();
 
   const filteredCategories = categories?.filter(category =>
-    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    !searchQuery?.trim() || (category.name && category.name.toLowerCase().includes(searchQuery.toLowerCase()))
   ) || [];
 
   const onRefresh = async () => {

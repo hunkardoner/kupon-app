@@ -193,7 +193,12 @@ const HelpCenterScreen: React.FC<HelpCenterProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {renderHeader()}
       
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <Text style={styles.sectionTitle}>Hızlı Erişim</Text>

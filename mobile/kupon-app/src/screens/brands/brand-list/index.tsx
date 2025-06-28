@@ -49,11 +49,12 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
 
   const filteredBrands = brands?.filter(brand => {
     // Search query filter
-    const matchesSearch = brand.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = !searchQuery?.trim() || 
+      (brand.name && brand.name.toLowerCase().includes(searchQuery.toLowerCase()));
     
     // Letter filter
     const matchesLetter = selectedLetter === null || 
-      brand.name.toUpperCase().startsWith(selectedLetter);
+      (brand.name && brand.name.toUpperCase().startsWith(selectedLetter));
     
     return matchesSearch && matchesLetter;
   }) || [];
