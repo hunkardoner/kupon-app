@@ -221,6 +221,7 @@ export const dataAPI = {
     // Brands API directly returns array (not wrapped in data)
     const brands = Array.isArray(response.data) ? response.data : (response.data.data || []);
     console.log('Parsed brands:', brands.length, 'items');
+    
     return brands;
   },
 
@@ -236,6 +237,47 @@ export const dataAPI = {
     // Coupons API returns paginated response with data array
     const coupons = response.data.data || [];
     console.log('Parsed coupons:', coupons.length, 'items');
+    
+    // Tüm kuponların brand bilgisini kontrol edelim
+    if (coupons.length > 0) {
+      console.log('All coupons brand check:');
+      coupons.slice(0, 3).forEach((coupon: any, index: number) => {
+        console.log(`Coupon ${index + 1}:`, {
+          id: coupon.id,
+          description: coupon.description?.substring(0, 50),
+          brand_id: coupon.brand_id,
+          brand: coupon.brand,
+          brand_type: typeof coupon.brand,
+          has_brand_logo: coupon.brand && typeof coupon.brand === 'object' && coupon.brand.logo ? 'YES' : 'NO',
+        });
+      });
+      
+      // Kuponlarda brand nesnesi gelmediği için, brand listesini de çekelim
+      console.log('Kuponlarda brand bilgisi gelmiyor, brand listesini çekiyoruz...');
+      
+      try {
+        const brandsResponse = await this.getBrands();
+        console.log('Brands loaded for coupon matching:', brandsResponse.length);
+        
+        // Kuponları brand bilgisiyle zenginleştir
+        const enrichedCoupons = coupons.map((coupon: any) => {
+          if (coupon.brand_id && !coupon.brand) {
+            const matchingBrand = brandsResponse.find(brand => brand.id === coupon.brand_id);
+            if (matchingBrand) {
+              coupon.brand = matchingBrand;
+              console.log(`Matched brand for coupon ${coupon.id}:`, matchingBrand.name, matchingBrand.logo);
+            }
+          }
+          return coupon;
+        });
+        
+        return enrichedCoupons;
+      } catch (error) {
+        console.error('Brand listesi çekilirken hata:', error);
+        return coupons;
+      }
+    }
+    
     return coupons;
   },
 
