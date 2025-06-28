@@ -106,6 +106,20 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+
+  // Code title 
+
+  couponCodeSection: {
+    marginBottom: 16,
+  },
+  codeTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+
   
   // Code section
   codeContainer: {

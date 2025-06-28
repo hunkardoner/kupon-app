@@ -140,7 +140,7 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
             console.log('Brand image load error for brand', item.id, ':', error.nativeEvent.error);
           }}
           onLoad={() => {
-            console.log('Brand image loaded successfully for brand', item.id);
+            // console.log('Brand image loaded successfully for brand', item.id);
           }}
         />
         

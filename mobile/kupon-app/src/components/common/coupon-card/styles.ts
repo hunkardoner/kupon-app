@@ -15,29 +15,34 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     overflow: 'hidden',
+    minHeight: 100,
   },
-  couponImageContainer: {
+  cardContent: {
+    flexDirection: 'row',
+    padding: 16,
+  },
+  logoContainer: {
     position: 'relative',
-    backgroundColor: '#f8f9fa',
-    height: 120,
+    marginRight: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  couponImage: {
-    width: 80,
-    height: 80,
+  brandLogo: {
+    width: 60,
+    height: 60,
     borderRadius: 8,
+    backgroundColor: '#f8f9fa',
   },
   badgeContainer: {
     position: 'absolute',
-    top: 8,
-    left: 8,
+    top: -8,
+    right: 24,
     flexDirection: 'column',
-    gap: 4,
+    gap: 2,
   },
   badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     borderRadius: 4,
   },
   newBadge: {
@@ -51,99 +56,63 @@ export const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
   },
-  couponContent: {
-    padding: 16,
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
-  couponHeader: {
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  brandName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    flex: 1,
+    marginRight: 8,
+  },
+  couponTitle: {
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 18,
+    marginBottom: 8,
+    flex: 1,
+  },
+  bottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
-  },
-  brandName: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: '500',
-    flex: 1,
-  },
-  couponTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-    lineHeight: 20,
   },
   discountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
   },
   discountBadge: {
     backgroundColor: '#4CAF50',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginRight: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginRight: 6,
   },
   discountText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
   },
   discountLabel: {
-    color: '#4CAF50',
     fontSize: 12,
+    color: '#4CAF50',
     fontWeight: '500',
   },
-  couponFooter: {
-    marginBottom: 12,
-  },
-  validityInfo: {
+  validityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
   },
   validityText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#666',
     marginLeft: 4,
-  },
-  categoryInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  categoryText: {
-    fontSize: 12,
-    color: '#666',
-    marginLeft: 4,
-    flex: 1,
-  },
-  actionContainer: {
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingTop: 12,
-  },
-  viewButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  viewButtonText: {
-    color: '#007bff',
-    fontSize: 14,
-    fontWeight: '600',
-    marginRight: 4,
-  },
-  usageContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  usageText: {
-    fontSize: 12,
-    color: '#2196F3',
-    marginLeft: 4,
-    fontWeight: '500',
   },
 });

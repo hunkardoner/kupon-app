@@ -224,6 +224,13 @@ const CouponScreen: React.FC<CouponScreenProps> = ({ route, navigation: stackNav
         )}
 
         {/* Coupon Code */}
+
+        <View style={styles.couponCodeSection}>
+
+          <Text style={styles.codeTitle}> {coupon.campaign_title} </Text>
+        
+        </View>
+
         <View style={[styles.codeContainer, expired && styles.expiredCodeContainer]}>
           <Text style={styles.codeLabel}>Kupon Kodu</Text>
           <View style={styles.codeRow}>

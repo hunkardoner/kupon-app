@@ -44,86 +44,72 @@ export const CouponCard: React.FC<CouponCardProps> = ({
       style={styles.couponCard}
       onPress={() => onPress(item.id)}
     >
-      <View style={styles.couponImageContainer}>
-        <Image
-          source={{ uri: logoUrl }}
-          style={styles.couponImage}
-          onError={(error) => {
-            console.log('CouponCard: Brand logo failed to load:', logoUrl, error.nativeEvent.error);
-          }}
-        />
-        
-        {/* Badges */}
-        {(isNew || isExpiringSoon) && (
-          <View style={styles.badgeContainer}>
-            {isNew && (
-              <View style={[styles.badge, styles.newBadge]}>
-                <Text style={styles.badgeText}>YENİ</Text>
-              </View>
-            )}
-            {isExpiringSoon && (
-              <View style={[styles.badge, styles.expiringSoonBadge]}>
-                <Text style={styles.badgeText}>Son Gün!</Text>
-              </View>
-            )}
-          </View>
-        )}
-      </View>
-
-      <View style={styles.couponContent}>
-        <View style={styles.couponHeader}>
-          <Text style={styles.brandName} numberOfLines={1}>
-            {item.brand && typeof item.brand === 'object' ? item.brand.name : 'Marka'}
-          </Text>
-          {showFavorite && (
-            <FavoriteButton 
-              couponId={item.id} 
-              size={20} 
-            />
+      <View style={styles.cardContent}>
+        {/* Sol taraf - Logo */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={{ uri: logoUrl }}
+            style={styles.brandLogo}
+            onError={(error) => {
+              console.log('CouponCard: Brand logo failed to load:', logoUrl, error.nativeEvent.error);
+            }}
+          />
+          
+          {/* Badges */}
+          {(isNew || isExpiringSoon) && (
+            <View style={styles.badgeContainer}>
+              {isNew && (
+                <View style={[styles.badge, styles.newBadge]}>
+                  <Text style={styles.badgeText}>YENİ</Text>
+                </View>
+              )}
+              {isExpiringSoon && (
+                <View style={[styles.badge, styles.expiringSoonBadge]}>
+                  <Text style={styles.badgeText}>Son Gün!</Text>
+                </View>
+              )}
+            </View>
           )}
         </View>
 
-        <Text style={styles.couponTitle} numberOfLines={2}>
-          {item.title}
-        </Text>
-
-        <View style={styles.discountContainer}>
-          <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>
-              {item.discount_type === 'percentage' ? `%${item.discount_value}` : `₺${item.discount_value}`}
+        {/* Sağ taraf - İçerik */}
+        <View style={styles.contentContainer}>
+          <View style={styles.headerRow}>
+            <Text style={styles.brandName} numberOfLines={1}>
+              {item.campaign_title}
             </Text>
+            {showFavorite && (
+              <FavoriteButton 
+                couponId={item.id} 
+                size={20} 
+              />
+            )}
           </View>
-          <Text style={styles.discountLabel}>İndirim</Text>
-        </View>
 
-        <View style={styles.couponFooter}>
-          <View style={styles.validityInfo}>
-            <Ionicons name="time-outline" size={14} color="#666" />
-            <Text style={styles.validityText}>
-              {item.valid_to ? 
-                `${new Date(item.valid_to).toLocaleDateString('tr-TR')} tarihine kadar` :
-                'Süresiz'
-              }
-            </Text>
-          </View>
-          
-          <View style={styles.categoryInfo}>
-            <Ionicons name="pricetag-outline" size={14} color="#666" />
-            <Text style={styles.categoryText} numberOfLines={1}>
-              {item.brand && typeof item.brand === 'object' ? 
-                item.brand.name : 'Kategori'}
-            </Text>
-          </View>
-        </View>
+          <Text style={styles.couponTitle} numberOfLines={2}>
+            {item.title || item.description}
+          </Text>
 
-        <View style={styles.actionContainer}>
-          <TouchableOpacity 
-            style={styles.viewButton}
-            onPress={() => onPress(item.id)}
-          >
-            <Text style={styles.viewButtonText}>Detayları Görüntüle</Text>
-            <Ionicons name="chevron-forward" size={16} color="#007bff" />
-          </TouchableOpacity>
+          <View style={styles.bottomRow}>
+            <View style={styles.discountContainer}>
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>
+                  {item.discount_type === 'percentage' ? `%${item.discount_value}` : `₺${item.discount_value}`}
+                </Text>
+              </View>
+              <Text style={styles.discountLabel}>İndirim</Text>
+            </View>
+
+            <View style={styles.validityContainer}>
+              <Ionicons name="time-outline" size={12} color="#666" />
+              <Text style={styles.validityText} numberOfLines={1}>
+                {item.valid_to ? 
+                  `${new Date(item.valid_to).toLocaleDateString('tr-TR')}` :
+                  'Süresiz'
+                }
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>

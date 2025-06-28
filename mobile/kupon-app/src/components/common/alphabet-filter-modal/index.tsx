@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { styles } from './styles';
@@ -51,27 +52,30 @@ export const AlphabetFilterModal: React.FC<AlphabetFilterModalProps> = ({
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.alphabetGrid}>
-            {alphabet.map((letter) => (
-              <TouchableOpacity
-                key={letter}
-                style={[
-                  styles.letterButton,
-                  (letter === 'Tümü' ? selectedLetter === null : selectedLetter === letter) && 
-                  styles.selectedLetter,
-                ]}
-                onPress={() => handleLetterPress(letter)}
-              >
-                <Text
+            {alphabet.map((letter, index) => {
+              const isSelected = letter === 'Tümü' ? selectedLetter === null : selectedLetter === letter;
+              
+              return (
+                <TouchableOpacity
+                  key={letter}
                   style={[
-                    styles.letterText,
-                    (letter === 'Tümü' ? selectedLetter === null : selectedLetter === letter) && 
-                    styles.selectedLetterText,
+                    styles.letterButton,
+                    isSelected && styles.selectedLetter,
                   ]}
+                  onPress={() => handleLetterPress(letter)}
+                  activeOpacity={0.7}
                 >
-                  {letter}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={[
+                      styles.letterText,
+                      isSelected && styles.selectedLetterText,
+                    ]}
+                  >
+                    {letter}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           <View style={styles.bottomSpacer} />
