@@ -11,10 +11,11 @@ import {
   CouponStackParamList,
   BrandStackParamList,
   CategoryStackParamList,
+  ProfileStackParamList,
 } from './types';
 
 import HomeScreen from '../screens/home'; // Updated to new folder structure
-import { Dashboard } from '../components/screens/Dashboard';
+import { Dashboard } from '../screens/dashboard';
 import CouponListScreen from '../screens/coupons/coupon-list'; // Yeni klasör yapısı
 import BrandListScreen from '../screens/brands/brand-list'; // Yeni klasör yapısı
 import CouponScreen from '../screens/coupons/coupon-detail'; // Yeni klasör yapısı
@@ -31,12 +32,17 @@ import HelpCenterScreen from '../screens/support/help-center';
 import ProfileScreen from '../screens/profile';
 import EditProfileScreen from '../screens/profile/edit-profile';
 import FavoritesScreen from '../screens/profile/favorites';
+import NotificationsScreen from '../screens/profile/notifications';
+import PreferencesScreen from '../screens/profile/preferences';
+import LanguageScreen from '../screens/profile/language';
+import CurrencyScreen from '../screens/profile/currency';
+import TermsOfServiceScreen from '../screens/profile/terms-of-service';
 
 // Search screen
 import SearchScreen from '../screens/search';
 
 // Auth screen
-import { AuthScreen } from '../components/screens/AuthScreen';
+import { AuthScreen } from '../screens/auth';
 
 // Context
 import { AuthContext } from '../context/AuthContext';
@@ -134,6 +140,70 @@ function CategoryStackNavigator() {
   );
 }
 
+// Profile Stack Navigator
+const ProfileStack = createStackNavigator<ProfileStackParamList>();
+function ProfileStackNavigator() {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="ProfileHome"
+        component={ProfileScreen}
+        options={{ title: 'Profil' }}
+      />
+      <ProfileStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ title: 'Profili Düzenle' }}
+      />
+      <ProfileStack.Screen
+        name="Favorites"
+        component={FavoritesScreen}
+        options={{ title: 'Favorilerim' }}
+      />
+      <ProfileStack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ title: 'Bildirimler' }}
+      />
+      <ProfileStack.Screen
+        name="Preferences"
+        component={PreferencesScreen}
+        options={{ title: 'Tercihlerim' }}
+      />
+      <ProfileStack.Screen
+        name="Language"
+        component={LanguageScreen}
+        options={{ title: 'Dil Seçimi' }}
+      />
+      <ProfileStack.Screen
+        name="Currency"
+        component={CurrencyScreen}
+        options={{ title: 'Para Birimi' }}
+      />
+      <ProfileStack.Screen
+        name="HelpCenter"
+        component={HelpCenterScreen}
+        options={{ title: 'Yardım Merkezi' }}
+      />
+      <ProfileStack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicyScreen}
+        options={{ title: 'Gizlilik Politikası' }}
+      />
+      <ProfileStack.Screen
+        name="TermsOfService"
+        component={TermsOfServiceScreen}
+        options={{ title: 'Kullanım Koşulları' }}
+      />
+      <ProfileStack.Screen
+        name="Contact"
+        component={ContactScreen}
+        options={{ title: 'İletişim' }}
+      />
+    </ProfileStack.Navigator>
+  );
+}
+
 // Bottom Tab Navigator
 const Tab = createBottomTabNavigator<MainTabParamList>();
 function MainTabNavigator() {
@@ -219,8 +289,17 @@ function MainTabNavigator() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStackNavigator}
         options={{ title: 'Profil' }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            // Profile tab'ına basıldığında Profile stack'ini root'a resetle
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Profile' }],
+            });
+          },
+        })}
       />
     </Tab.Navigator>
   );

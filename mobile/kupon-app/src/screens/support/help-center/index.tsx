@@ -165,7 +165,7 @@ const HelpCenterScreen: React.FC<HelpCenterProps> = ({ navigation }) => {
   };
 
   const handleEmailSupport = () => {
-    Linking.openURL('mailto:support@kuponapp.com');
+    Linking.openURL('mailto:support@kuponcepte.com.tr');
   };
 
   const renderFaqItem = (faq: FAQ) => (

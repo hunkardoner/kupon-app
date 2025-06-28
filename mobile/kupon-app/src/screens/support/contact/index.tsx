@@ -193,7 +193,7 @@ const ContactScreen: React.FC<ContactProps> = ({ navigation }) => {
               <Ionicons name="mail-outline" size={20} color="#2196F3" />
               <View style={styles.contactItemContent}>
                 <Text style={styles.contactItemTitle}>E-posta</Text>
-                <Text style={styles.contactItemText}>support@kuponapp.com</Text>
+                <Text style={styles.contactItemText}>support@kuponcepte.com.tr</Text>
               </View>
             </View>
 

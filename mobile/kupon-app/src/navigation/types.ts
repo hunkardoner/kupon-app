@@ -23,13 +23,27 @@ export type CategoryStackParamList = {
   CategoryDetail: { categoryId: number }; 
 };
 
+export type ProfileStackParamList = {
+  ProfileHome: undefined;
+  EditProfile: undefined;
+  Favorites: undefined;
+  Notifications: undefined;
+  Preferences: undefined;
+  Language: undefined;
+  Currency: undefined;
+  HelpCenter: undefined;
+  PrivacyPolicy: undefined;
+  TermsOfService: undefined;
+  Contact: undefined;
+};
+
 // Ensure all tabs are correctly defined for MainTabParamList
 export type MainTabParamList = {
   Dashboard: NavigatorScreenParams<HomeStackParamList>;
   Coupons: NavigatorScreenParams<CouponStackParamList>;
   Brands: NavigatorScreenParams<BrandStackParamList>;
   Categories: NavigatorScreenParams<CategoryStackParamList>;
-  Profile: undefined;
+  Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
 
 export type RootStackParamList = {

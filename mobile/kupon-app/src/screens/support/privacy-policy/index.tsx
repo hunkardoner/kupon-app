@@ -128,7 +128,7 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyProps> = ({ navigation }) => {
             Gizlilik Politikası ile ilgili sorularınız için bizimle iletişime geçebilirsiniz:
           </Text>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactText}>E-posta: privacy@kuponapp.com</Text>
+            <Text style={styles.contactText}>E-posta: privacy@kuponcepte.com.tr</Text>
             <Text style={styles.contactText}>Telefon: +90 (212) 123 45 67</Text>
           </View>
         </View>

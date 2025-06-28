@@ -1,92 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Image,
-  Switch,
-  Dimensions,
-} from 'react-native';
+import React from 'react';
+import { ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import styled from 'styled-components/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
-import { userAPI } from '../../api/index';
-import { styles } from './style';
+import { useTheme } from '../../theme';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { ProfileStackParamList } from '../../navigation/types';
 
-const { width } = Dimensions.get('window');
-
-interface UserStats {
-  favoriteCount: number;
-  savedAmount: number;
-  usedCoupons: number;
-  reviewCount: number;
-}
-
-interface NotificationSettings {
-  pushEnabled: boolean;
-  emailEnabled: boolean;
-  promotionsEnabled: boolean;
-  remindersEnabled: boolean;
-}
+type ProfileScreenNavigationProp = StackNavigationProp<ProfileStackParamList, 'ProfileHome'>;
 
 interface ProfileScreenProps {
-  navigation: any;
+  navigation: ProfileScreenNavigationProp;
 }
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
+// Styled Components
+const Container = styled(SafeAreaView)`
+  flex: 1;
+  background-color: ${({ theme }: any) => theme.colors.background};
+`;
+
+const Header = styled.View`
+  padding: ${({ theme }: any) => theme.spacing.large}px;
+  background-color: ${({ theme }: any) => theme.colors.primary};
+  align-items: center;
+`;
+
+const ProfileImage = styled.View`
+  width: 80px;
+  height: 80px;
+  border-radius: 40px;
+  background-color: ${({ theme }: any) => theme.colors.background};
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const UserName = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.xl}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  color: white;
+  margin-bottom: ${({ theme }: any) => theme.spacing.small}px;
+`;
+
+const UserEmail = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: rgba(255, 255, 255, 0.8);
+`;
+
+const Content = styled.ScrollView`
+  flex: 1;
+  padding: ${({ theme }: any) => theme.spacing.large}px;
+`;
+
+const Section = styled.View`
+  margin-bottom: ${({ theme }: any) => theme.spacing.large}px;
+`;
+
+const SectionTitle = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.large}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  color: ${({ theme }: any) => theme.colors.text};
+  margin-bottom: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const MenuItem = styled.TouchableOpacity<{ isDestructive?: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  padding: ${({ theme }: any) => theme.spacing.medium}px;
+  background-color: ${({ theme }: any) => theme.colors.surface};
+  border-radius: ${({ theme }: any) => theme.borderRadius.medium}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.small}px;
+`;
+
+const MenuItemIcon = styled.View<{ isDestructive?: boolean }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background-color: ${({ theme, isDestructive }: any) => 
+    isDestructive ? theme.colors.error : theme.colors.primary}15;
+  align-items: center;
+  justify-content: center;
+  margin-right: ${({ theme }: any) => theme.spacing.medium}px;
+`;
+
+const MenuItemText = styled.Text<{ isDestructive?: boolean }>`
+  flex: 1;
+  font-size: ${({ theme }: any) => theme.typography.sizes.medium}px;
+  color: ${({ theme, isDestructive }: any) => 
+    isDestructive ? theme.colors.error : theme.colors.text};
+  font-weight: ${({ theme }: any) => theme.typography.weights.medium};
+`;
+
+const MenuItemSubtitle = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  margin-top: 2px;
+`;
+
+const StatsContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: ${({ theme }: any) => theme.colors.surface};
+  border-radius: ${({ theme }: any) => theme.borderRadius.medium}px;
+  padding: ${({ theme }: any) => theme.spacing.large}px;
+  margin-bottom: ${({ theme }: any) => theme.spacing.large}px;
+`;
+
+const StatItem = styled.View`
+  align-items: center;
+`;
+
+const StatValue = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.xl}px;
+  font-weight: ${({ theme }: any) => theme.typography.weights.bold};
+  color: ${({ theme }: any) => theme.colors.primary};
+  margin-bottom: ${({ theme }: any) => theme.spacing.small}px;
+`;
+
+const StatLabel = styled.Text`
+  font-size: ${({ theme }: any) => theme.typography.sizes.small}px;
+  color: ${({ theme }: any) => theme.colors.textSecondary};
+  text-align: center;
+`;
+
+export function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { user, logout } = useAuth();
-  const [stats, setStats] = useState<UserStats>({
-    favoriteCount: 0,
-    savedAmount: 0,
-    usedCoupons: 0,
-    reviewCount: 0,
-  });
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    pushEnabled: true,
-    emailEnabled: true,
-    promotionsEnabled: true,
-    remindersEnabled: true,
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    try {
-      setLoading(true);
-      
-      // Kullanıcı istatistiklerini çek
-      if (user?.id) {
-        const [favoritesResponse, savingsResponse] = await Promise.allSettled([
-          userAPI.getFavorites(),
-          userAPI.getSavings(user.id),
-        ]);
-
-        const favoriteCount = favoritesResponse.status === 'fulfilled' 
-          ? (favoritesResponse.value.coupons?.length || 0) + (favoritesResponse.value.brands?.length || 0)
-          : 0;
-
-        const savingsData = savingsResponse.status === 'fulfilled' 
-          ? savingsResponse.value 
-          : null;
-
-        setStats({
-          favoriteCount,
-          savedAmount: savingsData?.total_saved || 0,
-          usedCoupons: savingsData?.coupons_used || 0,
-          reviewCount: 0, // TODO: Implement reviews
-        });
-      }
-    } catch (error) {
-      console.error('Failed to load user data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { theme } = useTheme();
 
   const handleLogout = () => {
     Alert.alert(
@@ -106,222 +146,138 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation }) => {
     );
   };
 
-  const handleNotificationChange = (key: keyof NotificationSettings, value: boolean) => {
-    setNotifications(prev => ({
-      ...prev,
-      [key]: value,
-    }));
-    // TODO: API call to update preferences
+  const handleNavigate = (screen: keyof ProfileStackParamList) => {
+    navigation.navigate(screen);
   };
 
-  const renderHeader = () => (
-    <View style={styles.header}>
-      <View style={styles.userInfoContainer}>
-        <View style={styles.profileImageContainer}>
-          <View style={styles.profileImage}>
-            <Ionicons name="person" size={40} color="#666" />
-          </View>
-        </View>
-        
-        <View style={styles.userDetails}>
-          <Text style={styles.userName}>{user?.name || 'Kullanıcı'}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'email@example.com'}</Text>
-        </View>
-      </View>
-      
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stats.favoriteCount}</Text>
-          <Text style={styles.statLabel}>Favori</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stats.usedCoupons}</Text>
-          <Text style={styles.statLabel}>Kullanılan</Text>
-        </View>
-        <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>₺{stats.savedAmount}</Text>
-          <Text style={styles.statLabel}>Tasarruf</Text>
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderMenuItem = (
-    icon: string,
-    title: string,
-    subtitle?: string,
-    onPress?: () => void,
-    rightIcon?: string,
-    isDestructive?: boolean
-  ) => (
-    <TouchableOpacity
-      style={styles.menuItem}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View style={[styles.menuIcon, isDestructive && styles.destructiveIcon]}>
-        <Ionicons 
-          name={icon as any} 
-          size={20} 
-          color={isDestructive ? '#f44336' : '#2196F3'} 
-        />
-      </View>
-      <View style={styles.menuContent}>
-        <Text style={[styles.menuTitle, isDestructive && styles.destructiveText]}>
-          {title}
-        </Text>
-        {subtitle && (
-          <Text style={styles.menuSubtitle}>{subtitle}</Text>
-        )}
-      </View>
-      {rightIcon && (
-        <Ionicons name={rightIcon as any} size={20} color="#999" />
-      )}
-    </TouchableOpacity>
-  );
-
-  const renderSwitchMenuItem = (
-    icon: string,
-    title: string,
-    subtitle: string,
-    value: boolean,
-    onValueChange: (value: boolean) => void
-  ) => (
-    <View style={styles.menuItem}>
-      <View style={styles.menuIcon}>
-        <Ionicons name={icon as any} size={20} color="#2196F3" />
-      </View>
-      <View style={styles.menuContent}>
-        <Text style={styles.menuTitle}>{title}</Text>
-        <Text style={styles.menuSubtitle}>{subtitle}</Text>
-      </View>
-      <Switch
-        value={value}
-        onValueChange={onValueChange}
-        trackColor={{ false: '#e0e0e0', true: '#2196F3' }}
-        thumbColor={value ? '#fff' : '#f4f3f4'}
-      />
-    </View>
-  );
-
   if (!user) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.emptyState}>
-          <Ionicons name="person-outline" size={64} color="#ccc" />
-          <Text style={styles.emptyTitle}>Giriş Yapın</Text>
-          <Text style={styles.emptySubtitle}>
-            Profil özelliklerini kullanmak için giriş yapmalısınız
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
+    return null;
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView 
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
-        {renderHeader()}
+    <Container>
+      <Header>
+        <ProfileImage>
+          <Ionicons 
+            name="person" 
+            size={40} 
+            color={theme.colors.primary} 
+          />
+        </ProfileImage>
+        <UserName>{user.name}</UserName>
+        <UserEmail>{user.email}</UserEmail>
+      </Header>
 
-        {/* Account Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Hesap</Text>
-          {renderMenuItem(
-            'person-outline',
-            'Kişisel Bilgiler',
-            'Profil bilgilerinizi düzenleyin',
-            () => navigation.navigate('EditProfile'),
-            'chevron-forward'
-          )}
-          {renderMenuItem(
-            'heart-outline',
-            'Favorilerim',
-            `${stats.favoriteCount} favori kuponunuz var`,
-            () => navigation.navigate('Favorites'),
-            'chevron-forward'
-          )}
-          {renderMenuItem(
-            'time-outline',
-            'Kupon Geçmişi',
-            'Kullandığınız kuponları görün',
-            () => {/* TODO: Navigate to history */},
-            'chevron-forward'
-          )}
-        </View>
+      <Content>
+        {/* Stats Section */}
+        <StatsContainer>
+          <StatItem>
+            <StatValue>₺{user.totalSavings?.toFixed(2) || '0.00'}</StatValue>
+            <StatLabel>Toplam{'\n'}Tasarruf</StatLabel>
+          </StatItem>
+          <StatItem>
+            <StatValue>{user.favoriteCategories?.length || 0}</StatValue>
+            <StatLabel>Favori{'\n'}Kategori</StatLabel>
+          </StatItem>
+          <StatItem>
+            <StatValue>
+              {user.memberSince ? 
+                Math.floor((Date.now() - new Date(user.memberSince).getTime()) / (1000 * 60 * 60 * 24)) 
+                : 0}
+            </StatValue>
+            <StatLabel>Üyelik{'\n'}Günü</StatLabel>
+          </StatItem>
+        </StatsContainer>
 
-        {/* Notifications Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Bildirimler</Text>
-          {renderSwitchMenuItem(
-            'notifications-outline',
-            'Push Bildirimleri',
-            'Yeni kuponlar için bildirim alın',
-            notifications.pushEnabled,
-            (value) => handleNotificationChange('pushEnabled', value)
-          )}
-          {renderSwitchMenuItem(
-            'mail-outline',
-            'E-posta Bildirimleri',
-            'E-posta ile kupon haberleri alın',
-            notifications.emailEnabled,
-            (value) => handleNotificationChange('emailEnabled', value)
-          )}
-          {renderSwitchMenuItem(
-            'megaphone-outline',
-            'Promosyon Bildirimleri',
-            'Özel kampanya bildirimlerini alın',
-            notifications.promotionsEnabled,
-            (value) => handleNotificationChange('promotionsEnabled', value)
-          )}
-        </View>
+        {/* Settings Section */}
+        <Section>
+          <SectionTitle>Ayarlar</SectionTitle>
+          
+          <MenuItem onPress={() => handleNavigate('Notifications')}>
+            <MenuItemIcon>
+              <Ionicons name="notifications-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Bildirimler</MenuItemText>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+
+          <MenuItem onPress={() => handleNavigate('Preferences')}>
+            <MenuItemIcon>
+              <Ionicons name="heart-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Tercihlerim</MenuItemText>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+
+          <MenuItem onPress={() => handleNavigate('Language')}>
+            <MenuItemIcon>
+              <Ionicons name="language-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Dil</MenuItemText>
+            <MenuItemSubtitle>Türkçe</MenuItemSubtitle>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+
+          <MenuItem onPress={() => handleNavigate('Currency')}>
+            <MenuItemIcon>
+              <Ionicons name="card-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Para Birimi</MenuItemText>
+            <MenuItemSubtitle>₺ TRY</MenuItemSubtitle>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+        </Section>
 
         {/* Support Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Destek</Text>
-          {renderMenuItem(
-            'help-circle-outline',
-            'Yardım Merkezi',
-            'Sık sorulan sorular ve destek',
-            () => navigation.navigate('HelpCenter'),
-            'chevron-forward'
-          )}
-          {renderMenuItem(
-            'chatbubble-outline',
-            'İletişim',
-            'Bizimle iletişime geçin',
-            () => navigation.navigate('Contact'),
-            'chevron-forward'
-          )}
-          {renderMenuItem(
-            'document-text-outline',
-            'Gizlilik Politikası',
-            'Gizlilik ve kullanım koşulları',
-            () => navigation.navigate('PrivacyPolicy'),
-            'chevron-forward'
-          )}
-        </View>
+        <Section>
+          <SectionTitle>Destek</SectionTitle>
+          
+          <MenuItem onPress={() => handleNavigate('HelpCenter')}>
+            <MenuItemIcon>
+              <Ionicons name="help-circle-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Yardım</MenuItemText>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+
+          <MenuItem onPress={() => handleNavigate('TermsOfService')}>
+            <MenuItemIcon>
+              <Ionicons name="document-text-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Kullanım Koşulları</MenuItemText>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+
+          <MenuItem onPress={() => handleNavigate('PrivacyPolicy')}>
+            <MenuItemIcon>
+              <Ionicons name="shield-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Gizlilik Politikası</MenuItemText>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+
+          <MenuItem>
+            <MenuItemIcon>
+              <Ionicons name="information-circle-outline" size={16} color={theme.colors.primary} />
+            </MenuItemIcon>
+            <MenuItemText>Hakkında</MenuItemText>
+            <MenuItemSubtitle>Sürüm 1.0.0</MenuItemSubtitle>
+            <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+          </MenuItem>
+        </Section>
 
         {/* Logout Section */}
-        <View style={styles.section}>
-          {renderMenuItem(
-            'log-out-outline',
-            'Çıkış Yap',
-            undefined,
-            handleLogout,
-            undefined,
-            true
-          )}
-        </View>
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-    </SafeAreaView>
+        <Section>
+          <MenuItem onPress={handleLogout} isDestructive>
+            <MenuItemIcon isDestructive>
+              <Ionicons name="log-out-outline" size={16} color={theme.colors.error} />
+            </MenuItemIcon>
+            <MenuItemText isDestructive>Çıkış Yap</MenuItemText>
+          </MenuItem>
+        </Section>
+      </Content>
+    </Container>
   );
-};
+}
 
 export default ProfileScreen;

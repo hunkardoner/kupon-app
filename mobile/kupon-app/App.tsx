@@ -14,7 +14,7 @@ import { AuthProvider, AuthContext } from './src/context/AuthContext';
 import { FavoritesProvider } from './src/context/FavoritesContext';
 
 // Screens
-import { AuthScreen } from './src/components/screens/AuthScreen';
+import { AuthScreen } from './src/screens/auth';
 
 // Services
 import { notificationService } from './src/services/notificationService';
