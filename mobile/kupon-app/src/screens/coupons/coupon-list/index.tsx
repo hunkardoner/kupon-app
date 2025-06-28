@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Dimensions,
   RefreshControl,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,7 +16,7 @@ import { CouponStackParamList } from '../../../navigation/types';
 import { Coupon } from '../../../types';
 import { CouponCard } from '../../../components/common/coupon-card';
 import { FilterModal, FilterOptions } from '../../../components/common/filter-modal';
-import { useCoupons } from '../../../hooks/useQueries';
+import { useInfiniteCoupons } from '../../../hooks/useQueries';
 import { dataAPI } from '../../../api';
 import { styles } from './style';
 
@@ -33,7 +34,6 @@ interface CouponListScreenProps {
 
 const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'popular' | 'ending'>('newest');
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
@@ -43,12 +43,105 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
   });
   const [categories, setCategories] = useState<Array<{ id: number; name: string }>>([]);
 
+  // Backend query parameters - frontend'deki filtreleri backend parametrelerine çevir
+  const queryParams = useMemo(() => {
+    // Frontend sort'u backend parametrelerine map et
+    const getSortParams = (sortBy: string) => {
+      switch (sortBy) {
+        case 'newest':
+          return { sort_by: 'created_at', sort_order: 'desc' };
+        case 'popular':
+          return { sort_by: 'view_count', sort_order: 'desc' };
+        case 'ending':
+          return { sort_by: 'valid_to', sort_order: 'asc' };
+        default:
+          return { sort_by: 'created_at', sort_order: 'desc' };
+      }
+    };
+
+    const params: any = {
+      per_page: 15,
+      ...getSortParams(filters.sortBy || sortBy),
+    };
+
+    // Search query
+    if (searchQuery && searchQuery.trim()) {
+      params.search = searchQuery.trim();
+    }
+
+    // Discount type filter
+    if (filters.discountType && filters.discountType !== 'all') {
+      if (filters.discountType === 'percentage') {
+        params.discount_type = 'percentage';
+      } else if (filters.discountType === 'fixed') {
+        params.discount_type = 'fixed_amount';
+      }
+    }
+
+    // Category filter (category_id backend'de number bekliyor)
+    if (filters.category) {
+      const category = categories.find(cat => cat.name === filters.category);
+      if (category) {
+        params.category_id = category.id;
+      }
+    }
+
+    // Status filter - only available coupons
+    if (filters.onlyAvailable) {
+      params.status = 'active';
+    }
+
+    console.log('Query params for backend:', params);
+    return params;
+  }, [searchQuery, filters, sortBy, categories]);
+
   const {
-    data: coupons,
+    data: infiniteData,
     isLoading,
     error,
     refetch,
-  } = useCoupons();
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteCoupons(queryParams);
+
+  // Tüm kuponları flat array'e çevir ve benzersiz hale getir
+  const allCoupons = useMemo(() => {
+    if (!infiniteData) return [];
+    
+    const allCouponsFlat = infiniteData.pages.flatMap((page: any) => {
+      const coupons = page?.data || page;
+      return Array.isArray(coupons) ? coupons : [];
+    });
+    
+    // Benzersiz kuponları al (ID'ye göre)
+    const uniqueCoupons = allCouponsFlat.filter((coupon: any, index: number, arr: any[]) => 
+      arr.findIndex((c: any) => c.id === coupon.id) === index
+    );
+    
+    console.log('All coupons processing:', {
+      totalPages: infiniteData.pages.length,
+      totalCouponsFlat: allCouponsFlat.length,
+      uniqueCoupons: uniqueCoupons.length,
+      duplicatesRemoved: allCouponsFlat.length - uniqueCoupons.length
+    });
+    
+    return uniqueCoupons;
+  }, [infiniteData]);
+
+  // Backend'den gelen verilerin çoğu zaten filtrelenmiş olduğu için 
+  // burada sadece minimal frontend filtreleme yapıyoruz
+  const displayedCoupons = useMemo(() => {
+    return allCoupons || [];
+  }, [allCoupons]);
+
+  // Total count bilgisini backend'den al
+  const totalCount = useMemo(() => {
+    if (infiniteData?.pages?.[0]?.meta?.total) {
+      return infiniteData.pages[0].meta.total;
+    }
+    return allCoupons?.length || 0;
+  }, [infiniteData, allCoupons]);
 
   // Load categories for filter
   React.useEffect(() => {
@@ -63,58 +156,15 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
     loadCategories();
   }, []);
 
-  const filteredAndSortedCoupons = coupons?.filter(coupon => {
-    // Search query filter
-    if (searchQuery && searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase().trim();
-      const matchesDescription = coupon.description && coupon.description.toLowerCase().includes(query);
-      const matchesBrand = coupon.brand && typeof coupon.brand === 'object' && 
-                          coupon.brand.name && coupon.brand.name.toLowerCase().includes(query);
-      
-      if (!matchesDescription && !matchesBrand) return false;
-    }
-
-    // Discount type filter
-    if (filters.discountType && filters.discountType !== 'all') {
-      if (filters.discountType === 'percentage' && coupon.discount_type !== 'percentage') return false;
-      if (filters.discountType === 'fixed' && coupon.discount_type !== 'fixed_amount') return false;
-    }
-
-    // Category filter
-    if (filters.category) {
-      const hasCategory = coupon.categories?.some(cat => 
-        typeof cat === 'object' && cat.name === filters.category
-      );
-      if (!hasCategory) return false;
-    }
-
-    // Only available filter
-    if (filters.onlyAvailable) {
-      const now = new Date();
-      const expiryDate = coupon.expires_at || coupon.valid_to;
-      if (expiryDate && new Date(expiryDate) < now) return false;
-    }
-
-    return true;
-  }).sort((a, b) => {
-    const sortBy = filters.sortBy || 'newest';
-    switch (sortBy) {
-      case 'newest':
-        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
-      case 'popular':
-        return (b.usage_count || 0) - (a.usage_count || 0);
-      case 'ending':
-        return new Date(a.valid_to || 0).getTime() - new Date(b.valid_to || 0).getTime();
-      default:
-        return 0;
-    }
-  }) || [];
-
   const onRefresh = async () => {
-    setRefreshing(true);
     await refetch();
-    setRefreshing(false);
   };
+
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleCouponPress = useCallback((couponId: number) => {
     navigation.navigate('CouponDetail', { couponId });
@@ -127,13 +177,18 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
     }
   };
 
+  const handleSortChange = (newSort: 'newest' | 'popular' | 'ending') => {
+    setSortBy(newSort);
+    setFilters(prev => ({ ...prev, sortBy: newSort }));
+  };
+
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.headerTop}>
         <View>
           <Text style={styles.headerTitle}>Kuponlar</Text>
           <Text style={styles.headerSubtitle}>
-            {filteredAndSortedCoupons.length} kupon bulundu
+            {totalCount} kupon bulundu
           </Text>
         </View>
         <TouchableOpacity
@@ -177,7 +232,7 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
                 styles.sortButton,
                 sortBy === sort.key && styles.sortButtonActive
               ]}
-              onPress={() => setSortBy(sort.key as any)}
+              onPress={() => handleSortChange(sort.key as any)}
             >
               <Text style={[
                 styles.sortButtonText,
@@ -242,7 +297,17 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
     </View>
   );
 
-  if (isLoading && !refreshing) {
+  const renderLoadingFooter = () => {
+    if (!isFetchingNextPage) return null;
+    return (
+      <View style={styles.loadingFooter}>
+        <ActivityIndicator size="small" color="#007AFF" />
+        <Text style={styles.loadingFooterText}>Daha fazla kupon yükleniyor...</Text>
+      </View>
+    );
+  };
+
+  if (isLoading && displayedCoupons.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
         {renderHeader()}
@@ -263,16 +328,19 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={filteredAndSortedCoupons}
+        data={displayedCoupons}
         renderItem={renderCouponItem}
         keyExtractor={(item: Coupon) => item.id.toString()}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmptyState}
+        ListFooterComponent={renderLoadingFooter}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={isLoading} onRefresh={onRefresh} />
         }
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
       />
       
       <FilterModal

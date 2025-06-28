@@ -61,12 +61,21 @@ apiClient.interceptors.response.use(
 );
 
 interface FetchParams {
-  limit?: number;
-  popular?: boolean;
   page?: number;
+  per_page?: number;
+  limit?: number; // backward compatibility
+  popular?: boolean; // backward compatibility
   brand_id?: number;
   category_id?: number;
+  discount_type?: 'percentage' | 'fixed_amount' | 'campaign' | 'all';
   search?: string;
+  sort_by?: 'created_at' | 'discount_value' | 'usage_count';
+  sort_order?: 'asc' | 'desc';
+  // Frontend mapping helpers
+  sortBy?: 'newest' | 'popular' | 'ending'; // Will be mapped to sort_by
+  status?: 'active' | 'expired' | 'all';
+  min_discount?: number;
+  max_discount?: number;
 }
 
 interface LoginResponse {
@@ -231,68 +240,119 @@ export const dataAPI = {
   },
 
   // Coupons
-  async getCoupons(params?: FetchParams): Promise<Coupon[]> {
-    const response = await apiClient.get('/coupon-codes', { params });
-    console.log('getCoupons API response with params:', params, response.data);
-    // Coupons API returns paginated response with data array
-    let coupons = response.data.data || [];
-    console.log('Parsed coupons:', coupons.length, 'items');
+  async getCoupons(params?: FetchParams): Promise<any> {
+    const apiParams: any = {};
     
-    // Backend filtreleme çalışmıyorsa frontend'de filtrele
-    if (params?.brand_id) {
-      coupons = coupons.filter((coupon: any) => coupon.brand_id === params.brand_id);
-      console.log('Frontend brand filtering applied, remaining coupons:', coupons.length);
+    // Page ve limit parametreleri
+    if (params?.page) apiParams.page = params.page;
+    if (params?.per_page) apiParams.per_page = params.per_page;
+    if (params?.limit && !params.per_page) apiParams.per_page = params.limit; // backward compatibility
+    
+    // Filter parametreleri
+    if (params?.brand_id) apiParams.brand_id = params.brand_id;
+    if (params?.category_id) apiParams.category_id = params.category_id;
+    if (params?.discount_type && params.discount_type !== 'all') {
+      apiParams.discount_type = params.discount_type;
     }
+    if (params?.search) apiParams.search = params.search;
+    if (params?.status && params.status !== 'all') apiParams.status = params.status;
+    if (params?.min_discount) apiParams.min_discount = params.min_discount;
+    if (params?.max_discount) apiParams.max_discount = params.max_discount;
     
-    if (params?.category_id) {
-      coupons = coupons.filter((coupon: any) => {
-        // Kuponun kategorileri array olarak geliyorsa
-        if (Array.isArray(coupon.categories)) {
-          return coupon.categories.some((cat: any) => cat.id === params.category_id);
-        }
-        // Tek kategori ID'si varsa
-        return coupon.category_id === params.category_id;
-      });
-      console.log('Frontend category filtering applied, remaining coupons:', coupons.length);
-    }
-    
-    // Tüm kuponların brand bilgisini kontrol edelim
-    if (coupons.length > 0) {
-      console.log('All coupons brand check:');
-      coupons.slice(0, 3).forEach((coupon: any, index: number) => {
-        console.log(`Coupon ${index + 1}:`, {
-          id: coupon.id,
-          description: coupon.description?.substring(0, 50),
-          brand_id: coupon.brand_id,
-          brand: coupon.brand,
-          brand_type: typeof coupon.brand,
-          has_brand_logo: coupon.brand && typeof coupon.brand === 'object' && coupon.brand.logo ? 'YES' : 'NO',
-        });
-      });
-      
-      // Kuponlarda brand nesnesi gelmediği için, brand listesini de çekelim
-      console.log('Kuponlarda brand bilgisi gelmiyor, brand listesini çekiyoruz...');
-      
-      try {
-        const brandsResponse = await this.getBrands();
-        console.log('Brands loaded for coupon matching:', brandsResponse.length);
-        
-        // Kuponları brand bilgisiyle zenginleştir
-        const enrichedCoupons = coupons.map((coupon: any) => {
-          if (coupon.brand_id && !coupon.brand) {
-            const matchingBrand = brandsResponse.find(brand => brand.id === coupon.brand_id);
-            if (matchingBrand) {
-              coupon.brand = matchingBrand;
-            }
-          }
-          return coupon;
-        });
-        
-        return enrichedCoupons;
-      } catch (error) {
-        console.error('Brand listesi çekilirken hata:', error);
-        return coupons;
+    // Sort parametreleri - Frontend'den backend'e mapping
+    if (params?.sortBy) {
+      // Frontend sort seçeneklerini backend parametrelerine çevir
+      switch (params.sortBy) {
+        case 'newest':
+          apiParams.sort_by = 'created_at';
+          apiParams.sort_order = 'desc';
+          break;
+        case 'popular':
+          apiParams.sort_by = 'usage_count';
+          apiParams.sort_order = 'desc';
+          break;
+        case 'ending':
+          // Ending için backend'de hangi alanı kullanmalıyız? expires_at veya valid_to?
+          // Şimdilik created_at kullanıyoruz, backend dokümantasyonuna göre düzeltilmeli
+          apiParams.sort_by = 'created_at';
+          apiParams.sort_order = 'asc';
+          break;
       }
+    }
+    
+    // Direct backend parameters (override frontend mapping if provided)
+    if (params?.sort_by) apiParams.sort_by = params.sort_by;
+    if (params?.sort_order) apiParams.sort_order = params.sort_order;
+    
+    // Popular backward compatibility
+    if (params?.popular) {
+      apiParams.sort_by = 'usage_count';
+      apiParams.sort_order = 'desc';
+    }
+    
+    console.log('getCoupons API request params:', apiParams);
+    
+    const response = await apiClient.get('/coupon-codes', { params: apiParams });
+    console.log('getCoupons API response:', {
+      success: response.data.success,
+      dataLength: response.data.data?.length,
+      meta: response.data.meta,
+      hasData: !!response.data.data,
+      hasMeta: !!response.data.meta
+    });
+    
+    const responseData = response.data;
+    let coupons = responseData.data || [];
+    const meta = responseData.meta;
+    
+    console.log('API Response Structure:', {
+      success: responseData.success,
+      couponsCount: Array.isArray(coupons) ? coupons.length : 0,
+      meta: meta,
+      isPagedRequest: !!apiParams.page,
+      totalPages: meta?.last_page,
+      currentPage: meta?.current_page,
+      total: meta?.total
+    });
+    
+    // Brand bilgisini zenginleştir (sadece gerekirse)
+    if (coupons.length > 0) {
+      const needsBrandEnrichment = coupons.some((coupon: any) => 
+        coupon.brand_id && !coupon.brand
+      );
+      
+      if (needsBrandEnrichment) {
+        console.log('Kuponlarda brand bilgisi eksik, brand listesini çekiyoruz...');
+        
+        try {
+          const brandsResponse = await this.getBrands();
+          console.log('Brands loaded for coupon matching:', brandsResponse.length);
+          
+          // Kuponları brand bilgisiyle zenginleştir
+          coupons = coupons.map((coupon: any) => {
+            if (coupon.brand_id && !coupon.brand) {
+              const matchingBrand = brandsResponse.find(brand => brand.id === coupon.brand_id);
+              if (matchingBrand) {
+                coupon.brand = matchingBrand;
+              }
+            }
+            return coupon;
+          });
+        } catch (error) {
+          console.error('Brand listesi çekilirken hata:', error);
+        }
+      }
+    }
+    
+    // Pagination bilgisi için full response döndür
+    if (apiParams.page) {
+      return {
+        data: coupons,
+        meta: meta,
+        links: responseData.links,
+        success: responseData.success,
+        message: responseData.message
+      };
     }
     
     return coupons;

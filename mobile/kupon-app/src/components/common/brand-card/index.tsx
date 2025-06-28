@@ -16,6 +16,37 @@ export const BrandCard: React.FC<BrandCardProps> = ({
 }) => {
   const couponCount = item.coupons_count || 0;
   
+  // Logo URL'sini güvenli şekilde al
+  const getLogoUrl = () => {
+    const baseUrl = 'https://www.kuponcepte.com.tr';
+    const defaultLogo = `${baseUrl}/storage/brands/default-brand-logo.png`;
+    
+    // Logo property'si yoksa default logo
+    if (!item.logo) {
+      return defaultLogo;
+    }
+    
+    const logoUrl = item.logo.trim();
+    
+    // Boş string kontrolü
+    if (!logoUrl) {
+      return defaultLogo;
+    }
+    
+    // Eğer URL zaten tam URL ise olduğu gibi kullan
+    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+      return logoUrl;
+    }
+    
+    // Eğer slash ile başlıyorsa direkt base URL ekle
+    if (logoUrl.startsWith('/')) {
+      return `${baseUrl}${logoUrl}`;
+    }
+    
+    // Eğer relative path ise storage path ekle
+    return `${baseUrl}/storage/${logoUrl}`;
+  };
+  
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <View style={[
@@ -23,9 +54,7 @@ export const BrandCard: React.FC<BrandCardProps> = ({
         horizontal && styles.cardContainerHorizontal
       ]}>
         <Image
-          source={{ 
-            uri: item.logo || 'https://via.placeholder.com/150x150?text=Marka' 
-          }}
+          source={{ uri: getLogoUrl() }}
           style={styles.cardImage}
           resizeMode="contain"
         />

@@ -28,13 +28,38 @@ export const CouponCard: React.FC<CouponCardProps> = ({
 
   // Logo URL'sini güvenli şekilde al
   const getLogoUrl = () => {
-    // Önce brand nesnesi varsa logoyu oradan al
-    if (item.brand && typeof item.brand === 'object' && item.brand.logo) {
-      return item.brand.logo;
-    }
+    const baseUrl = 'https://www.kuponcepte.com.tr';
+    const defaultLogo = `${baseUrl}/storage/brands/default-brand-logo.png`;
     
     // Brand nesnesi yoksa default logo
-    return 'https://www.kuponcepte.com.tr/storage/brands/default-brand-logo.png';
+    if (!item.brand || typeof item.brand !== 'object') {
+      return defaultLogo;
+    }
+    
+    // Logo property'si yoksa default logo
+    if (!item.brand.logo) {
+      return defaultLogo;
+    }
+    
+    const logoUrl = item.brand.logo.trim();
+    
+    // Boş string kontrolü
+    if (!logoUrl) {
+      return defaultLogo;
+    }
+    
+    // Eğer URL zaten tam URL ise olduğu gibi kullan
+    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+      return logoUrl;
+    }
+    
+    // Eğer slash ile başlıyorsa direkt base URL ekle
+    if (logoUrl.startsWith('/')) {
+      return `${baseUrl}${logoUrl}`;
+    }
+    
+    // Eğer relative path ise storage path ekle
+    return `${baseUrl}/storage/${logoUrl}`;
   };
 
   const logoUrl = getLogoUrl();

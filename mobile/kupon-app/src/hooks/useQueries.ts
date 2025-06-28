@@ -1,5 +1,5 @@
 // src/hooks/useQueries.ts
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, UseQueryOptions, UseInfiniteQueryOptions } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { dataAPI } from '../api';
 import { Category, Brand, Coupon, Slider } from '../types';
@@ -78,6 +78,49 @@ export const useCoupons = (
     queryKey: queryKeys.coupons(params),
     queryFn: () => dataAPI.getCoupons(params),
     staleTime: 2 * 60 * 1000, // 2 dakika - kuponlar daha sık güncellenebilir
+    ...options,
+  });
+};
+
+// Infinite scroll için yeni hook
+export const useInfiniteCoupons = (
+  params?: any,
+  options?: Omit<UseInfiniteQueryOptions<any, Error>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>
+) => {
+  return useInfiniteQuery({
+    queryKey: ['coupons', 'infinite', params],
+    queryFn: ({ pageParam = 1 }) => {
+      console.log('Fetching page:', pageParam, 'with params:', params);
+      const queryParams = {
+        ...params,
+        page: pageParam,
+        per_page: params?.per_page || 15 // Backend default, kullanıcı özelleştirebilir
+      };
+      return dataAPI.getCoupons(queryParams);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      console.log('getNextPageParam called with:', { 
+        currentPage: lastPage?.meta?.current_page,
+        lastPage: lastPage?.meta?.last_page,
+        totalPages: allPages.length,
+        meta: lastPage?.meta 
+      });
+      
+      // Backend meta bilgisini kullan
+      if (lastPage?.meta) {
+        const { current_page, last_page } = lastPage.meta;
+        if (current_page < last_page) {
+          const nextPage = current_page + 1;
+          console.log('Next page will be:', nextPage);
+          return nextPage;
+        }
+      }
+      
+      console.log('No more pages available');
+      return undefined;
+    },
+    staleTime: 2 * 60 * 1000,
     ...options,
   });
 };

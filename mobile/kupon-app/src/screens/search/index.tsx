@@ -14,6 +14,7 @@ import { useNavigation, NavigationProp } from '@react-navigation/native';
 import { dataAPI } from '../../api';
 import { Coupon } from '../../types';
 import { RootStackParamList } from '../../navigation/types';
+import { CouponCard } from '../../components/common/coupon-card';
 import { styles } from './style';
 
 const SearchScreen: React.FC = () => {
@@ -42,36 +43,11 @@ const SearchScreen: React.FC = () => {
     }
   }, [searchQuery]);
 
-  const handleCouponPress = useCallback((coupon: Coupon) => {
-    navigation.navigate('CouponDetail', { couponId: coupon.id });
-  }, [navigation]);
-
   const renderCouponItem = ({ item }: { item: Coupon }) => (
-    <TouchableOpacity
-      style={styles.couponItem}
-      onPress={() => handleCouponPress(item)}
-    >
-      <View style={styles.couponContent}>
-        <Text style={styles.brandName}>{item.brand?.name}</Text>
-        <Text style={styles.couponTitle} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View style={styles.couponFooter}>
-          <Text style={styles.discountText}>
-            {item.discount_type === 'percentage' 
-              ? `%${item.discount_value} İndirim`
-              : `₺${item.discount_value} İndirim`
-            }
-          </Text>
-          <Text style={styles.expiryText}>
-            {item.valid_to 
-              ? new Date(item.valid_to).toLocaleDateString('tr-TR')
-              : 'Süresiz'
-            }
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+    <CouponCard
+      item={item}
+      onPress={(couponId) => navigation.navigate('CouponDetail', { couponId })}
+    />
   );
 
   const renderEmptyState = () => {

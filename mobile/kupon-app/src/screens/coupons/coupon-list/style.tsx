@@ -285,4 +285,14 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  loadingFooter: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingFooterText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+  },
 });
