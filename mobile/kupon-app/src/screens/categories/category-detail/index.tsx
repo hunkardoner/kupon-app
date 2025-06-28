@@ -46,21 +46,22 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route, navigation }) =>
       setLoading(true);
       setError(null);
 
-      const [categoryData, couponsData] = await Promise.allSettled([
-        dataAPI.getCategory(categoryId),
-        dataAPI.getCoupons({ category_id: categoryId }),
-      ]);
-
-      if (categoryData.status === 'fulfilled') {
-        setCategory(categoryData.value);
-      }
-
-      if (couponsData.status === 'fulfilled') {
-        setCoupons(couponsData.value);
-      }
-
-      if (categoryData.status === 'rejected' && couponsData.status === 'rejected') {
-        setError('Kategori bilgileri yüklenirken bir hata oluştu');
+      // Kategori detayını al (coupon_codes ilişkisi ile birlikte)
+      const categoryData = await dataAPI.getCategory(categoryId);
+      
+      if (categoryData) {
+        setCategory(categoryData);
+        
+        // Backend'den gelen coupon_codes'u kullan
+        if (categoryData.coupon_codes && Array.isArray(categoryData.coupon_codes)) {
+          setCoupons(categoryData.coupon_codes);
+        } else {
+          // Eğer category'de coupon_codes yoksa, API'den kategori bazlı filtreleme yap
+          const couponsData = await dataAPI.getCoupons({ category_id: categoryId });
+          setCoupons(couponsData);
+        }
+      } else {
+        setError('Kategori bulunamadı');
       }
     } catch (err) {
       console.error('Failed to load category data:', err);

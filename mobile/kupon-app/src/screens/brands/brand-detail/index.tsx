@@ -49,21 +49,17 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
       setLoading(true);
       setError(null);
 
-      const [brandData, couponsData] = await Promise.allSettled([
-        dataAPI.getBrand(brandId),
-        dataAPI.getCoupons({ brand_id: brandId }),
-      ]);
-
-      if (brandData.status === 'fulfilled') {
-        setBrand(brandData.value);
-      }
-
-      if (couponsData.status === 'fulfilled') {
-        setCoupons(couponsData.value);
-      }
-
-      if (brandData.status === 'rejected' && couponsData.status === 'rejected') {
-        setError('Marka bilgileri yüklenirken bir hata oluştu');
+      // Marka detayını al
+      const brandData = await dataAPI.getBrand(brandId);
+      
+      if (brandData) {
+        setBrand(brandData);
+        
+        // Brand için kuponları ayrı olarak çek
+        const couponsData = await dataAPI.getCoupons({ brand_id: brandId });
+        setCoupons(couponsData);
+      } else {
+        setError('Marka bulunamadı');
       }
     } catch (err) {
       console.error('Failed to load brand data:', err);

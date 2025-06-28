@@ -233,10 +233,28 @@ export const dataAPI = {
   // Coupons
   async getCoupons(params?: FetchParams): Promise<Coupon[]> {
     const response = await apiClient.get('/coupon-codes', { params });
-    console.log('getCoupons API response:', response.data);
+    console.log('getCoupons API response with params:', params, response.data);
     // Coupons API returns paginated response with data array
-    const coupons = response.data.data || [];
+    let coupons = response.data.data || [];
     console.log('Parsed coupons:', coupons.length, 'items');
+    
+    // Backend filtreleme çalışmıyorsa frontend'de filtrele
+    if (params?.brand_id) {
+      coupons = coupons.filter((coupon: any) => coupon.brand_id === params.brand_id);
+      console.log('Frontend brand filtering applied, remaining coupons:', coupons.length);
+    }
+    
+    if (params?.category_id) {
+      coupons = coupons.filter((coupon: any) => {
+        // Kuponun kategorileri array olarak geliyorsa
+        if (Array.isArray(coupon.categories)) {
+          return coupon.categories.some((cat: any) => cat.id === params.category_id);
+        }
+        // Tek kategori ID'si varsa
+        return coupon.category_id === params.category_id;
+      });
+      console.log('Frontend category filtering applied, remaining coupons:', coupons.length);
+    }
     
     // Tüm kuponların brand bilgisini kontrol edelim
     if (coupons.length > 0) {
