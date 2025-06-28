@@ -1,9 +1,8 @@
-// src/components/common/ErrorDisplay.tsx
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { AppTheme } from '../../theme/theme';
+import { AppTheme } from '../../../theme/theme';
 
 interface ErrorDisplayProps {
   error?: Error | string;

@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 
 interface SectionHeaderProps {
   title: string;
-  onSeeAllPress?: () => void; // "Tümünü Gör" butonu için opsiyonel fonksiyon
+  onSeeAllPress?: () => void;
   seeAllText?: string;
 }
 
@@ -31,9 +31,9 @@ const SeeAllText = styled.Text`
   color: ${({ theme }: any) => theme.colors.primary};
 `;
 
-const SectionHeaderComponent: React.FC<SectionHeaderProps> = React.memo(({
+const SectionHeader: React.FC<SectionHeaderProps> = React.memo(({
   title,
-  onSeeAllPress, // onViewMore -> onSeeAllPress olarak düzeltildi
+  onSeeAllPress,
   seeAllText = 'Tümünü Gör',
 }) => {
   const handlePress = useCallback(() => {
@@ -53,6 +53,6 @@ const SectionHeaderComponent: React.FC<SectionHeaderProps> = React.memo(({
 });
 
 // Display name for better debugging
-SectionHeaderComponent.displayName = 'SectionHeaderComponent';
+SectionHeader.displayName = 'SectionHeader';
 
-export default SectionHeaderComponent;
+export default SectionHeader;

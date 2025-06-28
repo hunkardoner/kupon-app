@@ -1,15 +1,13 @@
 import { StyleSheet } from 'react-native';
-import COLORS from '../../constants/colors'; // Sabit renklerimize göre yolu ayarlayın
+import COLORS from '../../../constants/colors';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    // Arka plan rengini isteğe bağlı olarak ayarlayabilirsiniz
-    // backgroundColor: COLORS.background, 
   },
   title: {
     fontSize: 18,
@@ -22,5 +20,3 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 });
-
-export default styles;

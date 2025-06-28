@@ -18,7 +18,7 @@ import { BrandStackParamList } from '../../../navigation/types';
 import { Brand, Coupon } from '../../../types';
 import { API_BASE_URL, dataAPI } from '../../../api/index';
 import { useFavorites } from '../../../context/FavoritesContext';
-import { CouponCard } from '../../../components/common/CouponCard';
+import { CouponCard } from '../../../components/common/coupon-card';
 import { styles } from './style';
 
 const { width } = Dimensions.get('window');

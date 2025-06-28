@@ -8,7 +8,7 @@ import {
   Switch,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet } from 'react-native';
+import { styles } from './styles';
 
 export interface FilterOptions {
   discountType?: 'percentage' | 'fixed' | 'all';
@@ -148,22 +148,22 @@ export const FilterModal: React.FC<FilterModalProps> = ({
                   key={category.id}
                   style={[
                     styles.optionItem,
-                    filters.category === category.name && styles.selectedOption,
+                    filters.category === category.id.toString() && styles.selectedOption,
                   ]}
                   onPress={() => setFilters({ 
                     ...filters, 
-                    category: filters.category === category.name ? undefined : category.name 
+                    category: filters.category === category.id.toString() ? undefined : category.id.toString() 
                   })}
                 >
                   <Text
                     style={[
                       styles.optionText,
-                      filters.category === category.name && styles.selectedOptionText,
+                      filters.category === category.id.toString() && styles.selectedOptionText,
                     ]}
                   >
                     {category.name}
                   </Text>
-                  {filters.category === category.name && (
+                  {filters.category === category.id.toString() && (
                     <Ionicons name="checkmark" size={20} color="#2196F3" />
                   )}
                 </TouchableOpacity>
@@ -175,7 +175,7 @@ export const FilterModal: React.FC<FilterModalProps> = ({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Diğer Seçenekler</Text>
             <View style={styles.switchItem}>
-              <Text style={styles.switchLabel}>Sadece Aktif Kuponlar</Text>
+              <Text style={styles.switchLabel}>Sadece Geçerli Kuponlar</Text>
               <Switch
                 value={filters.onlyAvailable || false}
                 onValueChange={(value) => setFilters({ ...filters, onlyAvailable: value })}
@@ -198,102 +198,4 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  resetButton: {
-    padding: 8,
-  },
-  resetText: {
-    fontSize: 16,
-    color: '#2196F3',
-    fontWeight: '500',
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  section: {
-    marginTop: 24,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
-  optionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 8,
-    backgroundColor: '#f8f9fa',
-  },
-  selectedOption: {
-    backgroundColor: '#e3f2fd',
-    borderWidth: 1,
-    borderColor: '#2196F3',
-  },
-  optionText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  selectedOptionText: {
-    color: '#2196F3',
-    fontWeight: '500',
-  },
-  switchItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#f8f9fa',
-  },
-  switchLabel: {
-    fontSize: 14,
-    color: '#333',
-  },
-  footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-  },
-  applyButton: {
-    backgroundColor: '#2196F3',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  applyButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  bottomSpacer: {
-    height: 20,
-  },
-});
+export default FilterModal;

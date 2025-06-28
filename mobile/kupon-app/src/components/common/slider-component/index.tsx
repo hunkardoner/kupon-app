@@ -6,8 +6,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import styled from 'styled-components/native';
-import { Slider } from '../../types';
-import { API_BASE_URL } from '../../api/index';
+import { Slider } from '../../../types';
 
 interface SliderComponentProps {
   sliders: Slider[];
@@ -70,7 +69,7 @@ const Description = styled.Text`
 const SliderComponent: React.FC<SliderComponentProps> = ({
   sliders,
   onPressSlider,
-  onPress, // Add the new prop
+  onPress,
 }) => {
   const { width } = useWindowDimensions();
 

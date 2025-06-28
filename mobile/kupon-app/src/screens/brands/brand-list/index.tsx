@@ -17,7 +17,7 @@ import { RouteProp } from '@react-navigation/native';
 import { BrandStackParamList } from '../../../navigation/types';
 import { Brand } from '../../../types';
 import { useBrands } from '../../../hooks/useQueries';
-import { AlphabetFilterModal } from '../../../components/common/AlphabetFilterModal';
+import { AlphabetFilterModal } from '../../../components/common/alphabet-filter-modal';
 import { API_BASE_URL } from '../../../api/index';
 import { styles } from './style';
 
@@ -149,12 +149,6 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
         </Text>
         
         <View style={styles.brandStats}>
-          <Text style={styles.couponCount}>
-            {item.coupons_count && item.coupons_count > 0 
-              ? `${item.coupons_count} kupon` 
-              : 'Kupon yok'
-            }
-          </Text>
           {item.category && (
             <Text style={styles.categoryText} numberOfLines={1}>
               {item.category}

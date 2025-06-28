@@ -1,8 +1,7 @@
-// src/components/common/LoadingSpinner.tsx
 import React from 'react';
 import { ActivityIndicator, ViewStyle } from 'react-native';
 import styled from 'styled-components/native';
-import { AppTheme } from '../../theme/theme';
+import { AppTheme } from '../../../theme/theme';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';

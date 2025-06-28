@@ -13,11 +13,13 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { HomeStackParamList, MainTabParamList, RootStackParamList } from '../../navigation/types';
 import { Category, Slider, Coupon, Brand } from '../../types';
-import SectionHeaderComponent from '../../components/common/SectionHeaderComponent';
-import CardComponent from '../../components/common/CardComponent';
-import SliderComponent from '../../components/common/SliderComponent';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import ErrorDisplay from '../../components/common/ErrorDisplay';
+import SectionHeaderComponent from '../../components/common/section-header';
+import { CouponCard } from '../../components/common/coupon-card';
+import { CategoryCard } from '../../components/common/category-card';
+import { BrandCard } from '../../components/common/brand-card';
+import SliderComponent from '../../components/common/slider-component';
+import LoadingSpinner from '../../components/common/loading-spinner';
+import ErrorDisplay from '../../components/common/error-display';
 import { 
   useCategories, 
   useSliders, 
@@ -105,24 +107,23 @@ const HomeScreen: React.FC = React.memo(() => {
 
   // Memoized render functions to avoid recreation on each render
   const renderCategoryItem = useCallback(({ item }: { item: Category }) => (
-    <CardComponent
-      item={{ ...item, type: 'category' }}
+    <CategoryCard
+      item={item}
       onPress={() => handleCategoryPress(item)}
       horizontal={true}
     />
   ), [handleCategoryPress]);
 
   const renderCouponItem = useCallback(({ item }: { item: Coupon }) => (
-    <CardComponent
-      item={{ ...item, type: 'coupon' }}
+    <CouponCard
+      item={item}
       onPress={() => handleCouponPress(item)}
-      horizontal={true}
     />
   ), [handleCouponPress]);
 
   const renderBrandItem = useCallback(({ item }: { item: Brand }) => (
-    <CardComponent
-      item={{ ...item, type: 'brand' }}
+    <BrandCard
+      item={item}
       onPress={() => handleBrandPress(item)}
       horizontal={true}
     />

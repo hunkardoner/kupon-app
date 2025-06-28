@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from './src/theme';
-import ErrorBoundary from './src/components/common/ErrorBoundary';
+import ErrorBoundary from './src/components/common/error-boundary';
 import { View, ActivityIndicator } from 'react-native';
 
 // Navigation

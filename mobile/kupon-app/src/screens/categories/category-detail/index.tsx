@@ -16,7 +16,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { CategoryStackParamList } from '../../../navigation/types';
 import { Category, Coupon } from '../../../types';
 import { API_BASE_URL, dataAPI } from '../../../api/index';
-import { CouponCard } from '../../../components/common/CouponCard';
+import { CouponCard } from '../../../components/common/coupon-card';
 import { styles } from './style';
 
 const { width } = Dimensions.get('window');

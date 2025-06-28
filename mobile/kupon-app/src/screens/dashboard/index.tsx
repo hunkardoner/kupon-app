@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { usePersonalization } from '../../hooks/usePersonalization';
 import { useFavorites } from '../../context/FavoritesContext';
-import { FavoriteButton } from '../../components/common/FavoriteButton';
+import { FavoriteButton } from '../../components/common/favorite-button';
 import { dataAPI, userAPI } from '../../api';
 import { Coupon, Category, Slider } from '../../types';
 import { styles } from './style';
@@ -51,7 +51,6 @@ export function Dashboard({ navigation }: DashboardProps) {
           return [];
         }),
         dataAPI.getCategories({ limit: 6 }).then(data => {
-          console.log('Categories response:', data);
           return data;
         }).catch(err => {
           console.error('Error loading categories:', err);
@@ -233,8 +232,8 @@ export function Dashboard({ navigation }: DashboardProps) {
                     style={styles.couponImage} 
                   />
                   <FavoriteButton
-                    couponId={coupon.id.toString()}
-                    size="small"
+                    couponId={coupon.id}
+                    size={20}
                     style={styles.favoriteButton}
                   />
                   {('created_at' in coupon) && coupon.created_at && new Date(coupon.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (

@@ -121,10 +121,7 @@ const CategoryListScreen: React.FC<CategoryListScreenProps> = ({ navigation }) =
         <Text style={styles.categoryName} numberOfLines={2}>
           {item.name}
         </Text>
-        
-        <Text style={styles.couponCount}>
-          {couponCount} kupon
-        </Text>
+  
       </TouchableOpacity>
     );
   };
