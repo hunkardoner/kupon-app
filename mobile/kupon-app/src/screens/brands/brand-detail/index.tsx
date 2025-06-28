@@ -18,6 +18,7 @@ import { BrandStackParamList } from '../../../navigation/types';
 import { Brand, Coupon } from '../../../types';
 import { API_BASE_URL, dataAPI } from '../../../api/index';
 import { useFavorites } from '../../../context/FavoritesContext';
+import { CouponCard } from '../../../components/common/CouponCard';
 import { styles } from './style';
 
 const { width } = Dimensions.get('window');
@@ -93,7 +94,7 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
     }
 
     return (
-      <View style={styles.header}>
+      <View style={styles.headerContainer}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -101,18 +102,25 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
 
-        <View style={styles.brandInfo}>
-          <Image
-            source={{
-              uri: logoUrl || 'https://via.placeholder.com/100x100?text=Logo'
-            }}
-            style={styles.brandLogo}
-            resizeMode="contain"
-          />
-          <Text style={styles.brandName}>{brand.name}</Text>
-          {brand.description && (
-            <Text style={styles.brandDescription}>{brand.description}</Text>
-          )}
+        <View style={styles.brandSection}>
+          <View style={styles.brandLogoContainer}>
+            <Image
+              source={{
+                uri: logoUrl || 'https://www.kuponcepte.com.tr/storage/brands/default-brand-logo.png'
+              }}
+              style={styles.brandLogo}
+              resizeMode="contain"
+            />
+          </View>
+          
+          <View style={styles.brandTextInfo}>
+            <Text style={styles.brandName}>{brand.name}</Text>
+            {brand.description && (
+              <Text style={styles.brandDescription} numberOfLines={2}>
+                {brand.description}
+              </Text>
+            )}
+          </View>
         </View>
 
         <View style={styles.statsContainer}>
@@ -140,89 +148,19 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
   };
 
   const renderCouponItem = ({ item }: { item: Coupon }) => {
-    const isFavorite = favorites.includes(item.id.toString());
-    const isExpired = item.expiry_date ? new Date(item.expiry_date) < new Date() : false;
+    // CouponCard bileşeninde brand bilgisi otomatik olarak item.brand'dan alınacak
+    // Eğer brand bilgisi yoksa, mevcut brand bilgisini ekleyelim
+    const couponWithBrand = {
+      ...item,
+      brand: item.brand || brand || undefined
+    };
 
     return (
-      <TouchableOpacity
-        style={[styles.couponCard, isExpired && styles.expiredCard]}
-        onPress={() => handleCouponPress(item.id)}
-        activeOpacity={0.7}
-      >
-        {/* Discount Badge */}
-        {item.discount_amount && (
-          <View style={[styles.discountBadge, isExpired && styles.expiredBadge]}>
-            <Text style={[styles.discountText, isExpired && styles.expiredText]}>
-              {item.discount_type === 'percentage' ? '%' : '₺'}
-              {item.discount_amount}
-            </Text>
-          </View>
-        )}
-
-        {/* Favorite Button */}
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={async () => {
-            try {
-              if (isFavorite) {
-                await removeFavorite(item.id.toString());
-              } else {
-                await addFavorite(item.id.toString());
-              }
-            } catch (error) {
-              console.error('Favorite toggle error:', error);
-            }
-          }}
-        >
-          <Ionicons
-            name={isFavorite ? 'heart' : 'heart-outline'}
-            size={20}
-            color={isFavorite ? '#f44336' : '#666'}
-          />
-        </TouchableOpacity>
-
-        {/* Content */}
-        <View style={styles.couponContent}>
-          <Text style={[styles.couponTitle, isExpired && styles.expiredText]} numberOfLines={2}>
-            {item.title}
-          </Text>
-          
-          {item.description && (
-            <Text style={[styles.couponDescription, isExpired && styles.expiredText]} numberOfLines={2}>
-              {item.description}
-            </Text>
-          )}
-
-          <View style={styles.couponFooter}>
-            <View style={styles.codeContainer}>
-              <Text style={styles.codeLabel}>Kupon Kodu:</Text>
-              <Text style={[styles.codeText, isExpired && styles.expiredText]}>
-                {item.code}
-              </Text>
-            </View>
-
-            {item.expiry_date && (
-              <View style={styles.expiryContainer}>
-                <Ionicons
-                  name="time-outline"
-                  size={14}
-                  color={isExpired ? '#f44336' : '#666'}
-                />
-                <Text style={[styles.expiryText, isExpired && styles.expiredExpiryText]}>
-                  {isExpired ? 'Süresi dolmuş' : new Date(item.expiry_date).toLocaleDateString('tr-TR')}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Status Overlay */}
-        {isExpired && (
-          <View style={styles.expiredOverlay}>
-            <Text style={styles.expiredOverlayText}>Süresi Dolmuş</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+      <CouponCard
+        item={couponWithBrand}
+        onPress={handleCouponPress}
+        showFavorite={true}
+      />
     );
   };
 

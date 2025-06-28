@@ -4,7 +4,6 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Image,
   Dimensions,
   RefreshControl,
   TextInput,
@@ -14,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CouponStackParamList } from '../../../navigation/types';
 import { Coupon } from '../../../types';
-import { FavoriteButton } from '../../../components/common/FavoriteButton';
+import { CouponCard } from '../../../components/common/CouponCard';
 import { FilterModal, FilterOptions } from '../../../components/common/FilterModal';
 import { useCoupons } from '../../../hooks/useQueries';
 import { dataAPI } from '../../../api';
@@ -194,115 +193,12 @@ const CouponListScreen: React.FC<CouponListScreenProps> = ({ navigation }) => {
   );
 
   const renderCouponItem = ({ item }: { item: Coupon }) => {
-    // Debug marka bilgilerini kontrol edelim
-    console.log('Coupon item brand data:', {
-      id: item.id,
-      brand: item.brand,
-      brand_type: typeof item.brand,
-      brand_logo: item.brand && typeof item.brand === 'object' ? item.brand.logo : 'brand not object',
-      brand_logo_full: item.brand && typeof item.brand === 'object' && item.brand.logo ? item.brand.logo : null,
-    });
-
-    const isExpiringSoon = item.valid_to && 
-      new Date(item.valid_to).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
-    const isNew = item.created_at && 
-      new Date(item.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-    // Logo URL'sini güvenli şekilde al
-    const getLogoUrl = () => {
-      // Önce brand nesnesi varsa logoyu oradan al
-      if (item.brand && typeof item.brand === 'object' && item.brand.logo) {
-        console.log('Using logo URL from brand object:', item.brand.logo);
-        return item.brand.logo;
-      }
-      
-      // Brand nesnesi yoksa brand_id'ye göre default logo oluştur
-      if (item.brand_id) {
-        const defaultLogoUrl = `https://www.kuponcepte.com.tr/storage/brands/default-brand-logo.png`;
-        console.log(`No brand object for coupon ${item.id}, brand_id: ${item.brand_id}, using default:`, defaultLogoUrl);
-        return defaultLogoUrl;
-      }
-      
-      console.log('No brand info found for coupon', item.id);
-      return 'https://www.kuponcepte.com.tr/storage/brands/default-brand-logo.png';
-    };
-
-    const logoUrl = getLogoUrl();
-    console.log('Final logo URL for coupon', item.id, ':', logoUrl);
-
     return (
-      <TouchableOpacity
-        style={styles.couponCard}
-        onPress={() => handleCouponPress(item.id)}
-      >
-        <View style={styles.couponImageContainer}>
-          <Image
-            source={{ uri: logoUrl }}
-            style={styles.couponImage}
-            resizeMode="cover"
-            onError={(error) => {
-              console.log('Image load error for coupon', item.id, ':', error.nativeEvent.error);
-            }}
-            onLoad={() => {
-              console.log('Image loaded successfully for coupon', item.id);
-            }}
-          />
-          <FavoriteButton
-            couponId={item.id.toString()}
-            size="small"
-            style={styles.favoriteButton}
-          />
-          {isNew && (
-            <View style={styles.newBadge}>
-              <Text style={styles.newBadgeText}>YENİ</Text>
-            </View>
-          )}
-          {isExpiringSoon && (
-            <View style={styles.expireBadge}>
-              <Text style={styles.expireBadgeText}>BİTİYOR</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.couponContent}>
-          <Text style={styles.couponBrand}>
-            {(item.brand && typeof item.brand === 'object') ? item.brand.name : 'Genel'}
-          </Text>
-          <Text style={styles.couponTitle} numberOfLines={2}>
-            {item.description}
-          </Text>
-          
-          <View style={styles.couponDetails}>
-            <View style={styles.discountContainer}>
-              <Text style={styles.discountText}>
-                {item.discount_type === 'percentage' 
-                  ? `%${item.discount_value}` 
-                  : `₺${item.discount_value}`
-                }
-              </Text>
-              <Text style={styles.discountLabel}>İndirim</Text>
-            </View>
-            
-            {item.valid_to && (
-              <View style={styles.expiryContainer}>
-                <Ionicons name="time" size={14} color="#666" />
-                <Text style={styles.expiryText}>
-                  {new Date(item.valid_to).toLocaleDateString('tr-TR')}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {item.usage_count && item.usage_count > 0 && (
-            <View style={styles.usageContainer}>
-              <Ionicons name="people" size={14} color="#2196F3" />
-              <Text style={styles.usageText}>
-                {item.usage_count} kişi kullandı
-              </Text>
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
+      <CouponCard
+        item={item}
+        onPress={handleCouponPress}
+        showFavorite={true}
+      />
     );
   };
 

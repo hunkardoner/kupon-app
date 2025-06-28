@@ -5,17 +5,25 @@ const { width } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f5f5f5',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+  listContainer: {
+    paddingBottom: 20,
+  },
+  headerContainer: {
     backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    padding: 20,
+    marginBottom: 16,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 8,
   },
   backButton: {
     width: 40,
@@ -24,159 +32,67 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  actionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandSection: {
-    backgroundColor: 'white',
-    paddingVertical: 32,
-    paddingHorizontal: 20,
-    alignItems: 'center',
     marginBottom: 20,
   },
-  brandLogo: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+  brandSection: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  brandLogoContainer: {
     marginBottom: 16,
-    backgroundColor: '#f8f9fa',
+  },
+  brandLogo: {
+    width: 100,
+    height: 100,
+    borderRadius: 12,
+    backgroundColor: '#f0f0f0',
+  },
+  brandTextInfo: {
+    alignItems: 'center',
   },
   brandName: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#212529',
-    textAlign: 'center',
+    color: '#333',
     marginBottom: 8,
+    textAlign: 'center',
   },
   brandDescription: {
     fontSize: 16,
-    color: '#6c757d',
+    color: '#666',
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 20,
+    lineHeight: 22,
+    paddingHorizontal: 20,
   },
-  brandStats: {
+  statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 32,
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 16,
+    padding: 20,
   },
   statItem: {
+    flex: 1,
     alignItems: 'center',
   },
-  statNumber: {
-    fontSize: 24,
+  statDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#e0e0e0',
+  },
+  statValue: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#007bff',
+    color: '#2196F3',
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 14,
-    color: '#6c757d',
-  },
-  sectionHeader: {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#212529',
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: '#6c757d',
-  },
-  couponsList: {
-    paddingHorizontal: 20,
-  },
-  couponItem: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  couponHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  couponTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#212529',
-    flex: 1,
-    marginRight: 12,
-  },
-  discountBadge: {
-    backgroundColor: '#28a745',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  discountText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  couponDescription: {
-    fontSize: 14,
-    color: '#6c757d',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  couponFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  couponCode: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#e9ecef',
-    borderStyle: 'dashed',
-  },
-  couponCodeText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#007bff',
-    letterSpacing: 1,
-  },
-  expiryDate: {
     fontSize: 12,
-    color: '#dc3545',
-    fontWeight: '500',
+    color: '#666',
+    textAlign: 'center',
   },
-  favoriteButton: {
-    padding: 8,
-  },
-  centerContent: {
+  // Loading and error states
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -219,21 +135,13 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  emptyContainer: {
+  // Empty state
+  emptyState: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 40,
     paddingTop: 60,
-  },
-  emptyIcon: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#f8f9fa',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
   },
   emptyTitle: {
     fontSize: 24,
@@ -241,121 +149,12 @@ export const styles = StyleSheet.create({
     color: '#495057',
     marginBottom: 12,
     textAlign: 'center',
+    marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 16,
     color: '#6c757d',
     textAlign: 'center',
     lineHeight: 24,
-  },
-  // Additional styles for brand detail
-  brandInfo: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 16,
-    padding: 20,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 4,
-  },
-  statDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#e0e0e0',
-  },
-  couponCard: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    padding: 16,
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  expiredCard: {
-    opacity: 0.6,
-  },
-  expiredBadge: {
-    backgroundColor: '#999',
-  },
-  expiredText: {
-    color: '#999',
-  },
-  couponContent: {
-    paddingTop: 8,
-  },
-  codeContainer: {
-    flex: 1,
-  },
-  codeLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 2,
-  },
-  codeText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    letterSpacing: 1,
-  },
-  expiryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  expiryText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  expiredExpiryText: {
-    color: '#f44336',
-  },
-  // Missing styles
-  expiredOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  expiredOverlayText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#f44336',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    minHeight: 300,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  listContainer: {
-    paddingBottom: 20,
   },
 });

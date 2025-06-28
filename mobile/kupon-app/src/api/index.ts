@@ -265,7 +265,6 @@ export const dataAPI = {
             const matchingBrand = brandsResponse.find(brand => brand.id === coupon.brand_id);
             if (matchingBrand) {
               coupon.brand = matchingBrand;
-              console.log(`Matched brand for coupon ${coupon.id}:`, matchingBrand.name, matchingBrand.logo);
             }
           }
           return coupon;
