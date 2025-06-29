@@ -130,6 +130,7 @@ const SearchScreen: React.FC = () => {
           data={searchResults}
           renderItem={renderCouponItem}
           keyExtractor={(item) => item.id.toString()}
+          style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContainer}
           ListEmptyComponent={renderEmptyState}

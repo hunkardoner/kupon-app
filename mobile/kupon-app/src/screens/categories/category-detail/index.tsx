@@ -57,8 +57,10 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route, navigation }) =>
           setCoupons(categoryData.coupon_codes);
         } else {
           // Eğer category'de coupon_codes yoksa, API'den kategori bazlı filtreleme yap
-          const couponsData = await dataAPI.getCoupons({ category_id: categoryId });
-          setCoupons(couponsData);
+          const response = await dataAPI.getCoupons({ category_id: categoryId });
+          // API response'unu kontrol et - data field'ı var mı?
+          const couponsData = response?.data || response;
+          setCoupons(Array.isArray(couponsData) ? couponsData : []);
         }
       } else {
         setError('Kategori bulunamadı');

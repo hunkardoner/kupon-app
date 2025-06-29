@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
 import { useFavorites } from '../../../context/FavoritesContext';
 import { Coupon } from '../../../types';
+import { CouponCard } from '../../../components/common/coupon-card';
 import { styles } from './style';
 
 interface FavoritesProps {
@@ -40,8 +41,8 @@ const FavoritesScreen: React.FC<FavoritesProps> = ({ navigation }) => {
     }
   };
 
-  const handleCouponPress = (coupon: Coupon) => {
-    navigation.navigate('CouponDetail', { coupon });
+  const handleCouponPress = (couponId: number) => {
+    navigation.navigate('CouponDetail', { couponId });
   };
 
   const renderHeader = () => (
@@ -60,47 +61,12 @@ const FavoritesScreen: React.FC<FavoritesProps> = ({ navigation }) => {
   );
 
   const renderCouponItem = (coupon: Coupon) => (
-    <TouchableOpacity
+    <CouponCard
       key={coupon.id}
-      style={styles.couponItem}
-      onPress={() => handleCouponPress(coupon)}
-    >
-      <View style={styles.couponContent}>
-        <View style={styles.couponHeader}>
-          <Text style={styles.brandName}>{coupon.brand?.name}</Text>
-          <TouchableOpacity
-            style={styles.favoriteButton}
-            onPress={() => handleRemoveFavorite(coupon.id)}
-          >
-            <Ionicons name="heart" size={20} color="#ff4757" />
-          </TouchableOpacity>
-        </View>
-        
-        <Text style={styles.couponTitle} numberOfLines={2}>
-          {coupon.description}
-        </Text>
-        
-        <View style={styles.couponFooter}>
-          <View style={styles.discountContainer}>
-            {coupon.discount_type === 'percentage' ? (
-              <Text style={styles.discountText}>%{coupon.discount_value} İndirim</Text>
-            ) : (
-              <Text style={styles.discountText}>₺{coupon.discount_value} İndirim</Text>
-            )}
-          </View>
-          
-          <View style={styles.expiryContainer}>
-            <Ionicons name="time-outline" size={14} color="#666" />
-            <Text style={styles.expiryText}>
-              {coupon.expires_at || coupon.valid_to 
-                ? new Date(coupon.expires_at || coupon.valid_to).toLocaleDateString('tr-TR')
-                : 'Süresiz'
-              }
-            </Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+      item={coupon}
+      onPress={handleCouponPress}
+      showFavorite={true}
+    />
   );
 
   const renderEmptyState = () => (

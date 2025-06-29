@@ -114,16 +114,15 @@ const BrandListScreen: React.FC<BrandListScreenProps> = ({ navigation }) => {
 
   const renderBrandItem = ({ item, index }: { item: Brand; index: number }) => {
     // Debug brand logo data
-    console.log('Brand item logo data:', {
-      id: item.id,
-      name: item.name,
-      logo: item.logo,
-      logo_type: typeof item.logo,
-    });
+    // console.log('Brand item logo data:', {
+    //   id: item.id,
+    //   name: item.name,
+    //   logo: item.logo,
+    //   logo_type: typeof item.logo,
+    // });
 
     // Logo URL'sini güvenli şekilde al
     const logoUrl = item.logo; // API'den zaten tam URL geliyor
-    console.log('Final logo URL for brand', item.id, ':', logoUrl);
 
     return (
       <TouchableOpacity

@@ -49,65 +49,6 @@ export const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
   },
-  couponItem: {
-    backgroundColor: 'white',
-    borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  couponContent: {
-    padding: 16,
-  },
-  couponHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  brandName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2196F3',
-  },
-  favoriteButton: {
-    padding: 4,
-  },
-  couponTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-    lineHeight: 22,
-  },
-  couponFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  discountContainer: {
-    backgroundColor: '#4CAF50',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  discountText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  expiryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  expiryText: {
-    fontSize: 12,
-    color: '#666',
-    marginLeft: 4,
-  },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',

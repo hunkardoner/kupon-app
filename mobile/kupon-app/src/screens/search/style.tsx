@@ -76,7 +76,6 @@ export const styles = StyleSheet.create({
   },
   listContainer: {
     padding: 16,
-    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,

@@ -20,32 +20,20 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children, forceDarkMode }: ThemeProviderProps) {
   const [manualDark, setManualDark] = useState<boolean | null>(null);
   
-  // Otomatik dark mode için saat kontrolü
+  // Otomatik dark mode'u devre dışı bırak - sadece manuel kontrol
   const getAutoDarkMode = () => {
-    const hour = new Date().getHours();
-    return hour >= 21 || hour < 6; // 21:00 - 06:00 arası dark mode
+    return false; // Her zaman light mode kullan
   };
 
-  useEffect(() => {
-    // Eğer manuel tema seçimi yoksa, otomatik kontrolü başlat
-    if (manualDark === null && !forceDarkMode) {
-      const interval = setInterval(() => {
-        // Her dakika kontrol et (gerçek uygulamada daha optimize edilebilir)
-      }, 60000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [manualDark, forceDarkMode]);
-
-  // Tema belirleme mantığı
+  // Tema belirleme mantığı - sadece manuel seçim veya forceDarkMode
   const isDark = forceDarkMode ?? 
                  manualDark ?? 
-                 getAutoDarkMode(); // Default olarak light, sadece akşam saatlerinde dark
+                 false; // Default olarak her zaman light mode
   
   const theme = isDark ? darkTheme : lightTheme;
 
   const toggleTheme = () => {
-    setManualDark(prev => prev === null ? !getAutoDarkMode() : !prev);
+    setManualDark(prev => prev === null ? true : !prev);
   };
 
   return (
