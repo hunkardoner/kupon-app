@@ -30,17 +30,25 @@ class RecommendationService {
         headers,
       });
 
+      const jsonResponse = await response.json();
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorMessage = jsonResponse.message || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
-      return data;
-    } catch (error) {
+      // Yeni API formatını eski ApiResponse formatına dönüştür
+      return {
+        success: true,
+        data: jsonResponse.data,
+        message: jsonResponse.message || 'İşlem başarılı',
+      };
+
+    } catch (error: any) {
       console.error('API request failed:', error);
       return {
         success: false,
-        message: 'Ağ hatası oluştu',
+        message: error.message || 'Ağ hatası oluştu',
       };
     }
   }

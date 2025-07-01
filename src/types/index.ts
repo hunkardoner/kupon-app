@@ -20,7 +20,7 @@ export interface Brand {
   slug: string;
   description?: string | null;
   logo?: string | null; // Logo URL'si (backend'den asset() ile tam URL gelir)
-  website_url?: string | null;
+  // website_url?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
