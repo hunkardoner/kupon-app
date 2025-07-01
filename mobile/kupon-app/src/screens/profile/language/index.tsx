@@ -37,7 +37,7 @@ const Content = styled.ScrollView`
   padding: ${({ theme }: any) => theme.spacing.large}px;
 `;
 
-const LanguageItem = styled.TouchableOpacity<{ selected?: boolean }>`
+const LanguageItem = styled.TouchableOpacity<{ selected?: boolean, disabled?: boolean }>`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -48,6 +48,7 @@ const LanguageItem = styled.TouchableOpacity<{ selected?: boolean }>`
   margin-bottom: ${({ theme }: any) => theme.spacing.small}px;
   border: 2px solid ${({ theme, selected }: any) => 
     selected ? theme.colors.primary : 'transparent'};
+  opacity: ${({ disabled }: any) => disabled ? 0.5 : 1};
 `;
 
 const LanguageContent = styled.View`
@@ -114,7 +115,8 @@ export function LanguageScreen({ navigation }: LanguageScreenProps) {
           <LanguageItem
             key={language.code}
             selected={selectedLanguage === language.code}
-            onPress={() => selectLanguage(language.code)}
+            onPress={language.code === 'tr' ? () => selectLanguage(language.code) : undefined}
+            disabled={language.code !== 'tr'}
           >
             <LanguageContent>
               <LanguageFlag>{language.flag}</LanguageFlag>

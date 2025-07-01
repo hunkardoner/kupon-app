@@ -37,7 +37,7 @@ const Content = styled.ScrollView`
   padding: ${({ theme }: any) => theme.spacing.large}px;
 `;
 
-const CurrencyItem = styled.TouchableOpacity<{ selected?: boolean }>`
+const CurrencyItem = styled.TouchableOpacity<{ selected?: boolean, disabled?: boolean }>`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -48,6 +48,7 @@ const CurrencyItem = styled.TouchableOpacity<{ selected?: boolean }>`
   margin-bottom: ${({ theme }: any) => theme.spacing.small}px;
   border: 2px solid ${({ theme, selected }: any) => 
     selected ? theme.colors.primary : 'transparent'};
+  opacity: ${({ disabled }: any) => disabled ? 0.5 : 1};
 `;
 
 const CurrencyContent = styled.View`
@@ -119,7 +120,8 @@ export function CurrencyScreen({ navigation }: CurrencyScreenProps) {
           <CurrencyItem
             key={currency.code}
             selected={selectedCurrency === currency.code}
-            onPress={() => selectCurrency(currency.code)}
+            onPress={currency.code === 'TRY' ? () => selectCurrency(currency.code) : undefined}
+            disabled={currency.code !== 'TRY'}
           >
             <CurrencyContent>
               <CurrencySymbol>{currency.symbol}</CurrencySymbol>
