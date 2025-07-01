@@ -167,7 +167,9 @@ export function Dashboard({ navigation }: DashboardProps) {
 
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => navigation.navigate('Favorites')}
+          onPress={() => navigation.navigate('Profile', { 
+            screen: 'Favorites' 
+          })}
         >
           <Ionicons name="heart" size={24} color="#E91E63" />
           <Text style={styles.actionText}>Favoriler</Text>
@@ -180,7 +182,9 @@ export function Dashboard({ navigation }: DashboardProps) {
 
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => navigation.navigate('Notifications')}
+          onPress={() => navigation.navigate('Profile', { 
+            screen: 'Notifications' 
+          })}
         >
           <Ionicons name="notifications" size={24} color="#9C27B0" />
           <Text style={styles.actionText}>Bildirimler</Text>
