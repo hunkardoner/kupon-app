@@ -3,6 +3,7 @@ import { NavigatorScreenParams } from '@react-navigation/native';
 export type HomeStackParamList = {
   Home: undefined;
   Dashboard: undefined;
+  Recommendations: undefined;
   CouponDetail: { couponId: number };
   BrandDetail: { brandId: number };
   CategoryDetail: { categoryId: number }; // Added for consistency, was commented out
@@ -52,6 +53,7 @@ export type RootStackParamList = {
   CouponDetail: { couponId: number };
   BrandDetail: { brandId: number };
   CategoryDetail: { categoryId: number };
+  Recommendations: undefined;
   // Profile screens
   EditProfile: undefined;
   Favorites: undefined;

@@ -239,4 +239,50 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#333',
   },
+  categoryCount: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  brandsSection: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginBottom: 10,
+  },
+  brandsScroll: {
+    marginHorizontal: -10,
+  },
+  brandCard: {
+    width: 100,
+    marginHorizontal: 8,
+    alignItems: 'center',
+  },
+  brandLogoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#f8f9fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    overflow: 'hidden',
+  },
+  brandLogo: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    resizeMode: 'contain',
+  },
+  brandName: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  brandCouponCount: {
+    fontSize: 10,
+    color: '#666',
+    textAlign: 'center',
+  },
 });

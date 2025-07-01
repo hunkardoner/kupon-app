@@ -27,22 +27,77 @@ interface DashboardProps {
 export function Dashboard({ navigation }: DashboardProps) {
   const { user, isAuthenticated } = useAuth();
   const { personalizedCoupons, isLoading, generateRecommendations } = usePersonalization();
-  const { favorites } = useFavorites();
+  const { favorites, favoriteBrands, favoriteCoupons } = useFavorites();
   const [refreshing, setRefreshing] = useState(false);
   const [popularCoupons, setPopularCoupons] = useState<Coupon[]>([]);
+  const [favoriteBrandCoupons, setFavoriteBrandCoupons] = useState<Coupon[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [popularBrands, setPopularBrands] = useState<any[]>([]);
   const [sliders, setSliders] = useState<Slider[]>([]);
 
   useEffect(() => {
     loadDashboardData();
   }, []);
 
+  useEffect(() => {
+    if (isAuthenticated && favoriteBrands.length > 0) {
+      loadFavoriteBrandCoupons();
+    }
+  }, [isAuthenticated, favoriteBrands]);
+
+  const loadFavoriteBrandCoupons = async () => {
+    try {
+      if (!isAuthenticated || favoriteBrands.length === 0) {
+        setFavoriteBrandCoupons([]);
+        return;
+      }
+
+      console.log('Loading coupons from favorite brands:', favoriteBrands.map(b => b.name));
+      
+      // Favori markalardan kuponları getir
+      const brandIds = favoriteBrands.map(brand => brand.id);
+      const allCoupons: Coupon[] = [];
+
+      // Her marka için kuponları getir
+      for (const brandId of brandIds) {
+        try {
+          const brandCoupons = await dataAPI.getCoupons({ 
+            brand_id: brandId, 
+            limit: 3,
+            sort_by: 'created_at',
+            sort_order: 'desc'
+          });
+          if (Array.isArray(brandCoupons)) {
+            allCoupons.push(...brandCoupons);
+          }
+        } catch (error) {
+          console.error(`Error loading coupons for brand ${brandId}:`, error);
+        }
+      }
+
+      // Tarihe göre sırala (en yeni önce) ve 5-6 kupon al
+      const sortedCoupons = allCoupons
+        .sort((a, b) => {
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA;
+        })
+        .slice(0, 6);
+
+      console.log('Loaded favorite brand coupons:', sortedCoupons.length);
+      setFavoriteBrandCoupons(sortedCoupons);
+    } catch (error) {
+      console.error('Error loading favorite brand coupons:', error);
+      setFavoriteBrandCoupons([]);
+    }
+  };
+
   const loadDashboardData = async () => {
     try {
       console.log('Loading dashboard data...');
       
       // Load public data
-      const [popularData, categoriesData, slidersData] = await Promise.all([
+      const [popularData, categoriesData, brandsData, slidersData] = await Promise.all([
         dataAPI.getCoupons({ limit: 10, popular: true }).then(data => {
           console.log('Coupons response:', data);
           return data;
@@ -51,9 +106,33 @@ export function Dashboard({ navigation }: DashboardProps) {
           return [];
         }),
         dataAPI.getCategories({ limit: 6 }).then(data => {
+          // Kategorileri kupon sayısına göre sırala
+          if (Array.isArray(data)) {
+            const sortedCategories = data.sort((a, b) => {
+              const countA = (a as any).coupons_count || (a as any).coupon_codes_count || (a as any).coupon_count || 0;
+              const countB = (b as any).coupons_count || (b as any).coupon_codes_count || (b as any).coupon_count || 0;
+              return countB - countA;
+            });
+            return sortedCategories;
+          }
           return data;
         }).catch(err => {
           console.error('Error loading categories:', err);
+          return [];
+        }),
+        dataAPI.getBrands({ limit: 8 }).then(data => {
+          // Markaları kupon sayısına göre sırala
+          if (Array.isArray(data)) {
+            const sortedBrands = data.sort((a, b) => {
+              const countA = (a as any).coupons_count || (a as any).coupon_codes_count || (a as any).coupon_count || 0;
+              const countB = (b as any).coupons_count || (b as any).coupon_codes_count || (b as any).coupon_count || 0;
+              return countB - countA;
+            });
+            return sortedBrands;
+          }
+          return data;
+        }).catch(err => {
+          console.error('Error loading brands:', err);
           return [];
         }),
         dataAPI.getSliders().then(data => {
@@ -67,10 +146,12 @@ export function Dashboard({ navigation }: DashboardProps) {
 
       console.log('Popular coupons count:', Array.isArray(popularData) ? popularData.length : 'Not array');
       console.log('Categories count:', Array.isArray(categoriesData) ? categoriesData.length : 'Not array');
+      console.log('Brands count:', Array.isArray(brandsData) ? brandsData.length : 'Not array');
       console.log('Sliders count:', Array.isArray(slidersData) ? slidersData.length : 'Not array');
 
       setPopularCoupons(popularData || []);
       setCategories(categoriesData || []);
+      setPopularBrands(brandsData || []);
       setSliders(slidersData || []);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -81,14 +162,34 @@ export function Dashboard({ navigation }: DashboardProps) {
     setRefreshing(true);
     await Promise.all([
       loadDashboardData(),
-      generateRecommendations()
+      generateRecommendations(),
+      loadFavoriteBrandCoupons()
     ]);
     setRefreshing(false);
   };
 
   const calculateTotalSavings = () => {
-    // Get from user profile or analytics
-    return user?.totalSavings || 0;
+    // Bu fonksiyon backend'den kullanılan kuponların toplamını alacak
+    // Şimdilik basit bir hesaplama yapıyoruz
+    let totalSavings = 0;
+    
+    // Favori kuponlardaki fixed amount indirimlerini hesapla
+    favoriteCoupons.forEach(coupon => {
+      if (coupon.discount_type === 'fixed_amount' && coupon.discount_value) {
+        totalSavings += Number(coupon.discount_value);
+      }
+    });
+    
+    // Favori brand kuponlarından da ekle
+    favoriteBrandCoupons.forEach(coupon => {
+      if (('discount_type' in coupon && coupon.discount_type === 'fixed_amount') && 
+          ('discount_value' in coupon && coupon.discount_value)) {
+        totalSavings += Number(coupon.discount_value);
+      }
+    });
+    
+    // TODO: Backend'den gerçek kullanım verilerini al
+    return user?.totalSavings || totalSavings;
   };
 
   const getGreeting = () => {
@@ -182,28 +283,45 @@ export function Dashboard({ navigation }: DashboardProps) {
 
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => navigation.navigate('Profile', { 
-            screen: 'Notifications' 
-          })}
+          onPress={() => navigation.navigate('Brands')}
         >
-          <Ionicons name="notifications" size={24} color="#9C27B0" />
-          <Text style={styles.actionText}>Bildirimler</Text>
+          <Ionicons name="storefront" size={24} color="#9C27B0" />
+          <Text style={styles.actionText}>Markalar</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
   const renderPersonalizedCoupons = () => {
-    const couponsToShow = isAuthenticated ? personalizedCoupons : popularCoupons;
-    console.log('Rendering coupons:', couponsToShow.length, 'items');
+    // Kullanıcı giriş yapmışsa ve favori markaları varsa onlardan kuponları göster
+    // Yoksa popüler kuponları göster
+    let couponsToShow: Coupon[] = [];
+    let sectionTitle = '';
+    let isFromFavoriteBrands = false;
+    let isFromPersonalized = false;
+    
+    if (isAuthenticated && favoriteBrandCoupons.length > 0) {
+      couponsToShow = favoriteBrandCoupons;
+      sectionTitle = 'Favori Markalarınızdan Yeni Kuponlar';
+      isFromFavoriteBrands = true;
+    } else if (isAuthenticated && personalizedCoupons.length > 0) {
+      couponsToShow = personalizedCoupons.map(pc => ({...pc} as Coupon));
+      sectionTitle = 'Sizin İçin Öneriler';
+      isFromPersonalized = true;
+    } else {
+      couponsToShow = popularCoupons;
+      sectionTitle = isAuthenticated ? 'Sizin İçin Önerilenler' : 'Popüler Kuponlar';
+    }
+    
+    console.log('Rendering coupons:', couponsToShow.length, 'items, section:', sectionTitle);
     
     return (
       <View style={styles.personalizedSection}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>
-            {isAuthenticated ? 'Sizin İçin Öneriler' : 'Popüler Kuponlar'}
+            {sectionTitle}
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('AllCoupons')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Recommendations')}>
             <Text style={styles.viewAllText}>Tümünü Gör</Text>
           </TouchableOpacity>
         </View>
@@ -211,7 +329,7 @@ export function Dashboard({ navigation }: DashboardProps) {
         {couponsToShow.length === 0 ? (
           <View style={styles.emptyCouponsContainer}>
             <Text style={styles.emptyCouponsText}>
-              {isAuthenticated ? 'Henüz kişiselleştirilmiş kupon yok' : 'Kupon bulunamadı'}
+              {isAuthenticated ? 'Henüz kupon yok. Markaları takip ederek kişisel öneriler alabilirsiniz!' : 'Kupon bulunamadı'}
             </Text>
           </View>
         ) : (
@@ -220,7 +338,7 @@ export function Dashboard({ navigation }: DashboardProps) {
             showsHorizontalScrollIndicator={false}
             style={styles.couponsScroll}
           >
-            {couponsToShow.slice(0, 10).map((coupon) => (
+            {couponsToShow.slice(0, 6).map((coupon) => (
               <TouchableOpacity
                 key={coupon.id}
                 style={styles.couponCard}
@@ -231,9 +349,11 @@ export function Dashboard({ navigation }: DashboardProps) {
                     source={{ 
                       uri: (('brand' in coupon && coupon.brand && typeof coupon.brand === 'object') 
                         ? coupon.brand.logo 
-                        : null) || 'https://via.placeholder.com/150x120' 
+                        : null) || 'https://via.placeholder.com/150x120?text=Logo' 
                     }} 
-                    style={styles.couponImage} 
+                    style={styles.couponImage}
+                    onError={() => console.log('Image load error for coupon:', coupon.id)}
+                    defaultSource={{ uri: 'https://via.placeholder.com/150x120?text=Logo' }}
                   />
                   <FavoriteButton
                     couponId={coupon.id}
@@ -243,6 +363,11 @@ export function Dashboard({ navigation }: DashboardProps) {
                   {('created_at' in coupon) && coupon.created_at && new Date(coupon.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
                     <View style={styles.newBadge}>
                       <Text style={styles.newBadgeText}>YENİ</Text>
+                    </View>
+                  )}
+                  {isFromFavoriteBrands && (
+                    <View style={[styles.newBadge, { backgroundColor: '#E91E63', top: 8, right: 8 }]}>
+                      <Text style={styles.newBadgeText}>♥</Text>
                     </View>
                   )}
                 </View>
@@ -264,7 +389,16 @@ export function Dashboard({ navigation }: DashboardProps) {
                         : 'İndirim'}
                   </Text>
                   
-                  {isAuthenticated && (personalizedCoupons.find(p => p.id === coupon.id) as any)?.reason && (
+                  {isFromFavoriteBrands && (
+                    <View style={styles.reasonContainer}>
+                      <Ionicons name="heart" size={12} color="#E91E63" />
+                      <Text style={styles.reasonText} numberOfLines={1}>
+                        Favori markanızdan
+                      </Text>
+                    </View>
+                  )}
+                  
+                  {isFromPersonalized && (personalizedCoupons.find(p => p.id === coupon.id) as any)?.reason && (
                     <View style={styles.reasonContainer}>
                       <Ionicons name="bulb" size={12} color="#FF9800" />
                       <Text style={styles.reasonText} numberOfLines={1}>
@@ -300,9 +434,62 @@ export function Dashboard({ navigation }: DashboardProps) {
                 onPress={() => navigation.navigate('CategoryDetail', { categoryId: category.id })}
               >
                 <Text style={styles.categoryName}>{category.name}</Text>
+                <Text style={styles.categoryCount}>
+                  {(category as any).coupons_count || (category as any).coupon_codes_count || (category as any).coupon_count || 0} kupon
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
+        )}
+      </View>
+    );
+  };
+
+  const renderPopularBrands = () => {
+    console.log('Rendering brands:', popularBrands.length, 'items');
+    
+    return (
+      <View style={styles.brandsSection}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Popüler Markalar</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Brands')}>
+            <Text style={styles.viewAllText}>Tümünü Gör</Text>
+          </TouchableOpacity>
+        </View>
+        {popularBrands.length === 0 ? (
+          <View style={styles.emptyCouponsContainer}>
+            <Text style={styles.emptyCouponsText}>Marka bulunamadı</Text>
+          </View>
+        ) : (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.brandsScroll}
+          >
+            {popularBrands.slice(0, 8).map((brand) => (
+              <TouchableOpacity
+                key={brand.id}
+                style={styles.brandCard}
+                onPress={() => navigation.navigate('BrandDetail', { brandId: brand.id })}
+              >
+                <View style={styles.brandLogoContainer}>
+                  <Image 
+                    source={{ 
+                      uri: brand.logo || 'https://via.placeholder.com/80x80?text=Logo' 
+                    }} 
+                    style={styles.brandLogo}
+                    defaultSource={{ uri: 'https://via.placeholder.com/80x80?text=Logo' }}
+                  />
+                </View>
+                <Text style={styles.brandName} numberOfLines={1}>
+                  {brand.name}
+                </Text>
+                <Text style={styles.brandCouponCount}>
+                  {(brand as any).coupons_count || (brand as any).coupon_codes_count || (brand as any).coupon_count || 0} kupon
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         )}
       </View>
     );
@@ -319,6 +506,7 @@ export function Dashboard({ navigation }: DashboardProps) {
       {renderQuickActions()}
       {renderPersonalizedCoupons()}
       {renderCategories()}
+      {renderPopularBrands()}
     </ScrollView>
   );
 }

@@ -16,6 +16,7 @@ import {
 
 import HomeScreen from '../screens/home'; // Updated to new folder structure
 import { Dashboard } from '../screens/dashboard';
+import RecommendationsScreen from '../screens/recommendations';
 import CouponListScreen from '../screens/coupons/coupon-list'; // Yeni klasör yapısı
 import BrandListScreen from '../screens/brands/brand-list'; // Yeni klasör yapısı
 import CouponScreen from '../screens/coupons/coupon-detail'; // Yeni klasör yapısı
@@ -63,6 +64,11 @@ function HomeStackNavigator() {
         name="Dashboard"
         component={Dashboard}
         options={{ title: 'Dashboard' }}
+      />
+      <HomeStack.Screen
+        name="Recommendations"
+        component={RecommendationsScreen}
+        options={{ title: 'Öneriler' }}
       />
       {/* Detail screens are typically part of their respective stacks or a common modal stack */}
       {/* For navigating from Home to details in other tabs, the navigation action will target the tab first */}
@@ -368,6 +374,13 @@ function AppNavigator(): React.JSX.Element {
             <RootStack.Screen 
               name="CategoryDetail" 
               component={CategoryScreen}
+              options={{ headerShown: false }}
+            />
+            
+            {/* Recommendations Screen */}
+            <RootStack.Screen 
+              name="Recommendations" 
+              component={RecommendationsScreen}
               options={{ headerShown: false }}
             />
             

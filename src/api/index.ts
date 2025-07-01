@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { Category, Brand, Coupon, Slider, User } from '../types';
 
-export const API_BASE_URL = 'https://www.kuponcepte.com.tr/api';
+export const API_BASE_URL = 'http://localhost:8000/api';
 
 // Platform-aware storage
 const getStorageItem = async (key: string) => {
@@ -458,6 +458,17 @@ export const userAPI = {
 
   async toggleFavorite(couponId: number): Promise<{ is_favorite: boolean }> {
     const response = await apiClient.post('/favorites/toggle', { coupon_id: couponId });
+    // API response: { success: boolean, favorited: boolean, message: string }
+    return { 
+      is_favorite: response.data.favorited || false 
+    };
+  },
+
+  async toggleBrandFavorite(brandId: number): Promise<{ is_favorite: boolean }> {
+    const response = await apiClient.post('/favorites/toggle', { 
+      favoritable_type: 'App\\Models\\Brand',
+      favoritable_id: brandId 
+    });
     // API response: { success: boolean, favorited: boolean, message: string }
     return { 
       is_favorite: response.data.favorited || false 
