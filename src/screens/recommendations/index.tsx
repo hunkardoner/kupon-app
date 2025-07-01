@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  ScrollView,
+  FlatList,
   TouchableOpacity,
   Image,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { usePersonalization } from '../../hooks/usePersonalization';
 import { useFavorites } from '../../context/FavoritesContext';
 import { FavoriteButton } from '../../components/common/favorite-button';
+import { CouponCard } from '../../components/common/coupon-card';
 import { dataAPI } from '../../api';
 import { Coupon } from '../../types';
 import { styles } from './style'
@@ -99,132 +101,93 @@ export function Recommendations({ navigation }: RecommendationsProps) {
     setRefreshing(false);
   };
 
-  const renderCouponCard = (coupon: Coupon, source: 'favorite' | 'personalized' | 'popular') => (
-    <TouchableOpacity
-      key={`${coupon.id}-${source}`}
-      style={styles.couponCard}
-      onPress={() => navigation.navigate('CouponDetail', { couponId: coupon.id })}
-    >
-      <View style={styles.couponImageContainer}>
-        <Image 
-          source={{ 
-            uri: (('brand' in coupon && coupon.brand && typeof coupon.brand === 'object') 
-              ? coupon.brand.logo 
-              : null) || 'https://via.placeholder.com/150x120?text=Logo' 
-          }} 
-          style={styles.couponImage}
-          defaultSource={{ uri: 'https://via.placeholder.com/150x120?text=Logo' }}
-        />
-        <FavoriteButton
-          couponId={coupon.id}
-          size={20}
-          style={styles.favoriteButton}
-        />
-        {('created_at' in coupon) && coupon.created_at && new Date(coupon.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) && (
-          <View style={styles.newBadge}>
-            <Text style={styles.newBadgeText}>YENİ</Text>
-          </View>
-        )}
-        {source === 'favorite' && (
-          <View style={[styles.newBadge, { backgroundColor: '#E91E63', top: 8, right: 8 }]}>
-            <Text style={styles.newBadgeText}>♥</Text>
-          </View>
-        )}
-      </View>
+  const renderCouponCard = (coupon: Coupon, source: 'favorite' | 'personalized' | 'popular') => {
+    const handleCouponPress = (couponId: number) => {
+      navigation.navigate('CouponDetail', { couponId });
+    };
 
-      <View style={styles.couponContent}>
-        <Text style={styles.couponBrand} numberOfLines={1}>
-          {('brand' in coupon && coupon.brand && typeof coupon.brand === 'object') 
-            ? coupon.brand.name 
-            : 'Genel'}
-        </Text>
-        <Text style={styles.couponTitle} numberOfLines={2}>
-          {coupon.description || 'Kupon'}
-        </Text>
-        <Text style={styles.couponDiscount}>
-          {('discount_type' in coupon && coupon.discount_type === 'percentage') 
-            ? `%${coupon.discount_value} İndirim`
-            : ('discount_value' in coupon) 
-              ? `₺${coupon.discount_value} İndirim`
-              : 'İndirim'}
-        </Text>
+    return (
+      <View key={`${coupon.id}-${source}`} style={styles.couponWrapper}>
+        <CouponCard
+          item={coupon}
+          onPress={handleCouponPress}
+          showFavorite={true}
+        />
         
+        {/* Source badge */}
         {source === 'favorite' && (
-          <View style={styles.reasonContainer}>
-            <Ionicons name="heart" size={12} color="#E91E63" />
-            <Text style={styles.reasonText} numberOfLines={1}>
-              Favori markanızdan
-            </Text>
+          <View style={[styles.sourceBadge, { backgroundColor: '#E91E63' }]}>
+            <Ionicons name="heart" size={12} color="#FFF" />
+            <Text style={styles.sourceBadgeText}>Favori</Text>
           </View>
         )}
         
-        {source === 'personalized' && (personalizedCoupons.find(p => p.id === coupon.id) as any)?.reason && (
-          <View style={styles.reasonContainer}>
-            <Ionicons name="bulb" size={12} color="#FF9800" />
-            <Text style={styles.reasonText} numberOfLines={1}>
-              {(personalizedCoupons.find(p => p.id === coupon.id) as any)?.reason}
-            </Text>
+        {source === 'personalized' && (
+          <View style={[styles.sourceBadge, { backgroundColor: '#FF9800' }]}>
+            <Ionicons name="bulb" size={12} color="#FFF" />
+            <Text style={styles.sourceBadgeText}>Önerilen</Text>
           </View>
         )}
       </View>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Öneriler yükleniyor...</Text>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Öneriler yükleniyor...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
+  // Tüm kuponları tek bir array'de birleştir
+  const allCoupons = [
+    ...favoriteBrandCoupons.map(coupon => ({ ...coupon, source: 'favorite' as const })),
+    ...personalizedCoupons.map(coupon => ({ ...coupon as Coupon, source: 'personalized' as const })),
+    ...popularCoupons.map(coupon => ({ ...coupon, source: 'popular' as const }))
+  ];
+
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={24} color="#333" />
+      </TouchableOpacity>
+      <Text style={styles.headerTitle}>Tüm Öneriler</Text>
+    </View>
+  );
+
+  const renderCouponItem = ({ item }: { item: Coupon & { source: 'favorite' | 'personalized' | 'popular' } }) => {
+    return renderCouponCard(item, item.source);
+  };
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyState}>
+      <Ionicons name="heart-outline" size={64} color="#ccc" />
+      <Text style={styles.emptyTitle}>Henüz öneri yok</Text>
+      <Text style={styles.emptySubtitle}>
+        Sizin için özel kuponlar hazırlanıyor. Favori markalarınızı ekleyerek kişiselleştirilmiş öneriler alabilirsiniz.
+      </Text>
+    </View>
+  );
+
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Tüm Öneriler</Text>
-      </View>
-
-      {/* Favori Markalardan Kuponlar */}
-      {isAuthenticated && favoriteBrandCoupons.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Favori Markalarınızdan</Text>
-          <View style={styles.couponsGrid}>
-            {favoriteBrandCoupons.map(coupon => renderCouponCard(coupon, 'favorite'))}
-          </View>
-        </View>
-      )}
-
-      {/* Kişiselleştirilmiş Öneriler */}
-      {isAuthenticated && personalizedCoupons.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sizin İçin Özel</Text>
-          <View style={styles.couponsGrid}>
-            {personalizedCoupons.map(coupon => renderCouponCard(coupon as Coupon, 'personalized'))}
-          </View>
-        </View>
-      )}
-
-      {/* Popüler Kuponlar */}
-      {popularCoupons.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {isAuthenticated ? 'Diğer Popüler Kuponlar' : 'Popüler Kuponlar'}
-          </Text>
-          <View style={styles.couponsGrid}>
-            {popularCoupons.map(coupon => renderCouponCard(coupon, 'popular'))}
-          </View>
-        </View>
-      )}
-    </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={allCoupons}
+        renderItem={renderCouponItem}
+        keyExtractor={(item) => `${item.id}-${item.source}`}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmptyState}
+        contentContainerStyle={styles.listContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
+    </SafeAreaView>
   );
 }
 

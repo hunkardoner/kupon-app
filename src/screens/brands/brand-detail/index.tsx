@@ -37,6 +37,9 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMorePages, setHasMorePages] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
 
@@ -44,35 +47,86 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
     loadBrandData();
   }, [brandId]);
 
-  const loadBrandData = async () => {
+  const loadBrandData = async (page = 1, append = false) => {
     try {
-      setLoading(true);
+      if (page === 1) setLoading(true);
+      else setLoadingMore(true);
       setError(null);
 
-      // Marka detayını al
-      const brandData = await dataAPI.getBrand(brandId);
-      
-      if (brandData) {
-        setBrand(brandData);
-        
-        // Brand için kuponları ayrı olarak çek
-        const couponsData = await dataAPI.getCoupons({ brand_id: brandId });
-        setCoupons(couponsData);
-      } else {
-        setError('Marka bulunamadı');
+      // İlk sayfa için marka detayını da al
+      if (page === 1) {
+        const brandData = await dataAPI.getBrand(brandId);
+        if (brandData) {
+          setBrand(brandData);
+        } else {
+          setError('Marka bulunamadı');
+          return;
+        }
       }
+
+      // Brand için kuponları çek
+      const response = await dataAPI.getCoupons({ 
+        brand_id: brandId, 
+        page: page, 
+        per_page: 15 
+      });
+
+      if (response && response.data) {
+        const newCoupons = Array.isArray(response.data) ? response.data : response;
+        if (append) {
+          // Duplicate kuponları filtrele
+          setCoupons(prev => {
+            const existingIds = new Set(prev.map(coupon => coupon.id));
+            const uniqueNewCoupons = newCoupons.filter((coupon: Coupon) => !existingIds.has(coupon.id));
+            return [...prev, ...uniqueNewCoupons];
+          });
+        } else {
+          setCoupons(newCoupons);
+        }
+        
+        // Meta bilgilerini kontrol et
+        if (response.meta) {
+          setHasMorePages(response.meta.has_more_pages || page < response.meta.last_page);
+        } else {
+          setHasMorePages(newCoupons.length === 15); // Eğer meta yoksa, coupon sayısına göre tahmin et
+        }
+      } else {
+        const newCoupons = Array.isArray(response) ? response : [];
+        if (append) {
+          // Duplicate kuponları filtrele
+          setCoupons(prev => {
+            const existingIds = new Set(prev.map(coupon => coupon.id));
+            const uniqueNewCoupons = newCoupons.filter((coupon: Coupon) => !existingIds.has(coupon.id));
+            return [...prev, ...uniqueNewCoupons];
+          });
+        } else {
+          setCoupons(newCoupons);
+        }
+        setHasMorePages(false);
+      }
+
+      setCurrentPage(page);
     } catch (err) {
       console.error('Failed to load brand data:', err);
       setError('Marka bilgileri yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadBrandData();
+    setCurrentPage(1);
+    setHasMorePages(true);
+    await loadBrandData(1, false);
     setRefreshing(false);
+  };
+
+  const loadMore = async () => {
+    if (!loadingMore && hasMorePages && !loading && !refreshing) {
+      await loadBrandData(currentPage + 1, true);
+    }
   };
 
   const handleCouponPress = (couponId: number) => {
@@ -185,12 +239,22 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
         <Ionicons name="alert-circle-outline" size={64} color="#f44336" />
         <Text style={styles.errorTitle}>Bir hata oluştu</Text>
         <Text style={styles.errorSubtitle}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={loadBrandData}>
+        <TouchableOpacity style={styles.retryButton} onPress={() => loadBrandData(1, false)}>
           <Text style={styles.retryButtonText}>Tekrar Dene</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color="#2196F3" />
+        <Text style={styles.footerLoaderText}>Daha fazla kupon yükleniyor...</Text>
+      </View>
+    );
+  };
 
   if (loading) {
     return renderLoadingState();
@@ -208,11 +272,15 @@ const BrandDetailScreen: React.FC<BrandScreenProps> = ({ route, navigation }) =>
         keyExtractor={(item) => item.id.toString()}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmptyState}
+        ListFooterComponent={renderFooter}
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.01}
       />
     </SafeAreaView>
   );

@@ -157,4 +157,15 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
+  // Footer loader for infinite scroll
+  footerLoader: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerLoaderText: {
+    fontSize: 14,
+    color: '#6c757d',
+    marginTop: 8,
+  },
 });
