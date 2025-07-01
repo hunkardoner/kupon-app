@@ -26,6 +26,26 @@ export const CouponCard: React.FC<CouponCardProps> = ({
   const isNew = item.created_at && 
     new Date(item.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000;
 
+  const getDiscountText = () => {
+    const value = item.discount_value; // parseFloat kaldırıldı
+    switch (item.discount_type) {
+      case 'percentage':
+        return `%${value}`;
+      case 'fixed_amount':
+        return `₺${value}`;
+      case 'campaign':
+        return 'Kampanya';
+      default:
+        // Varsayılan bir durum olarak, eğer değer varsa göster
+        if (value > 0) {
+          // Eğer tip belirtilmemişse ama değer varsa, birini tahmin etmeye çalışabiliriz
+          // veya genel bir format kullanabiliriz. Şimdilik TL varsayalım.
+          return `₺${value}`;
+        }
+        return 'İndirim'; // Veya boş string
+    }
+  };
+
   // Logo URL'sini güvenli şekilde al
   const getLogoUrl = () => {
     const baseUrl = 'https://www.kuponcepte.com.tr';
@@ -119,7 +139,7 @@ export const CouponCard: React.FC<CouponCardProps> = ({
             <View style={styles.discountContainer}>
               <View style={styles.discountBadge}>
                 <Text style={styles.discountText}>
-                  {item.discount_type === 'percentage' ? `%${item.discount_value}` : `₺${item.discount_value}`}
+                  {getDiscountText()}
                 </Text>
               </View>
               <Text style={styles.discountLabel}>İndirim</Text>

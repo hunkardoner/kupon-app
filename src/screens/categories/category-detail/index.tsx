@@ -125,7 +125,7 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route, navigation }) =>
             <Text style={styles.statValue}>
               {coupons.filter(c => c.discount_type === 'percentage').length}
             </Text>
-            <Text style={styles.statLabel}>% İndirim</Text>
+            <Text style={styles.statLabel}>İndirim</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>

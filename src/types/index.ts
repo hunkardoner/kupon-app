@@ -33,7 +33,7 @@ export interface Coupon {
   code: string;
   title?: string; // Mobile app için alias
   description: string;
-  discount_type: 'percentage' | 'fixed_amount';
+  discount_type: 'percentage' | 'fixed_amount' | 'campaign'; // 'campaign' eklendi
   discount_value: number;
   discount_amount?: number; // Alias for discount_value
   valid_from: string; // API'den gelen field ismi
