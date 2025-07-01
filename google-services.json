@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "647075040650",
+    "project_id": "kupon-cepte",
+    "storage_bucket": "kupon-cepte.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:647075040650:android:5f5c6d7e8f9a0b1c2d3e4f",
+        "android_client_info": {
+          "package_name": "com.kuponce.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "647075040650-rcp18gp3bv82ijhhr12lki0g6t8lqhe1.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kuponce.app",
+            "certificate_hash": "sha1_debug_certificate_hash"
+          }
+        },
+        {
+          "client_id": "647075040650-i83qb16u0i1ptu1f0idtl4q5dqmdm0ol.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvOiuR0QpCHMOh9WzJvDaEwcG2nXxFpMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "647075040650-i83qb16u0i1ptu1f0idtl4q5dqmdm0ol.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "647075040650-6lrv93le5hvr78qdi6c7e73k2mbbpb1r.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kuponce.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

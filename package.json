@@ -1,0 +1,66 @@
+{
+  "name": "kupon-app",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "format": "prettier --write \"src/**/*.tsx\" \"*.{js,json,md}\"",
+    "convert-assets": "chmod +x scripts/convert-assets.sh && scripts/convert-assets.sh",
+    "doctor": "npx expo doctor",
+    "prebuild": "npm run convert-assets && npx expo prebuild",
+    "prebuild:clean": "npm run convert-assets && npx expo prebuild --clean"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~5.0.4",
+    "@expo/vector-icons": "^14.1.0",
+    "@react-native-async-storage/async-storage": "2.1.2",
+    "@react-native-google-signin/google-signin": "^15.0.0",
+    "@react-navigation/bottom-tabs": "^7.3.13",
+    "@react-navigation/native": "^7.1.9",
+    "@react-navigation/stack": "^7.3.2",
+    "@tanstack/react-query": "^5.76.2",
+    "@tanstack/react-query-devtools": "^5.77.0",
+    "axios": "^1.9.0",
+    "expo": "53.0.12",
+    "expo-apple-authentication": "~7.2.4",
+    "expo-auth-session": "^6.2.0",
+    "expo-build-properties": "~0.14.6",
+    "expo-clipboard": "~7.1.4",
+    "expo-crypto": "^14.1.5",
+    "expo-device": "^7.1.4",
+    "expo-notifications": "^0.31.3",
+    "expo-secure-store": "^14.2.3",
+    "expo-status-bar": "~2.2.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.4",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.4",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "~4.11.1",
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-web": "^0.20.0",
+    "styled-components": "^6.1.18"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@react-native-community/cli": "^18.0.0",
+    "@react-native/metro-config": "^0.79.2",
+    "@types/react": "~19.0.10",
+    "@types/react-native-vector-icons": "^6.4.18",
+    "@types/styled-components-react-native": "^5.2.5",
+    "prettier": "^3.5.3",
+    "typescript": "~5.8.3"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "listUnknownPackages": false
+      }
+    }
+  },
+  "private": true
+}

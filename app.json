@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Kupon Cepte",
+    "slug": "kupon-cepte",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Assets.xcassets/AppIcon.appiconset/1024.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/Assets.xcassets/AppIcon.appiconset/1024.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kuponce.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "associatedDomains": [
+        "applinks:kupon.com"
+      ]
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android/mipmap-xxxhdpi/kuponcepte.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.kuponce.app",
+      "versionCode": 1,
+      "edgeToEdgeEnabled": true,
+      "jsEngine": "hermes",
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "favicon": "./assets/android/mipmap-mdpi/kuponcepte.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fb14a637-c37c-49e9-b802-dbe15033ea45"
+      }
+    },
+    "owner": "hunkardoner",
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": false,
+            "enableShrinkResourcesInReleaseBuilds": false
+          },
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.647075040650-6lrv93le5hvr78qdi6c7e73k2mbbpb1r"
+        }
+      ],
+      "expo-apple-authentication"
+    ]
+  }
+}
