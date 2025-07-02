@@ -14,7 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 import { usePersonalization } from '../../hooks/usePersonalization';
 import { useFavorites } from '../../context/FavoritesContext';
 import { FavoriteButton } from '../../components/common/favorite-button';
-import { dataAPI, userAPI } from '../../api';
+import { dataAPI, userAPI, API_BASE_URL } from '../../api';
 import { Coupon, Category, Slider } from '../../types';
 import { styles } from './style';
 
@@ -34,6 +34,37 @@ export function Dashboard({ navigation }: DashboardProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [popularBrands, setPopularBrands] = useState<any[]>([]);
   const [sliders, setSliders] = useState<Slider[]>([]);
+
+  // Logo URL'sini güvenli şekilde al
+  const getLogoUrl = (logoPath?: string | null) => {
+    const baseUrl = API_BASE_URL.replace('/api', '');
+    const defaultLogo = `${baseUrl}/storage/brands/default-brand-logo.png`;
+    
+    // Logo property'si yoksa default logo
+    if (!logoPath) {
+      return defaultLogo;
+    }
+    
+    const logoUrl = logoPath.trim();
+    
+    // Boş string kontrolü
+    if (!logoUrl) {
+      return defaultLogo;
+    }
+    
+    // Eğer URL zaten tam URL ise olduğu gibi kullan
+    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+      return logoUrl;
+    }
+    
+    // Eğer slash ile başlıyorsa direkt base URL ekle
+    if (logoUrl.startsWith('/')) {
+      return `${baseUrl}${logoUrl}`;
+    }
+    
+    // Eğer relative path ise storage path ekle
+    return `${baseUrl}/storage/${logoUrl}`;
+  };
 
   useEffect(() => {
     loadDashboardData();
@@ -347,13 +378,13 @@ export function Dashboard({ navigation }: DashboardProps) {
                 <View style={styles.couponImageContainer}>
                   <Image 
                     source={{ 
-                      uri: (('brand' in coupon && coupon.brand && typeof coupon.brand === 'object') 
+                      uri: getLogoUrl(('brand' in coupon && coupon.brand && typeof coupon.brand === 'object') 
                         ? coupon.brand.logo 
-                        : null) || 'https://via.placeholder.com/150x120?text=Logo' 
+                        : null)
                     }} 
                     style={styles.couponImage}
                     onError={() => console.log('Image load error for coupon:', coupon.id)}
-                    defaultSource={{ uri: 'https://via.placeholder.com/150x120?text=Logo' }}
+                    defaultSource={{ uri: getLogoUrl(null) }}
                   />
                   <FavoriteButton
                     couponId={coupon.id}
@@ -475,10 +506,10 @@ export function Dashboard({ navigation }: DashboardProps) {
                 <View style={styles.brandLogoContainer}>
                   <Image 
                     source={{ 
-                      uri: brand.logo || 'https://via.placeholder.com/80x80?text=Logo' 
+                      uri: getLogoUrl(brand.logo)
                     }} 
                     style={styles.brandLogo}
-                    defaultSource={{ uri: 'https://via.placeholder.com/80x80?text=Logo' }}
+                    defaultSource={{ uri: getLogoUrl(null) }}
                   />
                 </View>
                 <Text style={styles.brandName} numberOfLines={1}>
